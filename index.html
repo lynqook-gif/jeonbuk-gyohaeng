@@ -116,8 +116,14 @@
   .panel{display:none}
   .panel.open{display:block}
   .menu-card.on{padding-bottom:32px}
-  .menu-card.on::after{content:"＋";position:absolute;bottom:12px;right:14px;font-size:16px;font-weight:800;color:var(--accent)}
-  .menu-card.on.open::after{content:"－"}
+  .menu-card.on::after{content:"›";position:absolute;bottom:8px;right:14px;font-size:22px;font-weight:800;color:var(--accent);line-height:1}
+  /* 페이지 이동 방식 */
+  .pagebar{position:sticky;top:0;z-index:15;background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;display:none;align-items:center;gap:12px;padding:13px 16px;box-shadow:0 2px 12px rgba(15,42,74,.18)}
+  .pagebar .back{background:rgba(255,255,255,.16);border:0;color:#fff;font-size:14.5px;font-weight:800;border-radius:10px;padding:8px 13px;cursor:pointer;flex:none}
+  .pagebar .back:active{background:rgba(255,255,255,.3)}
+  .pagebar .ptitle{font-size:16px;font-weight:800;letter-spacing:-.3px}
+  body.in-page header.hero,body.in-page #menu{display:none}
+  body.in-page .panel{padding-top:14px}
   .tmodal{position:fixed;inset:0;background:#fff;z-index:100;display:none;flex-direction:column}
   .tmodal.open{display:flex}
   .tmodal-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--navy);color:#fff;font-weight:800;font-size:14px}
@@ -126,6 +132,8 @@
 </style>
 </head>
 <body>
+
+<div class="pagebar" id="pagebar"><button class="back" onclick="goHome()">← 홈</button><span class="ptitle" id="ptitle"></span></div>
 
 <header class="hero" id="top">
   <div class="wrap hero-in">
@@ -143,10 +151,10 @@
     <div class="sec-title">분야별로 빠르게 찾기</div>
     <p class="sec-sub">하려는 일의 종류를 먼저 고르세요.</p>
     <div class="menu">
-      <div class="menu-card on" onclick="togglePanel(this,'sec-calc')"><span class="badge ready">이용 가능</span><span class="ic">🧮</span><span class="t">계산</span><span class="d">여비·초과근무·일할·날짜를 바로 계산합니다.</span></div>
-      <div class="menu-card on" onclick="togglePanel(this,'sec-forms')"><span class="badge ready">이용 가능</span><span class="ic">🧾</span><span class="t">서식 생성</span><span class="d">대장·인수인계·평가·자동서식 등 서식을 만듭니다.</span></div>
-      <div class="menu-card on" onclick="togglePanel(this,'guide')"><span class="badge ready">이용 가능</span><span class="ic">📒</span><span class="t">실무 지침</span><span class="d">회계업무시스템 입문서·행정업무 길라잡이를 봅니다.</span></div>
-      <div class="menu-card soon" onclick="soon()"><span class="badge soon">준비 중</span><span class="ic">🔗</span><span class="t">자주 쓰는 사이트</span><span class="d">업무포털·나이스·법령 등 링크를 모읍니다.</span></div>
+      <div class="menu-card on" onclick="showPage('sec-calc','계산')"><span class="badge ready">이용 가능</span><span class="ic">🧮</span><span class="t">계산</span><span class="d">여비·초과근무·일할·날짜를 바로 계산합니다.</span></div>
+      <div class="menu-card on" onclick="showPage('sec-forms','서식 생성')"><span class="badge ready">이용 가능</span><span class="ic">🧾</span><span class="t">서식 생성</span><span class="d">대장·인수인계·평가·자동서식 등 서식을 만듭니다.</span></div>
+      <div class="menu-card on" onclick="showPage('guide','실무 지침')"><span class="badge ready">이용 가능</span><span class="ic">📒</span><span class="t">실무 지침</span><span class="d">회계업무시스템 입문서·행정업무 길라잡이를 봅니다.</span></div>
+      <div class="menu-card on" onclick="showPage('sec-links','자주 쓰는 사이트')"><span class="badge ready">이용 가능</span><span class="ic">🔗</span><span class="t">자주 쓰는 사이트</span><span class="d">GAI 허브·제작도구·교행노트 등 자주 찾는 사이트 모음.</span></div>
     </div>
   </div>
 </section>
@@ -332,6 +340,24 @@
   </div>
 </section>
 
+<section id="sec-links" class="panel">
+  <div class="wrap">
+    <div class="grp-label"><span class="gi">🔗</span>자주 쓰는 사이트</div>
+    <p class="grp-desc">업무에 자주 쓰는 외부 사이트 모음이에요. 카드를 누르면 새 탭에서 열립니다.</p>
+    <div class="cat-block" data-cat="사이트 링크 도구">
+      <div class="cards">
+        <a class="link-card" href="https://gaihub.net/" target="_blank" rel="noopener" data-key="GAI 허브 gai hub 도구 지식 공유"><span class="go">↗</span><span class="lt">GAI</span><span class="ld">교육행정 업무도구·AI 지식 공유 허브</span></a>
+        <a class="link-card" href="https://www.jbe.go.kr/board/list.jbe?boardId=BBS_0000683&amp;menuCd=DOM_000000106011002002&amp;contentsSid=3257&amp;cpath=" target="_blank" rel="noopener" data-key="전북교육청 교직원 제작 도구 데이터 허브 도구실"><span class="go">↗</span><span class="lt">교직원 제작 도구</span><span class="ld">전북교육청 교육데이터 허브·도구실</span></a>
+        <a class="link-card" href="https://contract.sen.go.kr/" target="_blank" rel="noopener" data-key="서울특별시교육청 계약길잡이 계약 실무"><span class="go">↗</span><span class="lt">계약길잡이</span><span class="ld">서울시교육청 계약 실무 길잡이</span></a>
+        <a class="link-card" href="https://scan0.net/" target="_blank" rel="noopener" data-key="소확엑셀 scan0 엑셀 업무자동화 도구"><span class="go">↗</span><span class="lt">소확엑셀</span><span class="ld">교육행정 엑셀 업무자동화 도구 모음</span></a>
+        <a class="link-card" href="https://edusprouthaey.co.kr/" target="_blank" rel="noopener" data-key="업무천재 고주무관 업천고 업무효율화"><span class="go">↗</span><span class="lt">업무천재 고주무관</span><span class="ld">교육행정 업무 효율화 웹페이지</span></a>
+        <a class="link-card" href="https://gyohaeng.pages.dev/" target="_blank" rel="noopener" data-key="교행노트 강원 기록"><span class="go">↗</span><span class="lt">교행노트(강원)</span><span class="ld">교행 업무를 하며 공부한 것들을 기록하는 곳</span></a>
+      </div>
+    </div>
+    <div class="note" style="margin-top:14px">외부 사이트로 이동하는 링크예요. 각 사이트의 운영·내용은 해당 기관·제작자에게 있습니다. 추가·수정할 링크가 있으면 알려주세요.</div>
+  </div>
+</section>
+
 <footer id="foot">
   <div class="wrap">
     <div class="cr">제작자: 정주고등학교 박지은</div>
@@ -340,11 +366,11 @@
 </footer>
 
 <nav class="botnav">
-  <a href="#top"><span class="bi">🏠</span>홈</a>
-  <a href="javascript:void(0)" onclick="navOpen('sec-calc')"><span class="bi">🧮</span>계산</a>
-  <a href="javascript:void(0)" onclick="navOpen('sec-forms')"><span class="bi">🧾</span>서식생성</a>
-  <a href="javascript:void(0)" onclick="navOpen('guide')"><span class="bi">📒</span>실무지침</a>
-  <a href="#foot"><span class="bi">💬</span>문의</a>
+  <a href="javascript:void(0)" onclick="goHome()"><span class="bi">🏠</span>홈</a>
+  <a href="javascript:void(0)" onclick="showPage('sec-calc','계산')"><span class="bi">🧮</span>계산</a>
+  <a href="javascript:void(0)" onclick="showPage('sec-forms','서식 생성')"><span class="bi">🧾</span>서식</a>
+  <a href="javascript:void(0)" onclick="showPage('sec-links','자주 쓰는 사이트')"><span class="bi">🔗</span>사이트</a>
+  <a href="javascript:void(0)" onclick="showPage('guide','실무 지침')"><span class="bi">📒</span>지침</a>
 </nav>
 
 <script>
@@ -352,6 +378,25 @@
   function toggle(head){ head.closest('.tool').classList.toggle('open'); }
   function goto(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }
   function soon(){ alert('준비 중인 메뉴입니다. 자료가 정리되면 열립니다.'); }
+
+  /* 페이지 이동 방식 */
+  function showPage(panelId, title){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
+    const panel = document.getElementById(panelId);
+    if(panel) panel.classList.add('open');
+    document.body.classList.add('in-page');
+    document.getElementById('pagebar').style.display = 'flex';
+    document.getElementById('ptitle').textContent = title || '';
+    document.querySelectorAll('.botnav a').forEach(a=>a.classList.remove('active'));
+    window.scrollTo(0, 0);
+  }
+  function goHome(){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
+    document.body.classList.remove('in-page');
+    document.getElementById('pagebar').style.display = 'none';
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('popstate', goHome);
 
   function togglePanel(card, panelId){
     const panel = document.getElementById(panelId);
