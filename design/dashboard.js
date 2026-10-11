@@ -28,4 +28,10 @@ if(c.site==='law'){
 
 const bottom=rail.querySelector('.desk-bottom');bottom.innerHTML='<a class="desk-support" href="https://open.kakao.com/o/s1GnTRJi" target="_blank" rel="noopener"><img src="design/assistant-face.png" alt="" width="42" height="42"><span><b>도움이 필요하신가요?</b><small>문의·건의하기 ↗</small></span></a>';
 document.querySelectorAll('a[href*="open.kakao.com"]').forEach(a=>{if(a.closest('.desk-rail')||a.classList.contains('fab'))return;a.classList.add('desk-contact-link');const img=document.createElement('img');img.src='design/assistant-face.png';img.alt='';img.width=30;img.height=30;a.prepend(img)});
+
+// One persistent support entry; keep author attribution without repeated calls to action.
+document.querySelectorAll('.credit').forEach(credit=>{const text=credit.textContent.split(/문의|카카오/)[0].replace(/[·/\s]+$/,'').trim();credit.textContent=text;});
+document.querySelectorAll('a[href*="open.kakao.com"]').forEach(a=>{if(a.closest('.desk-support'))return;const card=a.closest('.chatcta,.askbox,.ls-cta');if(card){card.remove();return;}a.remove();});
+document.querySelectorAll('.desk-contact-link img').forEach(img=>img.remove());
+document.querySelectorAll('.chatcta,.askbox,.ls-cta').forEach(el=>el.remove());document.querySelectorAll('.bottom').forEach(el=>{if(!el.children.length)el.remove()});
 })();

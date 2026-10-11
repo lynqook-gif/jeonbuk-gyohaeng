@@ -62,3 +62,5 @@ body.desk-layout{font-size:15px;line-height:1.65;color:#20324b}.desk-menu button
 /* Compact home: remove the legacy illustration's reserved height. */
 .desk-layout .hero2-in{min-height:0!important;height:auto!important}.desk-layout .hero2 .hero2-in{margin:0 28px 16px}.desk-layout .hero2{padding:0!important}.desk-layout #menu{padding:8px 0 20px}.desk-layout:not(.in-page)>.topbar{display:none}.desk-layout>.desk-hero{min-height:0!important;padding:22px 4px!important}.desk-layout>.desk-hero h1{font-size:28px;margin:10px 0}.desk-layout .qhead{margin-top:26px}
 @media(max-width:760px){.desk-layout .hero2 .hero2-in{margin:0 14px 14px}.desk-layout>.desk-hero h1{font-size:24px}}
+
+@media(max-width:1100px){.desk-bottom{display:block;position:absolute;right:16px;top:14px;border:0;padding:0;margin:0}.desk-support{padding:0}.desk-support img{width:30px;height:30px}.desk-support b{display:none}.desk-support small{font-size:12px;margin:0}.desk-rail{padding-right:16px}}
