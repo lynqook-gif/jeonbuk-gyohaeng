@@ -54,3 +54,4 @@ body.desk-layout:before{content:"";position:fixed;z-index:-1;inset:0 0 0 212px;p
 @media print{body.desk-layout:before{display:none}}
 
 .desk-menu button.selected:hover,.desk-menu button.selected{background:var(--desk-accent);color:#fff}
+.desk-layout .hero2 .h-img{display:none}.desk-layout .hero2 .h-txt{width:100%;min-width:0;padding:0}.desk-layout .hsearch{width:100%;max-width:100%;margin:0;border-radius:10px;box-shadow:none;padding:6px 8px 6px 16px}.desk-layout .hsearch button{border-radius:7px;height:42px;width:56px}.desk-layout .qitem{min-width:0;padding:0 14px;font-size:13px;gap:10px}
