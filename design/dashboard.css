@@ -64,3 +64,7 @@ body.desk-layout{font-size:15px;line-height:1.65;color:#20324b}.desk-menu button
 @media(max-width:760px){.desk-layout .hero2 .hero2-in{margin:0 14px 14px}.desk-layout>.desk-hero h1{font-size:24px}}
 
 @media(max-width:1100px){.desk-bottom{display:block;position:absolute;right:16px;top:14px;border:0;padding:0;margin:0}.desk-support{padding:0}.desk-support img{width:30px;height:30px}.desk-support b{display:none}.desk-support small{font-size:12px;margin:0}.desk-rail{padding-right:16px}}
+
+/* One forms category control; the global rail handles primary navigation. */
+.desk-layout #sec-forms .lside{display:none}.desk-layout #sec-forms .lay3{grid-template-columns:minmax(0,1fr) 230px}.desk-layout #sec-forms .fbanner{display:none}.desk-layout #pagebar{margin-bottom:22px;gap:16px;align-items:center}.desk-layout #pagebar .ptitle{font-size:27px;font-weight:800;color:var(--desk-dark)}.desk-layout #pagebar .back{font-size:13px;background:white;border:1px solid var(--desk-border);border-radius:7px;padding:8px 12px}.desk-layout #sec-forms .lmain{min-width:0}.desk-layout #sec-forms .fcats{margin-top:16px}
+@media(max-width:1100px){.desk-layout #sec-forms .lay3{grid-template-columns:minmax(0,1fr)}}
