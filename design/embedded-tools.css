@@ -1,0 +1,40 @@
+/* Screen design shared by the 12 embedded HTML tools.
+   Embedded inline for offline use. Original print styles remain authoritative. */
+@media screen {
+ :root{--navy:#1e3a5f;--navy2:#294f7d;--accent:#2775ce;--accent-soft:#edf4ff;--primary:#2775ce;--ink:#243b58;--muted:#60758c;--line:#dbe5ef}
+ body{font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif!important;background:#f4f7fb;color:#243b58;line-height:1.65;letter-spacing:-.02em}
+ button,input,select,textarea{font-family:inherit!important}
+ h1,h2,h3,h4{font-family:inherit!important;line-height:1.5;letter-spacing:-.025em}
+ h1{font-size:clamp(21px,3vw,28px)}
+ h2{font-size:21px}h3{font-size:18px}
+ p,.hint,.sub,.note,.guide{line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}
+ .hint,.sub,.note{font-size:13px}
+ body>header,header.site-header,.site-header,.header{background:#1e3a5f;color:#fff;box-shadow:none;border-bottom:0}
+ .site-header h1,.site-header h2,.header h1,.header h2,body>header h1{color:inherit}
+ .sidebar{background:#1e3a5f;color:#fff;box-shadow:none}
+ .sidebar .nav button.active,.sidebar .nav button.on{background:#2775ce;color:#fff}
+ .card,.input-card,.setting-card,.panel.left,.panel.right,.sec.guide{border:1px solid #dbe5ef;border-radius:12px;box-shadow:none;background:#fff}
+ .card,.input-card,.setting-card{padding:20px}
+ .section-title{color:#1e3a5f;font-weight:700;line-height:1.6}
+ .toolbar,.controls,.header-actions{gap:10px;flex-wrap:wrap}
+ .toolbar{background:#fff;border-color:#dbe5ef;border-radius:10px}
+ button,.btn,.header-btn,.calc-btn{border-radius:8px!important;min-height:40px;font-size:14px;font-weight:600;line-height:1.5;box-shadow:none!important}
+ .btn-primary,.btn-blue,.btn-navy,.btn-main,button.primary,.calc-btn{background:#1e3a5f!important;border-color:#1e3a5f!important;color:#fff!important}
+ .btn-line,.btn-sub,.btn.ghost,button.ghost{background:#fff;border:1px solid #cbd9e9;color:#1e3a5f}
+ .tab-bar,.tabs,.subnav{gap:8px;border-color:#dbe5ef}
+ .tab-btn,.tabs>.tab,.subnav>button{border-radius:8px;min-height:44px;font-size:14px;font-weight:600;line-height:1.6;word-break:keep-all}
+ .tab-btn.active,.tabs>.tab.active,.tabs>.tab.on,.subnav>button.active,.subnav>button.on{background:#1e3a5f!important;border-color:#1e3a5f!important;color:#fff!important}
+ .field input,.field select,.field textarea,.fld input,.fld select,.config-item input,.config-item select,.setting-card input,.setting-card select,.left input,.left select,.left textarea{border:1px solid #ccd9e8;border-radius:7px;min-height:42px;padding:9px 11px;font-size:15px;background:#fff;color:#243b58}
+ .field label,.fld label,.config-item label{font-size:14px;line-height:1.6;color:#465e79}
+ .drop{border-color:#a9c5e5;border-radius:10px;background:#f7faff;color:#1e3a5f}
+ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2775ce66;outline-offset:2px}
+ .credit,.maker,.sidebar .foot{line-height:1.8;font-size:12px}
+}
+@media screen and (max-width:600px){
+ .card,.input-card,.setting-card{padding:16px}
+ .toolbar,.controls,.header-actions{gap:8px}
+ .toolbar button,.controls button,.header-actions button{font-size:13px;padding:9px 12px}
+ .field input,.field select,.field textarea,.fld input,.fld select,.config-item input,.config-item select,.setting-card input,.setting-card select,.left input,.left select,.left textarea{font-size:16px}
+ .tab-bar,.tabs,.subnav{flex-wrap:wrap}
+ .tab-btn,.tabs>.tab,.subnav>button{font-size:13px;padding:10px 12px}
+}
