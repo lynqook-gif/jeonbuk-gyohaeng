@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학교운영위원회 자동서식 프로그램</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{
+  --navy:#14273f; --navy2:#1e3a5f; --navy3:#2c4f7c; --gold:#c9a227;
+  --line:#d7dde6; --bg:#eef1f5; --paper:#ffffff; --ink:#1a1a1a; --muted:#6b7684;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'Malgun Gothic','Noto Sans KR',sans-serif; background:var(--bg); color:var(--ink);}
+.app{display:flex; min-height:100vh;}
+.sidebar{width:230px; background:var(--navy); color:#fff; flex-shrink:0; display:flex; flex-direction:column;}
+.sidebar .brand{padding:20px 18px 14px; border-bottom:1px solid rgba(255,255,255,.15);}
+.sidebar .brand h1{font-size:16px; font-weight:700; line-height:1.4;}
+.sidebar .brand p{font-size:11px; color:#aebbd0; margin-top:4px;}
+.nav{flex:1; overflow-y:auto; padding:10px 0;}
+.nav button{display:block; width:100%; text-align:left; background:none; border:none; color:#c6d2e2;
+  padding:9px 18px; font-size:13px; cursor:pointer; font-family:inherit; border-left:3px solid transparent;}
+.nav button:hover{background:rgba(255,255,255,.07); color:#fff;}
+.nav button.active{background:rgba(255,255,255,.12); color:#fff; border-left-color:var(--gold); font-weight:700;}
+.nav .sec{padding:12px 18px 5px; font-size:10.5px; letter-spacing:.12em; color:#7e90a9; font-weight:700;}
+.sidebar .foot{padding:12px 18px; font-size:10.5px; color:#7e90a9; border-top:1px solid rgba(255,255,255,.15);}
+.main{flex:1; display:flex; flex-direction:column; min-width:0;}
+.toolbar{background:#fff; border-bottom:2px solid var(--navy); padding:10px 22px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.toolbar .title{font-size:15px; font-weight:700; color:var(--navy); margin-right:auto;}
+.btn{border:1px solid var(--navy2); background:#fff; color:var(--navy2); padding:7px 14px; border-radius:4px;
+  font-size:12.5px; cursor:pointer; font-family:inherit; font-weight:600;}
+.btn:hover{background:var(--navy2); color:#fff;}
+.btn.primary{background:var(--navy2); color:#fff;}
+.btn.primary:hover{background:var(--navy);}
+.btn.sm{padding:3px 9px; font-size:11.5px;}
+.content{flex:1; overflow-y:auto; padding:24px;}
+
+.card{background:#fff; border:1px solid var(--line); border-radius:6px; margin-bottom:18px; overflow:hidden;}
+.card h2{background:var(--navy2); color:#fff; font-size:13.5px; padding:9px 16px; font-weight:700;}
+.card h2 .hint{font-weight:400; font-size:11px; color:#c6d2e2; margin-left:8px;}
+.card .body{padding:16px;}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px;}
+.fld label{display:block; font-size:11.5px; color:var(--muted); font-weight:700; margin-bottom:4px;}
+.fld input,.fld select,.fld textarea{width:100%; border:1px solid var(--line); border-radius:4px; padding:7px 9px; font-size:13px; font-family:inherit;}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none; border-color:var(--navy3);}
+.fld .auto{background:#f4f7fb; color:var(--navy2); font-weight:600;}
+table.edit{width:100%; border-collapse:collapse; font-size:12.5px;}
+table.edit th{background:#f2f5f9; border:1px solid var(--line); padding:6px; color:var(--navy); font-size:11.5px;}
+table.edit td{border:1px solid var(--line); padding:3px;}
+table.edit td input, table.edit td select, table.edit td textarea{width:100%; border:none; padding:5px 6px; font-size:12.5px; font-family:inherit; background:transparent; resize:vertical;}
+table.edit td input:focus, table.edit td select:focus, table.edit td textarea:focus{outline:2px solid var(--navy3); outline-offset:-2px; background:#fff;}
+table.edit .num{width:34px; text-align:center; color:var(--muted);}
+table.edit .del{width:36px; text-align:center;}
+table.edit .chk{width:44px; text-align:center;}
+.xbtn{border:none; background:none; color:#b23b3b; cursor:pointer; font-size:14px; padding:2px 6px;}
+.xbtn:hover{background:#fbeaea; border-radius:3px;}
+.addrow{margin-top:8px;}
+.note{font-size:11.5px; color:var(--muted); margin-top:8px; line-height:1.5;}
+.agenda-detail{background:#f8fafc; border:1px solid var(--line); border-radius:5px; padding:12px; margin-bottom:10px;}
+.agenda-detail .hd{font-weight:700; font-size:13px; color:var(--navy); margin-bottom:8px; display:flex; align-items:center; gap:8px;}
+.agenda-detail .dgrid{display:grid; grid-template-columns:1fr 90px 90px 140px; gap:8px; margin-top:8px;}
+@media(max-width:800px){.agenda-detail .dgrid{grid-template-columns:1fr 1fr;}}
+
+.paper-wrap{display:flex; justify-content:center;}
+.paper{width:210mm; min-height:297mm; background:var(--paper); box-shadow:0 2px 14px rgba(20,39,63,.18);
+  padding:20mm 20mm; font-family:'Batang','Noto Serif KR',serif; font-size:12pt; line-height:1.7; color:#111;}
+.paper .org{font-size:20pt; font-weight:700; letter-spacing:.12em; text-align:center; margin-bottom:6mm;}
+.paper .doc-title{font-size:16pt; font-weight:700; text-align:center; margin:8mm 0 6mm; letter-spacing:.04em;}
+.paper .row{display:flex; margin:1mm 0;}
+.paper .row .lab{width:20mm; font-weight:700; flex-shrink:0;}
+.paper table.doc{width:100%; border-collapse:collapse; margin:4mm 0; font-size:11pt;}
+.paper table.doc th{border:1.5px solid #000; background:#f0f0f0; padding:2mm; font-weight:700;}
+.paper table.doc td{border:1px solid #000; padding:2mm; text-align:center;}
+.paper table.doc td.l{text-align:left;}
+.paper .sign{text-align:center; font-size:16pt; font-weight:700; letter-spacing:.25em; margin:12mm 0 8mm;}
+.paper .footer{border-top:1.5px solid #000; margin-top:10mm; padding-top:2mm; font-size:9.5pt; line-height:1.7; font-family:'Malgun Gothic',sans-serif;}
+.paper .indent{padding-left:8mm;}
+.paper .indent2{padding-left:14mm;}
+.blank{color:#bbb;}
+.minutes h3{font-size:12pt; margin:4mm 0 1mm; font-weight:700;}
+.minutes p{margin:.5mm 0;}
+.mrec-body{line-height:1.4;}
+.mrec-body p{margin:.3mm 0; line-height:1.4;}
+.sc-doc{font-size:13pt; line-height:1.9;}
+.sc-doc .sc-tbl{font-size:12.5pt;}
+.sc-doc .sc-tbl th{background:#eef1f5; white-space:nowrap;}
+.sc-doc .sc-tbl td{text-align:left; line-height:1.85; padding:2.5mm;}
+.sc-doc .indent{padding-left:8mm; margin:.5mm 0;}
+.rec-doc{font-size:12.5pt; line-height:1.8;}
+.rec-doc .org{font-size:20pt; font-weight:700; letter-spacing:.12em; text-align:center; margin-bottom:8mm;}
+.rec-doc .rec-tbl{margin:4mm 0; table-layout:fixed;}
+.rec-doc .rec-tbl th{background:#f0f0f0;}
+.rec-doc .rec-tbl td{padding:2mm; word-break:break-all;}
+.no-print{}
+@media print{ .no-print{display:none !important;} }
+
+@media print{
+  body{background:#fff;}
+  .sidebar,.toolbar{display:none !important;}
+  .content{padding:0; overflow:visible;}
+  .paper{box-shadow:none; width:auto; min-height:auto; padding:0;}
+  .paper-wrap{display:block;}
+  .no-print{display:none !important;}
+  /* 페이지 분할: 행·문단 중간에서 잘리지 않게 */
+  table.doc tr{ break-inside:avoid; page-break-inside:avoid; }
+  table.doc tr.flow-row{ break-inside:auto; page-break-inside:auto; }
+  .minutes p, .sc-doc p{ break-inside:avoid; page-break-inside:avoid; }
+  .sc-tbl{ break-inside:auto; }
+  thead{ display:table-header-group; }
+  @page{size:A4; margin:15mm;}
+}
+@media(max-width:900px){
+  .app{flex-direction:column;}
+  .sidebar{width:100%;}
+  .paper{width:100%; padding:10mm;}
+}
+</style>
+<style>
+/* Screen design shared by the 12 embedded HTML tools.
+   Embedded inline for offline use. Original print styles remain authoritative. */
+@media screen {
+ :root{--navy:#1e3a5f;--navy2:#294f7d;--accent:#2775ce;--accent-soft:#edf4ff;--primary:#2775ce;--ink:#243b58;--muted:#60758c;--line:#dbe5ef}
+ body{font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif!important;background:#f4f7fb;color:#243b58;line-height:1.65;letter-spacing:-.02em}
+ button,input,select,textarea{font-family:inherit!important}
+ h1,h2,h3,h4{font-family:inherit!important;line-height:1.5;letter-spacing:-.025em}
+ h1{font-size:clamp(21px,3vw,28px)}
+ h2{font-size:21px}h3{font-size:18px}
+ p,.hint,.sub,.note,.guide{line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}
+ .hint,.sub,.note{font-size:13px}
+ body>header,header.site-header,.site-header,.header{background:#1e3a5f;color:#fff;box-shadow:none;border-bottom:0}
+ .site-header h1,.site-header h2,.header h1,.header h2,body>header h1{color:inherit}
+ .sidebar{background:#1e3a5f;color:#fff;box-shadow:none}
+ .sidebar .nav button.active,.sidebar .nav button.on{background:#2775ce;color:#fff}
+ .card,.input-card,.setting-card,.panel.left,.panel.right,.sec.guide{border:1px solid #dbe5ef;border-radius:12px;box-shadow:none;background:#fff}
+ .card,.input-card,.setting-card{padding:20px}
+ .section-title{color:#1e3a5f;font-weight:700;line-height:1.6}
+ .toolbar,.controls,.header-actions{gap:10px;flex-wrap:wrap}
+ .toolbar{background:#fff;border-color:#dbe5ef;border-radius:10px}
+ button,.btn,.header-btn,.calc-btn{border-radius:8px!important;min-height:40px;font-size:14px;font-weight:600;line-height:1.5;box-shadow:none!important}
+ .btn-primary,.btn-blue,.btn-navy,.btn-main,button.primary,.calc-btn{background:#1e3a5f!important;border-color:#1e3a5f!important;color:#fff!important}
+ .btn-line,.btn-sub,.btn.ghost,button.ghost{background:#fff;border:1px solid #cbd9e9;color:#1e3a5f}
+ .tab-bar,.tabs,.subnav{gap:8px;border-color:#dbe5ef}
+ .tab-btn,.tabs>.tab,.subnav>button{border-radius:8px;min-height:44px;font-size:14px;font-weight:600;line-height:1.6;word-break:keep-all}
+ .tab-btn.active,.tabs>.tab.active,.tabs>.tab.on,.subnav>button.active,.subnav>button.on{background:#1e3a5f!important;border-color:#1e3a5f!important;color:#fff!important}
+ .field input,.field select,.field textarea,.fld input,.fld select,.config-item input,.config-item select,.setting-card input,.setting-card select,.left input,.left select,.left textarea{border:1px solid #ccd9e8;border-radius:7px;min-height:42px;padding:9px 11px;font-size:15px;background:#fff;color:#243b58}
+ .field label,.fld label,.config-item label{font-size:14px;line-height:1.6;color:#465e79}
+ .drop{border-color:#a9c5e5;border-radius:10px;background:#f7faff;color:#1e3a5f}
+ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2775ce66;outline-offset:2px}
+ .credit,.maker,.sidebar .foot{line-height:1.8;font-size:12px}
+}
+@media screen and (max-width:600px){
+ .card,.input-card,.setting-card{padding:16px}
+ .toolbar,.controls,.header-actions{gap:8px}
+ .toolbar button,.controls button,.header-actions button{font-size:13px;padding:9px 12px}
+ .field input,.field select,.field textarea,.fld input,.fld select,.config-item input,.config-item select,.setting-card input,.setting-card select,.left input,.left select,.left textarea{font-size:16px}
+ .tab-bar,.tabs,.subnav{flex-wrap:wrap}
+ .tab-btn,.tabs>.tab,.subnav>button{font-size:13px;padding:10px 12px}
+}
+
+/* 2026-10-13: approved blue workspace design; screen only. */
+@media screen {
+ :root{--bg:#f3f8ff;--surface:#fff;--border:#d3dfef;--border-light:#e3edf9;--text:#26364d;--text-sub:#60728c;--text-hint:#72839b;--accent:#0866e8;--accent-light:#eaf3ff;--rule:#d3dfef;--rule-2:#e3edf9;--ink-2:#465e79;--ink-3:#72839b}
+ body{background:linear-gradient(135deg,#f5f9ff,#edf5ff);color:#26364d}
+ body>header,header.site-header,.site-header,.header{background:#fff;color:#163b66;border-bottom:1px solid #dce8f7;box-shadow:0 3px 16px #163b6606}
+ body>header p,.header p{color:#647892}
+ .site-header{padding:20px 28px;flex-wrap:wrap;gap:18px}
+ #pageTitleDisplay{font-size:24px;white-space:normal;border-bottom-color:#b6ccea}
+ #pageTitleInput{background:#f7faff;color:#163b66;border-color:#b6ccea;max-width:100%}
+ .header-edit-hint{color:#647892;opacity:1}
+ .header-btn,.dev-tab-btn{background:#fff;color:#0963dc;border:1px solid #7dafff;padding:9px 15px}
+ .header-btn:hover{background:#edf5ff}
+ .dev-tab-btn{color:#738299;border-color:#dbe5f2}
+ .main-wrap{max-width:1180px;padding:20px 18px 60px}
+ .card,.input-card,.setting-card,.panel.left,.panel.right,.sec.guide{border-color:#dce8f7;border-radius:14px;box-shadow:0 4px 20px #1e3a5f04;background:#fff}
+ .card{margin-bottom:16px;padding:22px 24px}
+ .card-title,.section-title{font-size:19px;color:#163b66}
+ .card-title::before{width:4px;height:22px;background:#0866e8}
+ .card-header{border-bottom-color:#dce8f7;padding-bottom:12px;gap:12px}
+ .btn-primary,.btn-blue,.btn-main,button.primary,.calc-btn{background:#0866e8!important;border-color:#0866e8!important;color:#fff!important}
+ .btn-navy{background:#1e3a5f!important}
+ .btn-reset{background:#fff;color:#0963dc;border-color:#9fc2f7}
+ .btn-add{background:#eaf3ff;color:#0963dc;border-color:#b6d5ff}
+ .btn-sm{background:#fff3f4;color:#d8414b;border-color:#ffd3d8;min-height:32px}
+ .btn:disabled,button:disabled{opacity:.5;cursor:not-allowed}
+ .tab-bar,.tabs,nav.steps{background:#fff;border:1px solid #dce8f7;border-radius:12px;padding:4px;gap:4px;box-shadow:0 3px 12px #1e3a5f03}
+ .tab-btn{min-height:50px;font-size:15px}
+ .tab-num{width:34px;height:34px;font-size:13px;background:#eaf3ff;color:#0963dc}
+ .tab-btn.active .tab-num{background:#eaf3ff;color:#0963dc}
+ nav.steps .step{flex:1;border-radius:8px;border-color:transparent}
+ nav.steps .step[aria-selected=true]{background:#1e3a5f;color:#fff;box-shadow:none}
+ nav.steps .step[aria-selected=true] em{color:#cbdcf2}
+ nav.steps .step .num{border-radius:50%;width:30px;height:30px}
+ .subnav .sub[aria-selected=true]{color:#0963dc;border-bottom-color:#0963dc}
+ .field-group{border-color:#dce8f7;border-radius:12px;background:#fff}
+ .field-group-header{background:#eff6ff;border-color:#dce8f7;padding:12px 16px;gap:12px}
+ .field-group-header input[type=text]{font-size:16px;font-weight:700;color:#163b66}
+ .field-group-body{padding:16px 18px}
+ .criteria-row{gap:10px;margin-bottom:10px}
+ .crit-hint{color:#647892;margin:5px 0}
+ input[type=text],input[type=number],input[type=date],select,textarea{background:#fff;color:#26364d;border-color:#cbd9eb;border-radius:7px;font-size:14px;padding:8px 10px}
+ input[type=checkbox],input[type=radio]{accent-color:#0866e8}
+ .field-group textarea{line-height:1.65}
+ .entry-num{background:#dcecff;color:#0963dc;width:30px;height:30px;font-size:13px}
+ .tbl th,.score-matrix th,.score-matrix th.col-company{background:#eff6ff;color:#465e79}
+ .score-matrix td.td-company{background:#f8fbff}
+ .subj-grades,.obj-opts-wrap,.entry-item{background:#f5f9ff}
+ .save-bar{background:#f2f7ff;border-color:#dce8f7;justify-content:center;box-shadow:0 -4px 18px #1e3a5f04}
+ .drop,.drop-zone,#drop{border-color:#adcef6;background:#f6faff;border-radius:12px}
+ .manual,.rule-box,.howto{border-color:#dce8f7;border-radius:10px;background:#f5f9ff}
+ .howto div{background:#f5f9ff}.howto b{color:#0963dc}
+ header.doc{border-bottom:1px solid #dce8f7;color:#163b66}
+ .toolbar{border-color:#dce8f7;padding:16px;box-shadow:0 3px 16px #163b6604}
+ .credit,.maker{color:#647892;text-align:center}
+}
+@media screen and (max-width:700px){
+ .site-header{padding:16px;gap:12px}.header-actions{width:100%;gap:8px;flex-shrink:1}
+ .header-actions button{flex:1 1 auto}#pageTitleDisplay{font-size:21px}
+ .card{padding:16px}.main-wrap{padding:16px 12px 40px}
+ .card-title,.section-title{font-size:17px}.tab-btn{padding:9px 6px;font-size:13px;gap:6px}.tab-num{width:26px;height:26px}
+ .field-group-header{flex-wrap:wrap;padding:12px}.field-group-header input[type=text]{min-width:0;flex-basis:60%}
+ .field-group-body{padding:12px}.criteria-row input[type=text]{min-width:0}
+ input[type=text],input[type=number],input[type=date],select,textarea{font-size:16px}
+ nav.steps .step{flex-basis:100%}.settings-row{flex-wrap:wrap}.setting-card{min-width:0!important}
+ .subj-grades{grid-template-columns:repeat(2,1fr)}
+}
+
+@media print{.design-author-credit{display:none!important}}
+
+@media screen{.sidebar{background:#1e3a5f}.sidebar .nav button.active{border-left-color:#73b6ff}.toolbar .title{font-size:21px}.content{padding:24px;max-width:1350px;width:100%;margin:auto}.card{padding:0}.card h2{background:#fff;color:#163b66;font-size:18px;border-bottom:1px solid #dce8f7;padding:16px 20px}.card h2 .hint{color:#647892}.card .body{padding:20px}.toolbar{border-bottom:1px solid #dce8f7}.nav button{border-radius:7px;margin:3px 8px;width:calc(100% - 16px)}.paper-wrap{overflow:auto;justify-content:flex-start}}
+@media screen and (max-width:900px){.sidebar .nav{display:flex;flex-wrap:wrap;padding:8px}.sidebar .nav .sec{width:100%;padding:8px}.sidebar .nav button{width:auto;flex:1 1 145px;margin:3px;font-size:13px}.content{padding:14px}.toolbar{padding:14px}.toolbar .title{width:100%}.card .body{padding:14px}.paper{min-width:650px}.grid{grid-template-columns:1fr}.card .body{overflow:auto}}</style>
+
+<style id="council-review-design">
+@media screen{
+ :root{--gold:#0866e8}
+ body{font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif!important;background:#f5f8fc;letter-spacing:-.025em}
+ .app{min-height:calc(100vh - 58px)}
+ .sidebar{width:244px;background:#173657!important;padding:10px 12px}
+ .sidebar .brand{padding:24px 14px;border-bottom:1px solid #ffffff1c}
+ .sidebar .brand h1{font-size:19px;line-height:1.65;letter-spacing:-.04em}
+ .sidebar .nav{padding-top:18px}.sidebar .nav .sec{font-size:12px;letter-spacing:0;color:#94abc5;padding:18px 14px 8px}
+ .sidebar .nav button{margin:4px 0;width:100%;padding:11px 14px;font-size:14px;border-left:0;border-radius:8px!important}
+ .sidebar .nav button.active{background:#2c5681!important;box-shadow:inset 3px 0 #75b6ff!important}
+ .sidebar .foot{display:none}
+ .main .toolbar{padding:18px 32px;border-radius:0;box-shadow:none;gap:10px;min-height:82px}
+ .toolbar .title{font-size:23px;letter-spacing:-.04em}
+ .toolbar .btn{font-size:13px;padding:9px 14px;border-color:#ccdaeb;color:#315578}
+ .toolbar .btn.primary{color:#fff}
+ .content{padding:38px 32px;max-width:1400px;overflow:visible}
+ .council-home{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(360px,1.15fr);gap:24px 40px;max-width:1080px;margin:12px auto;align-items:start}
+ .council-home>.card{margin:0;border:0;box-shadow:none;background:transparent;border-radius:0}
+ .council-home .council-intro{grid-column:1;grid-row:1}
+ .council-intro>.body{padding:26px 0 0!important}
+ .council-intro .body>div:first-child{font-size:11px!important;letter-spacing:.14em!important;color:#3979ba!important}
+ .council-intro h1{font-size:clamp(28px,2.7vw,36px)!important;line-height:1.5!important;letter-spacing:-.055em;margin:18px 0!important;color:#173657!important;word-break:keep-all}
+ .council-intro p{font-size:16px!important;line-height:1.9!important;color:#61758e!important;word-break:keep-all}
+ .council-intro p br{display:none}
+ .council-home .council-guide{grid-column:2;grid-row:1 / 3;background:#fff;border:1px solid #e1eaf5;border-radius:16px;padding:26px 28px}
+ .council-guide h2{padding:0 0 16px!important;background:transparent;border-bottom:1px solid #e7eef6;font-size:20px!important}
+ .council-guide>.body{padding:4px 0 0!important}
+ .council-guide .body>div{padding:18px 0!important;gap:14px!important;border-color:#e7eef6!important}
+ .council-guide .body>div>div:first-child{background:#edf4fe!important;color:#1766b5!important;width:30px!important;height:30px!important;font-size:13px}
+ .council-guide .body>div>div:last-child>div:first-child{font-size:16px!important;margin-bottom:6px!important;color:#244464!important}
+ .council-guide .body>div>div:last-child>div:last-child{font-size:14px!important;color:#60718a!important;line-height:1.85!important;word-break:keep-all}
+ .council-guide .note{font-size:12px;line-height:1.85;background:#f5f8fc;padding:12px 14px;border-radius:8px;color:#6b7e95}
+ .council-home .council-start{grid-column:1;grid-row:2;align-self:start}
+ .council-start>.body{padding:0!important;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+ .council-start-note{font-size:14px;color:#6b7e95;margin:0;line-height:1.8}
+ .council-start .btn{font-size:16px;padding:14px 24px;min-height:52px;border-radius:10px!important}
+ .main .content>.card{border:1px solid #e0e9f4;box-shadow:none;margin-bottom:24px;border-radius:12px}
+ .main .content>.card h2{font-size:19px;padding:18px 22px;border-bottom:1px solid #e7eef6}
+ .main .content>.card h2 .hint{display:block;font-size:12px;font-weight:400;margin:5px 0 0}
+ .main .content>.card .body{padding:22px}
+ .fld label{font-size:14px;color:#4b6380;margin-bottom:7px}.grid{gap:20px 18px;grid-template-columns:repeat(3,minmax(0,1fr))}
+ .fld input,.fld select,.fld textarea{font-size:15px;min-height:44px;padding:10px 12px;background:#fbfdff}
+ .agenda-detail{padding:18px;background:#f8fbff;border-color:#e1eaf5;border-radius:10px}
+ .design-author-credit{padding:18px!important;font-size:12px!important;background:#f5f8fc;color:#7b8ca1!important}
+}
+@media screen and (max-width:1150px){.council-home{gap:24px;grid-template-columns:minmax(230px,.8fr) minmax(320px,1.2fr)}.sidebar{width:218px}.content{padding:26px 22px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media screen and (max-width:900px){.sidebar{width:100%;padding:0 12px}.sidebar .brand{padding:18px 10px}.sidebar .brand h1 br{display:none}.sidebar .brand h1{font-size:18px}.sidebar .nav{gap:4px;padding:8px 0}.sidebar .nav .sec{padding:8px 10px}.sidebar .nav button{flex:1 1 145px;margin:0;padding:9px 10px;font-size:13px}.main .toolbar{padding:16px}.content{padding:22px 16px}.council-home{grid-template-columns:1fr;max-width:680px;gap:24px}.council-home .council-intro{grid-row:1;grid-column:1}.council-intro>.body{padding-top:0!important}.council-intro h1{font-size:30px!important}.council-home .council-start{grid-row:2;grid-column:1}.council-home .council-guide{grid-row:3;grid-column:1;padding:22px}.council-start>.body{gap:10px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media screen and (max-width:520px){.grid{grid-template-columns:1fr}.council-intro h1{font-size:27px!important}.council-intro p{font-size:15px!important}.council-start .btn{width:100%}.council-home .council-guide{padding:20px}.main .content>.card .body{padding:16px}.main .content>.card h2{padding:16px}.fld input,.fld select,.fld textarea{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>학교운영위원회<br>자동서식 프로그램</h1>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="foot" style="text-align:center;">
+      <span style="color:#e8eef6; font-weight:700; font-size:11.5px;">제작 · 정주고등학교 박지은</span>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="toolbar">
+      <span class="title" id="pageTitle">기초자료</span>
+      <button class="btn" onclick="saveJSON()">💾 저장(JSON)</button>
+      <button class="btn" onclick="document.getElementById('loadFile').click()">📂 불러오기</button>
+      <input type="file" id="loadFile" accept=".json" style="display:none" onchange="loadJSON(event)">
+      <button class="btn" id="copyBtn" onclick="copyText(this)" style="display:none">📋 텍스트 복사</button>
+      <label id="maskBox" style="display:none; align-items:center; gap:5px; font-size:12.5px; color:var(--navy2); cursor:pointer; padding:0 4px;">
+        <input type="checkbox" id="maskChk" onchange="S.maskNames=this.checked; render()"> 이름 O 처리</label>
+      <button class="btn" id="editBtn" onclick="toggleEdit(this)" style="display:none">✏️ 직접 수정</button>
+      <button class="btn" id="pdfBtn" onclick="savePDF(this)" style="display:none">📄 PDF 저장</button>
+      <button class="btn" id="hwpxBtn" onclick="saveHWPX()" style="display:none">📝 한글(HWPX) 저장</button>
+      <button class="btn primary" id="printBtn" onclick="window.print()" style="display:none">🖨 인쇄</button>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script>
+/* ───────────── 상태 (기본값 = 배포용 중립 예시) ───────────── */
+const MEMBER_TYPES = ['위원장','부위원장','교원위원','학부모위원','지역위원','당연직(교장)'];
+const RESULTS = ['','원안 가결','수정 가결','부결','보류','조건부 가결'];
+
+let S = {
+  school:'○○학교',
+  zip:'',
+  addr:'',
+  tel:'', fax:'', email:'', web:'',
+  docPrefix:'○○학교운영위',       // 문서번호 앞이름 → 시행 ○○학교운영위 - 1
+  docNo:'1',
+  noticePrefix:'○○학교 공고', // 공고번호 앞이름 → ○○학교 공고 제2026-1호
+  noticeNo:'2026-1',
+  regNo:'○○학교-',           // 회의록 등록번호
+  open:'공개',
+  chargeName:'',             // 담당자
+  secName:'', secTitle:'행정실장', // 간사
+  ruleArt:'제20조',                // 근거 규정 조항
+  year:'2026', round:'2', mtype:'임시회',
+  mdate:'', mtime:'11:00', endTime:'12:00',
+  place:'○○학교 회의실',
+  sendDate:'',                     // 시행(발송)일 = 공고일
+  resultDate:'',                   // 결과 통보일 (회의 후)
+  resultDocNo:'',                  // 결과 문서번호 (개최통보 다음)
+  resultNoticeNo:'',               // 결과 공고번호 (다음)
+  opinEmail:'',
+  sessionDays:'1',                 // 회기(일)
+  useSession:true,                 // 회기 결정의 건 넣기(true) / 빼기(false)
+  attendStaff:'교감, 행정실장, 담당자 ○○○',
+  etcNote:'',                      // 회의록 기타 사항
+  // 시나리오 진행자 (인라인 입력)
+  scPresenter:'교무부장',          // 안건설명 진행자
+  maskNames:false,                 // 회의록 이름 O 처리
+  scRows:[
+    {min:'1', act:'개 회', who:'교무부장'},
+    {min:'4', act:'인사말씀 및 회의진행', who:'위 원 장'},
+    {min:'5', act:'안건설명', who:'교무부장'},
+    {min:'30', act:'안건심의', who:'위 원 장'},
+    {min:'', act:'폐 회', who:''},
+  ],
+  // 개방이사 추천 (인라인 입력, 개인정보라 저장 안 함)
+  recLawArt:'사립학교법 제14조 4항, 정관 제20조 4',
+  recCount:'3',
+  recList:[
+    {name:'', birth:'', role:'운영위원장', addr:''},
+    {name:'', birth:'', role:'지역위원', addr:''},
+    {name:'', birth:'', role:'학부모위원', addr:''},
+  ],
+  members:[
+    {type:'위원장', name:'', email:'', note:'', attend:true},
+    {type:'교원위원', name:'', email:'', note:'', attend:true},
+    {type:'교원위원', name:'', email:'', note:'', attend:true},
+    {type:'학부모위원', name:'', email:'', note:'', attend:true},
+    {type:'학부모위원', name:'', email:'', note:'', attend:true},
+    {type:'지역위원', name:'', email:'', note:'', attend:true},
+  ],
+  agendas:[
+    {name:'', dept:'행정실', result:'', speak:'', yes:'', no:'', etc:''},
+  ],
+};
+
+/* ───────────── 유틸 ───────────── */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const bl = (v, ph) => v ? esc(v) : `<span class="blank">${ph||'　　'}</span>`;
+const WD = ['일','월','화','수','목','금','토'];
+const WDF = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+function D(iso){ if(!iso) return null; const d = new Date(iso+'T00:00:00'); return isNaN(d)?null:d; }
+function fmtK(iso, full){ // 2026년 6월 25일(목) / (목요일)
+  const d = D(iso); if(!d) return '';
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일(${full?WDF[d.getDay()]:WD[d.getDay()]})`;
+}
+function fmtDot(iso){ const d = D(iso); if(!d) return ''; return `${d.getFullYear()}. ${String(d.getMonth()+1).padStart(2,'0')}. ${String(d.getDate()).padStart(2,'0')}.`; }
+function fmtDotShort(iso){ const d = D(iso); if(!d) return ''; return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}.`; }
+const council = () => S.school + '운영위원회';
+const roundYr = () => `${S.year}학년도 제${S.round||'○'}회`;
+const roundHoe = () => `제${S.round||'○'}회 ${council()}`;
+const chair = () => { const m = S.members.find(m=>m.type==='위원장'); return m && m.name ? m.name : ''; };
+// 이름 가운데 글자 O 처리 (2자: 뒤글자O, 3자↑: 가운데 전부O). 한글 이름만, 직위/직함은 건드리지 않음
+function maskName(name){
+  if(!name) return name;
+  const n = String(name).trim();
+  if(n.length === 2) return n[0] + '○';
+  if(n.length >= 3) return n[0] + '○'.repeat(n.length-2) + n[n.length-1];
+  return n;
+}
+const mn = name => S.maskNames ? maskName(name) : name;
+// 문장 속 이름 마스킹: "유삼석 위원장님", "담당자 박지은" 등에서 등록된 위원/담당자/간사 이름만 치환
+function maskInText(text){
+  if(!S.maskNames || !text) return text;
+  let t = text;
+  const names = [...S.members.map(m=>m.name), S.chargeName, S.secName].filter(x=>x && x.length>=2);
+  // 긴 이름부터 치환(부분매칭 방지)
+  names.sort((a,b)=>b.length-a.length).forEach(nm=>{
+    t = t.split(nm).join(maskName(nm));
+  });
+  return t;
+}
+const attendMembers = () => S.members.filter(m=>m.attend && m.name);
+const realAgendas = () => S.agendas.filter(a=>a.name);
+
+/* ───────────── 네비게이션 ───────────── */
+const DOCS = [
+  {id:'home', name:'🏠 사용방법', sec:'안내'},
+  {id:'base', name:'기초자료', sec:'입력'},
+  {id:'d1', name:'1. 안건제출', sec:'회의 전'},
+  {id:'d2', name:'2. 개최 통보'},
+  {id:'d3', name:'3. 개최 공고문'},
+  {id:'d4', name:'4. 가정통신문(개최)'},
+  {id:'d5', name:'5. 회의참석자명부'},
+  {id:'d6', name:'6. 회의록 표지', sec:'회의 후'},
+  {id:'d7', name:'7. 회의록'},
+  {id:'d8', name:'8. 심의결과통보'},
+  {id:'d9', name:'9. 결과 안내(공고)'},
+  {id:'d10', name:'10. 가정통신문(결과)'},
+  {id:'sc', name:'📢 회의 진행 시나리오', sec:'회의 진행'},
+  {id:'rec', name:'👤 개방이사 추천', sec:'기타 서식'},
+];
+let cur = 'home';
+let editMode = false;
+
+function renderNav(){
+  let html = '', lastSec = '';
+  DOCS.forEach(d=>{
+    if(d.sec && d.sec !== lastSec){ html += `<div class="sec">${d.sec}</div>`; lastSec = d.sec; }
+    html += `<button class="${cur===d.id?'active':''}" onclick="go('${d.id}')">${d.name}</button>`;
+  });
+  $('nav').innerHTML = html;
+}
+function go(id){
+  cur = id;
+  editMode = false;
+  renderNav();
+  $('pageTitle').textContent = DOCS.find(d=>d.id===id).name;
+  const isDoc = id !== 'base' && id !== 'home';
+  $('printBtn').style.display = isDoc ? '' : 'none';
+  $('copyBtn').style.display = isDoc ? '' : 'none';
+  $('pdfBtn').style.display = isDoc ? '' : 'none';
+  $('hwpxBtn').style.display = isDoc ? '' : 'none';
+  const mb = $('maskBox');
+  if(mb){ mb.style.display = (cur==='d7') ? 'inline-flex' : 'none'; const c=$('maskChk'); if(c) c.checked = S.maskNames; }
+  const eb = $('editBtn');
+  eb.style.display = isDoc ? '' : 'none';
+  eb.textContent = '✏️ 직접 수정';
+  eb.classList.remove('primary');
+  render();
+}
+
+/* ───────────── 복사 · 직접수정 ───────────── */
+function copyText(btn){
+  const paper = document.querySelector('.paper');
+  if(!paper) return;
+  const text = paper.innerText.replace(/\n{3,}/g,'\n\n').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    const t = btn.textContent;
+    btn.textContent = '✅ 복사됨';
+    setTimeout(()=>btn.textContent = t, 1500);
+  }).catch(()=>{
+    // 클립보드 미지원 시 폴백
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+    btn.textContent = '✅ 복사됨';
+    setTimeout(()=>btn.textContent = '📋 텍스트 복사', 1500);
+  });
+}
+function savePDF(){
+  // 브라우저 인쇄 파이프라인 사용 → 긴 문서도 페이지 자동 분할(잘림 없음)
+  const docName = DOCS.find(d=>d.id===cur).name.replace(/^[0-9]+\\.\\s*/,'').replace(/[🏠📢👤\\s]/g,'');
+  const prevTitle = document.title;
+  document.title = `${S.year}학년도_제${S.round}회_${docName}_${S.school}`;
+  const msg = 'PDF로 저장하는 방법\\n\\n' +
+    '곧 인쇄 창이 열립니다. 종이로 인쇄하는 게 아니라 아래처럼 하면 PDF 파일로 저장됩니다.\\n\\n' +
+    '1. 인쇄 창의 "프린터" 또는 "대상" 칸을 클릭\\n' +
+    '2. 목록에서 "PDF로 저장"(Save as PDF) 선택\\n' +
+    '3. "저장" 버튼 클릭 → 파일명 정하고 저장\\n\\n' +
+    '확인을 누르면 인쇄 창이 열립니다.';
+  if(!confirm(msg)){ document.title = prevTitle; return; }
+  window.print();
+  setTimeout(()=>{ document.title = prevTitle; }, 500);
+}
+function toggleEdit(btn){
+  const paper = document.querySelector('.paper');
+  if(!paper) return;
+  editMode = !editMode;
+  paper.contentEditable = editMode;
+  if(editMode){
+    btn.textContent = '✔ 수정 완료';
+    btn.classList.add('primary');
+    paper.style.outline = '2px dashed var(--gold)';
+    paper.focus();
+  }else{
+    btn.textContent = '✏️ 직접 수정';
+    btn.classList.remove('primary');
+    paper.style.outline = 'none';
+  }
+}
+
+/* ───────────── 홈(사용방법) ───────────── */
+function renderHome(){
+  const step = (n,t,d)=>`<div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--line);">
+    <div style="width:32px; height:32px; border-radius:50%; background:var(--navy2); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${n}</div>
+    <div><div style="font-weight:700; color:var(--navy); font-size:14px; margin-bottom:3px;">${t}</div>
+    <div style="font-size:12.5px; color:#3d4653; line-height:1.7;">${d}</div></div></div>`;
+  $('content').innerHTML = `
+  <div class="council-home">
+    <div class="card council-intro">
+      <div class="body" style="padding:28px 30px;">
+        <div style="font-size:11px; letter-spacing:.2em; color:var(--gold); font-weight:800;">SCHOOL COUNCIL DOCS</div>
+        <h1 style="font-size:24px; color:var(--navy); margin:6px 0 8px;">학교운영위원회<br>자동서식 프로그램</h1>
+        <p style="font-size:13px; color:var(--muted); line-height:1.7;">기초자료 한 번 입력으로 안건제출부터 회의록·결과 안내까지<br>학교운영위원회 문서 10종이 자동 생성됩니다.</p>
+      </div>
+    </div>
+    <div class="card council-guide"><h2>사용 방법</h2><div class="body">
+      ${step(1,'기초자료 입력','왼쪽 메뉴 <b>[기초자료]</b> 맨 위 <b>📗 기초자료 일괄 업로드</b>에서 <b>⬇ 통합 양식</b>(시트 3개: 기본정보·안건·위원명단)을 받아 채운 뒤 올리면 학교정보·회의정보·안건·위원명단이 한 번에 입력됩니다. 직접 타이핑하거나 안건·명단만 따로 업로드해도 됩니다.')}
+      ${step(2,'회의 전 문서 출력','안건제출 → 개최 통보 → 개최 공고문 → 가정통신문 → 참석자명부 순으로 자동 생성됩니다. 각 문서에서 <b>🖨 인쇄</b> 버튼으로 A4 출력하세요.')}
+      ${step(3,'회의 후 결과 입력','기초자료의 안건 목록에서 <b>발언내용·찬성/반대 표수·결정사항</b>을 입력하고, 운영위원 명단에서 <b>출석 체크</b>를 하면 회의록이 완성됩니다.')}
+      ${step(4,'인쇄 · PDF 저장','문서 화면에서 <b>🖨 인쇄</b>는 종이 출력, <b>📄 PDF 저장</b>은 파일로 저장입니다. PDF 저장을 누르면 인쇄 창이 열리는데, <b>프린터(대상) 칸에서 "PDF로 저장"을 선택</b>하고 저장하면 됩니다. 회의록처럼 긴 문서도 여러 장으로 자동 분할되어 잘리지 않습니다.')}
+      ${step(5,'수정 · 복사 · 백업','문서 화면에서 <b>✏️ 직접 수정</b>으로 문구를 바로 고칠 수 있고(인쇄 전 임시수정), <b>📋 텍스트 복사</b>로 K-에듀파인 등에 붙여넣을 수 있습니다. <b>💾 저장(JSON)</b>으로 회차별 파일을 보관했다가 <b>📂 불러오기</b>로 이어서 작업하세요.')}
+      <p class="note" style="margin-top:12px;">※ 직접 수정한 내용은 인쇄용 임시 수정입니다. 다른 메뉴로 이동하면 기초자료 기준으로 다시 생성되니, 계속 쓸 내용은 기초자료에 입력하세요.</p>
+    </div></div>
+    <div class="card council-start"><div class="body">
+      <p class="council-start-note">학교 정보와 회의 자료를 입력해 시작하세요.</p>
+      <button class="btn primary" onclick="go('base')">기초자료 입력 시작 →</button>
+    </div></div>
+  </div>`;
+}
+
+/* ───────────── 기초자료 화면 ───────────── */
+function renderBase(){
+  const f = (k,label,ph)=>`<div class="fld"><label>${label}</label><input id="f_${k}" value="${esc(S[k])}" placeholder="${ph||''}" oninput="S.${k}=this.value; sync()"></div>`;
+  $('content').innerHTML = `
+  <div class="card" style="border-left:4px solid var(--gold);"><div class="body" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:240px;">
+      <div style="font-weight:700; color:var(--navy); font-size:13.5px;">📗 기초자료 일괄 업로드</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:3px;">양식(시트 3개: 기본정보 · 안건 · 위원명단)을 받아 채운 뒤 올리면 아래 항목이 한 번에 채워집니다.</div>
+    </div>
+    <button class="btn sm" onclick="tmplAll()">⬇ 통합 양식 받기</button>
+    <button class="btn sm primary" onclick="document.getElementById('upAll').click()">📤 통합 업로드</button>
+    <input type="file" id="upAll" accept=".xlsx,.xls" style="display:none" onchange="uploadAll(event)">
+  </div></div>
+  <div class="card"><h2>학교 정보<span class="hint">모든 문서에 자동 반영</span></h2><div class="body"><div class="grid">
+    ${f('school','기관명 *')}
+    ${f('zip','우편번호')}
+    ${f('addr','주소')}
+    ${f('tel','전화')}
+    ${f('fax','전송(팩스)')}
+    ${f('email','이메일')}
+    ${f('web','학교홈페이지')}
+    ${f('ruleArt','근거 규정 조항','제20조')}
+  </div></div></div>
+
+  <div class="card"><h2>문서번호 · 담당자</h2><div class="body"><div class="grid">
+    ${f('docPrefix','문서번호 앞이름','○○학교운영위')}
+    ${f('docNo','문서번호','1')}
+    ${f('noticePrefix','공고번호 앞이름','○○학교 공고')}
+    ${f('noticeNo','공고번호','2026-21')}
+    ${f('regNo','회의록 등록번호','○○학교-')}
+    <div class="fld"><label>공개여부</label><select onchange="S.open=this.value; sync()">
+      ${['공개','부분공개','비공개'].map(o=>`<option ${S.open===o?'selected':''}>${o}</option>`).join('')}</select></div>
+    ${f('chargeName','담당자')}
+    ${f('secTitle','간사 직위','행정실장')}
+    ${f('secName','간사 성명')}
+  </div></div></div>
+
+  <div class="card"><h2>회의 정보</h2><div class="body"><div class="grid">
+    ${f('year','학년도','2026')}
+    ${f('round','회의 회차','2')}
+    <div class="fld"><label>회의 구분</label><select onchange="S.mtype=this.value; sync()">
+      <option ${S.mtype==='임시회'?'selected':''}>임시회</option><option ${S.mtype==='정기회'?'selected':''}>정기회</option></select></div>
+    <div class="fld"><label>회의 날짜</label><input type="date" value="${S.mdate}" oninput="S.mdate=this.value; sync()"></div>
+    ${f('mtime','시작 시간','11:00')}
+    ${f('endTime','종료 시간 (회의록용)','12:00')}
+    ${f('place','회의 장소')}
+    <div class="fld"><label>시행(공고)일</label><input type="date" value="${S.sendDate}" oninput="S.sendDate=this.value; sync()"></div>
+    ${f('sessionDays','회기(일) — 회의록용','1')}
+    <div class="fld"><label>회기 결정의 건</label><select onchange="S.useSession=this.value==='1'; render()"><option value="1" ${S.useSession!==false?'selected':''}>넣기 (1번 안건으로 자동 추가)</option><option value="0" ${S.useSession===false?'selected':''}>빼기</option></select></div>
+    ${f('opinEmail','의견제출 이메일','')}
+    ${f('attendStaff','출석 교직원 (회의록용)','교감, 행정실장, 담당자 ○○○')}
+  </div>
+  <div class="fld" style="margin-top:12px;"><label>기타 사항 (회의록 하단)</label>
+    <textarea rows="2" oninput="S.etcNote=this.value; sync()" placeholder="예: 지정학생 대상 장학금이 기탁 확정되어 …">${esc(S.etcNote)}</textarea></div>
+  </div></div>
+
+  <div class="card"><h2>결과 문서 (회의 후)<span class="hint">심의결과통보·결과안내·가정통신문(결과) 전용 · 비우면 회의정보 값 사용</span></h2><div class="body"><div class="grid">
+    <div class="fld"><label>결과 통보일</label><input type="date" value="${S.resultDate}" oninput="S.resultDate=this.value; sync()"></div>
+    ${f('resultDocNo','결과 문서번호','예: 4 (개최통보 다음 번호)')}
+    ${f('resultNoticeNo','결과 공고번호','예: 2026-22')}
+  </div></div></div>
+
+  <div class="card"><h2>안건 목록<span class="hint">엑셀 업로드 가능 · 발언·표결은 회의 후 회의록용으로 입력</span></h2><div class="body">
+    <div style="display:flex; gap:6px; margin-bottom:12px;">
+      <button class="btn sm" onclick="document.getElementById('upAgenda').click()">📤 엑셀 업로드</button>
+      <button class="btn sm" onclick="tmplAgenda()">⬇ 업로드 양식 받기</button>
+      <input type="file" id="upAgenda" accept=".xlsx,.xls,.csv" style="display:none" onchange="uploadExcel(event,'agenda')">
+    </div>
+    ${S.agendas.map((a,i)=>`<div class="agenda-detail">
+      <div class="hd">안건 ${i+1}
+        <input style="flex:1; border:1px solid var(--line); border-radius:4px; padding:5px 8px; font-weight:400;" value="${esc(a.name)}" placeholder="안건명 입력" oninput="S.agendas[${i}].name=this.value; sync()">
+        <button class="xbtn" onclick="S.agendas.splice(${i},1); render()">✕</button>
+      </div>
+      <div class="fld"><label>발언내용 (회의록) — 줄바꿈으로 구분, 각 줄 앞에 ◦ 자동</label>
+        <textarea rows="2" oninput="S.agendas[${i}].speak=this.value; sync()" placeholder="위원(○○○) 변경하는 이유에 대해 질의함">${esc(a.speak)}</textarea></div>
+      <div class="dgrid">
+        <div class="fld"><label>제안부서</label><input value="${esc(a.dept)}" oninput="S.agendas[${i}].dept=this.value; sync()"></div>
+        <div class="fld"><label>찬성</label><input value="${esc(a.yes)}" oninput="S.agendas[${i}].yes=this.value; sync()" placeholder="6"></div>
+        <div class="fld"><label>반대</label><input value="${esc(a.no)}" oninput="S.agendas[${i}].no=this.value; sync()" placeholder="0"></div>
+        <div class="fld"><label>결정</label><select onchange="S.agendas[${i}].result=this.value; sync()">${RESULTS.map(r=>`<option ${a.result===r?'selected':''}>${r}</option>`).join('')}</select></div>
+      </div>
+      <div class="fld" style="margin-top:8px"><label>기타사항 (회의록)</label><input value="${esc(a.etc)}" oninput="S.agendas[${i}].etc=this.value; sync()"></div>
+    </div>`).join('')}
+    <button class="btn sm addrow" onclick="S.agendas.push({name:'',dept:'',result:'',speak:'',yes:'',no:'',etc:''}); render()">＋ 안건 추가</button>
+    <p class="note">※ ${S.useSession!==false ? `회의록·시나리오·결과 문서에는 「제${esc(S.round)}회 학교운영위원회 ${esc(S.mtype)} 회기 결정의 건」이 1번 안건으로 자동 추가됩니다(기초자료 위쪽 '회기 결정의 건'에서 뺄 수 있어요).` : '회기 결정의 건을 넣지 않습니다. 입력한 안건이 1번부터 매겨집니다.'} 공고문·통보문에는 마지막에 "기타." 항목이 자동으로 붙습니다.</p>
+  </div></div>
+
+  <div class="card"><h2>운영위원 명단<span class="hint">엑셀 업로드 가능 · 출석 체크는 회의록·참석자명부에 반영</span></h2><div class="body">
+    <div style="display:flex; gap:6px; margin-bottom:12px;">
+      <button class="btn sm" onclick="document.getElementById('upMember').click()">📤 엑셀 업로드</button>
+      <button class="btn sm" onclick="tmplMember()">⬇ 업로드 양식 받기</button>
+      <input type="file" id="upMember" accept=".xlsx,.xls,.csv" style="display:none" onchange="uploadExcel(event,'member')">
+    </div>
+    <table class="edit"><tr><th class="num">연번</th><th style="width:120px">구분</th><th style="width:120px">성명</th><th>이메일</th><th style="width:100px">비고</th><th class="chk">출석</th><th class="del"></th></tr>
+    ${S.members.map((m,i)=>`<tr>
+      <td class="num">${i+1}</td>
+      <td><select onchange="S.members[${i}].type=this.value; sync()">${[...new Set([...MEMBER_TYPES, m.type])].map(t=>`<option ${m.type===t?'selected':''}>${t}</option>`).join('')}</select></td>
+      <td><input value="${esc(m.name)}" oninput="S.members[${i}].name=this.value; sync()" placeholder="성명"></td>
+      <td><input value="${esc(m.email)}" oninput="S.members[${i}].email=this.value; sync()" placeholder="email@example.com"></td>
+      <td><input value="${esc(m.note)}" oninput="S.members[${i}].note=this.value; sync()"></td>
+      <td class="chk"><input type="checkbox" ${m.attend?'checked':''} onchange="S.members[${i}].attend=this.checked; sync()"></td>
+      <td class="del"><button class="xbtn" onclick="S.members.splice(${i},1); render()">✕</button></td>
+    </tr>`).join('')}</table>
+    <button class="btn sm addrow" onclick="S.members.push({type:'교원위원',name:'',email:'',note:'',attend:true}); render()">＋ 위원 추가</button>
+  </div></div>`;
+}
+function sync(){}
+
+/* ───────────── 문서 공통 조각 ───────────── */
+function agendaListGa(){ // 가) 나) 다) + 마지막 기타.
+  const KA = ['가','나','다','라','마','바','사','아','자','차','카','타','파','하'];
+  const items = realAgendas().map((a,i)=>`<div class="indent">${KA[i]||i+1}) ${esc(a.name)}</div>`).join('');
+  const etcIdx = realAgendas().length;
+  return items + `<div class="indent">${KA[etcIdx]||etcIdx+1}) 기타.</div>`;
+}
+function agendaListNum(){ // 1) 2) 3) + 기타.
+  const items = realAgendas().map((a,i)=>`<div class="indent2">${i+1}) ${esc(a.name)}</div>`).join('');
+  return items + `<div class="indent2">${realAgendas().length+1}) 기타.</div>`;
+}
+function agendaTable(withResult){
+  const real = realAgendas();
+  // 결과 문서(심의결과 표)에는 회기 결정의 건을 1번으로 포함
+  const sessionRow = {name:`제${S.round||'○'}회 학교운영위원회 ${S.mtype} 회기 결정의 건`, dept:'-', result:'원안 가결'};
+  const list = withResult && S.useSession!==false ? [sessionRow, ...real] : real;
+  const rows = list.length ? list : [{name:'',dept:'',result:''}];
+  return `<table class="doc"><tr><th style="width:20mm; white-space:nowrap;">안건번호</th><th>안 건 명</th><th style="width:28mm">제안부서</th>${withResult?'<th style="width:26mm">심의결과</th>':''}</tr>
+  ${rows.map((a,i)=>`<tr><td>${i+1}</td><td class="l">${bl(a.name)}</td><td>${bl(a.dept)}</td>${withResult?`<td>${bl(a.result)}</td>`:''}</tr>`).join('')}</table>`;
+}
+function docFooter(opt){
+  opt = opt || {};
+  const docNo = opt.docNo || S.docNo;
+  const dateISO = opt.dateISO || S.sendDate;
+  const send = dateISO ? fmtDotShort(dateISO).replace(/\.$/,'') : '　　.　　.　　';
+  return `<div class="footer">
+    <span style="margin-right:22mm;">담당자 ${bl(S.chargeName)}</span><span style="margin-right:22mm;">간사 ${bl(S.secName)}</span><span>위원장 ${bl(chair())}</span><br>
+    협조자<br>
+    시행 ${esc(S.docPrefix)} - ${esc(docNo)} (${send})<br>
+    우 ${bl(S.zip)} ${bl(S.addr)} / ${bl(S.web)}<br>
+    전화 ${bl(S.tel)} 전송 ${bl(S.fax)} / ${S.email?esc(S.email):''} / ${esc(S.open)}
+  </div>`;
+}
+// 결과 문서용 헬퍼 (비면 회의정보 값으로 폴백)
+const resultDateISO = () => S.resultDate || S.mdate;
+const resultDocNoTxt = () => S.resultDocNo || S.docNo;
+const resultNoticeTxt = () => S.resultNoticeNo || S.noticeNo || `${S.year}-${S.round||'○'}`;
+const resultDay = () => resultDateISO() ? fmtK(resultDateISO()).replace(/\(.\)/,'') : '　　년　　월　　일';
+const meetLine = () => `${fmtK(S.mdate)||'　　년　　월　　일'} ${esc(S.mtime||'')}`;
+const noticeDay = () => S.sendDate ? fmtK(S.sendDate).replace(/\(.\)/,'') : '　　년　　월　　일';
+
+/* ───────────── 문서 렌더 ───────────── */
+const RENDER = {
+  d1(){ return `
+    <div class="row"><div class="lab">수 신</div><div>${council()} 위원장</div></div>
+    <div class="row"><div class="lab">(경 유)</div></div>
+    <div class="row"><div class="lab">제 목</div><div><b>학교운영위원회 안건 제출</b></div></div>
+    <br>
+    <div>1. 관련: 학교운영위원회규정 ${esc(S.ruleArt)}</div>
+    <div>2. ${roundYr()} 학교운영위원회 안건을 붙임과 같이 제출하오니 심의하여 주시기 바랍니다.</div>
+    ${agendaTable(false)}
+    <div>붙임&nbsp;&nbsp;안건 각 1부.&nbsp;&nbsp;끝.</div>
+    <div class="sign">${council()}위원장</div>`;
+  },
+  d2(){ return `
+    <div class="org">${council()}</div>
+    <div class="row"><div class="lab">수 신</div><div>${council()} 위원</div></div>
+    <div class="row"><div class="lab">(경 유)</div></div>
+    <div class="row"><div class="lab">제 목</div><div><b>${roundYr()} 학교운영위원회 개최 통보</b></div></div>
+    <br>
+    <div>1. 귀 댁의 평안하심을 기원합니다.</div>
+    <div>2. ${esc(S.school)} 학교운영위원회규정 ${esc(S.ruleArt)}에 의하여 ${roundYr()} 학교운영위원회의를 아래와 같이 개최하고자 하오니 바쁘시더라도 꼭 참석하여 주시기 바랍니다.</div>
+    <div style="text-align:center; letter-spacing:1em; margin:3mm 0; font-weight:700">아 래</div>
+    <div class="indent">가. 개최일시: ${meetLine()}</div>
+    <div class="indent">나. 장소: ${bl(S.place)}</div>
+    <div class="indent">다. 회의안건</div>
+    ${agendaListNum()}
+    <div class="sign">${council()}위원장</div>
+    ${docFooter()}`;
+  },
+  d3(){ return `
+    <div style="font-size:12pt">${esc(S.noticePrefix)} 제 ${esc(S.noticeNo)}호</div>
+    <div class="doc-title">제${esc(S.round)}회 ${council()} 개최 공고</div>
+    <div>&nbsp;&nbsp;${council()}규정 ${esc(S.ruleArt)}에 의거 다음과 같이 제${esc(S.round)}회 ${council()} 개최를 공고합니다.</div>
+    <br>
+    <div class="indent">1. 일 시: ${fmtK(S.mdate,true)||'　　년　　월　　일'} ${esc(S.mtime||'')}</div>
+    <div class="indent">2. 장 소: ${bl(S.place)}</div>
+    <div class="indent">3. 안 건</div>
+    ${agendaListGa()}
+    <br><br>
+    <div style="text-align:center; font-size:12pt">${noticeDay()}</div>
+    <div class="sign">${esc(S.school)}장</div>`;
+  },
+  d4(){ return `
+    <div class="org" style="font-size:16pt">가 정 통 신 문</div>
+    <div style="text-align:center; font-size:10.5pt; margin-top:-4mm; margin-bottom:4mm">${esc(S.school)} · ${bl(S.tel)}</div>
+    <div class="doc-title">${roundYr()} 학교운영위원회 개최 안내</div>
+    <div>학부모님 가정에 건강과 행복이 가득하시길 기원합니다.</div>
+    <div>${roundYr()} 학교운영위원회(${esc(S.mtype)})를 아래와 같이 개최함을 안내드립니다. 회의는 공개를 원칙으로 하며, 참관을 희망하시는 분은 누구나 방청하실 수 있습니다.</div>
+    <br>
+    <div class="indent">1. 일 시: ${meetLine()}</div>
+    <div class="indent">2. 장 소: ${bl(S.place)}</div>
+    <div class="indent">3. 안 건</div>
+    ${agendaListGa()}
+    ${S.opinEmail?`<div class="indent">4. 안건에 대한 의견 제출: 이메일(${esc(S.opinEmail)})</div>`:''}
+    <br><br>
+    <div style="text-align:center; font-size:12pt">${noticeDay()}</div>
+    <div class="sign">${council()}위원장</div>`;
+  },
+  d5(){
+    const rows = S.members.filter(m=>m.name).length ? S.members.filter(m=>m.name) : S.members;
+    return `
+    <div class="doc-title">${roundYr()} 학교운영위원회<br>회의 참석자 명부</div>
+    <div class="row"><div class="lab" style="width:26mm">일　시</div><div>${meetLine()}</div></div>
+    <div class="row"><div class="lab" style="width:26mm">장　소</div><div>${bl(S.place)}</div></div>
+    <table class="doc"><tr><th style="width:16mm">연번</th><th style="width:40mm">구분</th><th>성명</th><th style="width:45mm">서명</th></tr>
+    ${rows.map((m,i)=>`<tr style="height:12mm"><td>${i+1}</td><td>${bl(m.type)}</td><td>${bl(m.name)}</td><td></td></tr>`).join('')}
+    </table>
+    <div style="font-size:10pt; color:#333; font-family:'Malgun Gothic',sans-serif">※ 간사 및 참관인은 별도 기재</div>`;
+  },
+  d6(){ return `
+    <div style="height:235mm; display:flex; flex-direction:column; justify-content:center; text-align:center;">
+      <div>
+        <div style="font-size:26pt; font-weight:700; letter-spacing:.15em">학교운영위원회 회의록</div>
+        <div style="font-size:15pt; margin-top:6mm">(${roundYr()})</div>
+      </div>
+      <div style="margin-top:60mm">
+        <div style="font-size:14pt; margin-bottom:12mm">${S.mdate ? fmtDot(S.mdate).replace(/\. 0/g,'. ') : '　　. 　. 　.'}</div>
+        <div style="font-size:20pt; font-weight:700; letter-spacing:.3em">${esc(S.school)}</div>
+      </div>
+    </div>`;
+  },
+  d7(){
+    const att = attendMembers();
+    const total = S.members.filter(m=>m.name).length || S.members.length;
+    const attTxt = att.map(m => m.type==='위원장' ? `${esc(mn(m.name))} 위원장님` : `${esc(mn(m.name))} 위원님`).join(', ');
+    const ras = realAgendas();
+    const sessionName = `제${esc(S.round)}회 학교운영위원회 ${esc(S.mtype)} 회기 결정의 건`;
+    const useS = S.useSession!==false, off = useS ? 1 : 0; // 회기 결정의 건을 넣으면 실제 안건은 2번부터
+    const speakLines = t => t ? t.split('\n').filter(x=>x.trim()).map(x=>`<p>◦ ${esc(x.trim())}</p>`).join('') : '';
+    const vote = a => `(찬성 ${a.yes!==''?esc(a.yes):att.length}표, 반대 ${a.no!==''?esc(a.no):'0'}표)`;
+    return `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5mm;">
+      <table class="doc" style="width:75mm; margin:0; font-size:10pt;">
+        <tr style="height:7mm;"><th style="width:24mm; padding:1mm;">등록번호</th><td class="l" style="padding:1mm 2mm;">${esc(S.regNo)}</td></tr>
+        <tr style="height:7mm;"><th style="padding:1mm;">등록일자</th><td class="l" style="padding:1mm 2mm;">${fmtDot(S.mdate)||'　'}</td></tr>
+        <tr style="height:7mm;"><th style="padding:1mm;">결재일자</th><td class="l" style="padding:1mm 2mm;">${fmtDot(S.mdate)||'　'}</td></tr>
+        <tr style="height:7mm;"><th style="padding:1mm;">공개여부</th><td class="l" style="padding:1mm 2mm;">${esc(S.open)}</td></tr>
+      </table>
+      <table class="doc" style="width:56mm; margin:0; font-size:10pt;">
+        <tr style="height:7mm;"><th style="width:28mm; padding:1mm;">위원장</th><th style="width:28mm; padding:1mm;">학교장</th></tr>
+        <tr style="height:21mm;"><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="doc-title" style="margin:3mm 0 3mm;">${council()} 회의록</div>
+    <div class="minutes mrec-body">
+    <table class="doc" style="font-size:10pt;">
+      <tr><th style="width:28mm; padding:1mm 2mm;">회의명</th><td class="l" style="padding:1mm 2mm;">${roundHoe()}</td></tr>
+      <tr><th style="padding:1mm 2mm;">회의일시<br>및 장소</th><td class="l" style="padding:1mm 2mm;">${fmtDotShort(S.mdate)||'　'} ${esc(S.mtime)} ~ ${esc(S.endTime)}　${bl(S.place)}</td></tr>
+      <tr><th style="padding:1mm 2mm;">참석자명단</th><td class="l" style="padding:1mm 2mm;">
+        <p>출석위원: ${attTxt || '　'} (${total}명 중 ${att.length}명 참석)</p>
+        <p>출석교직원: ${S.attendStaff?esc(maskInText(S.attendStaff)):`<span class="blank">　　</span>`}</p>
+      </td></tr>
+      <tr><th style="padding:1mm 2mm;">회의진행순서</th><td class="l" style="padding:1mm 2mm;">
+        <p>1. 개회　2. 국민의례　3. 학교장인사　4. 위원장인사　5. 안건심의　6. 폐회</p>
+      </td></tr>
+      <tr><th style="padding:1mm 2mm;">상정안건</th><td class="l" style="padding:1mm 2mm;">
+        ${useS ? `<p>1. ${sessionName}</p>` : ''}
+        ${ras.map((a,i)=>`<p>${i+1+off}. ${esc(a.name)}</p>`).join('')}
+      </td></tr>
+      <tr class="flow-row"><th style="padding:1mm 2mm;">심의결과</th><td class="l" style="padding:1mm 2mm;">
+        ${useS ? `<p><b>1. ${sessionName}</b></p>
+        <p>가. 발언내용</p>
+        <p>◦ 위원장(${mn(chair())||'○○○'}) ${esc(S.sessionDays)}일로 결정하고자 함</p>
+        <p style="padding-left:4mm;">- 질의사항 없음</p>
+        <p>나. 결정사항: ${esc(S.sessionDays)}일로 결정(찬성 ${att.length}표, 반대 0표)</p>` : ''}
+        ${ras.map((a,i)=>`
+          <p style="margin-top:${i||useS?'1.5mm':'0'};"><b>${i+1+off}. ${esc(a.name)}</b></p>
+          <p>가. 발언내용</p>
+          <p>◦ ${esc(a.name)}을(를) 상정함</p>
+          ${speakLines(a.speak)}
+          <p>나. 결정사항: ${a.result?esc(a.result):'원안 가결'}${vote(a)}</p>
+          ${a.etc?`<p>다. 기타사항: ${esc(a.etc)}</p>`:''}
+        `).join('')}
+      </td></tr>
+      <tr><th style="padding:1mm 2mm;">기타 사항</th><td class="l" style="padding:1mm 2mm;">${S.etcNote?esc(S.etcNote).replace(/\n/g,'<br>'):'　'}</td></tr>
+    </table>
+    <br>
+    <p style="text-align:right;">기록자: ${S.chargeName?esc(mn(S.chargeName)):`<span class="blank">　　</span>`} (서명)</p>
+    <p style="text-align:right;">간사: ${esc(S.secTitle)} ${S.secName?esc(mn(S.secName)):`<span class="blank">　　</span>`} (서명)</p>
+    </div>`;
+  },
+  d8(){ return `
+    <div class="org">${council()}</div>
+    <div class="row"><div class="lab">수 신</div><div>${esc(S.school)}장</div></div>
+    <div class="row"><div class="lab">(경 유)</div></div>
+    <div class="row"><div class="lab">제 목</div><div><b>${roundYr()} 학교운영위원회 심의 결과 통보</b></div></div>
+    <br>
+    <div>1. 관련: ${esc(S.school)} 학교운영위원회규정 ${esc(S.ruleArt)}</div>
+    <div>2. ${fmtK(S.mdate)} 개최된 ${roundYr()} 학교운영위원회의 안건 심의 결과를 아래와 같이 통보합니다.</div>
+    ${agendaTable(true)}
+    <div>붙임&nbsp;&nbsp;회의록 사본 1부.&nbsp;&nbsp;끝.</div>
+    <div class="sign">${council()}위원장</div>
+    ${docFooter({docNo: resultDocNoTxt(), dateISO: resultDateISO()})}`;
+  },
+  d9(){ return `
+    <div style="font-size:12pt">${esc(S.noticePrefix)} 제 ${esc(resultNoticeTxt())}호</div>
+    <div class="doc-title">${roundYr()} 학교운영위원회 회의 결과 안내</div>
+    <div>&nbsp;&nbsp;${fmtK(S.mdate)} 개최된 ${roundYr()} 학교운영위원회의 심의 결과를 다음과 같이 안내합니다.</div>
+    <br>
+    <div class="indent">1. 일 시: ${meetLine()}</div>
+    <div class="indent">2. 장 소: ${bl(S.place)}</div>
+    <div class="indent">3. 심의 결과</div>
+    ${agendaTable(true)}
+    <div class="indent">4. 회의록은 학교 홈페이지 학교운영위원회 자료실에서 확인하실 수 있습니다.</div>
+    <br><br>
+    <div style="text-align:center; font-size:12pt">${resultDay()}</div>
+    <div class="sign">${council()}위원장</div>`;
+  },
+  sc(){
+    const ras = realAgendas();
+    const att = attendMembers();
+    const total = S.members.filter(m=>m.name).length || S.members.length;
+    const ii = (v, path, w) => `<input value="${esc(v)}" oninput="${path}=this.value" style="border:none; border-bottom:1px dashed #999; background:#fffdf3; font-family:inherit; font-size:inherit; text-align:center; width:${w||'22mm'}; padding:1px 2px;">`;
+    const sessionName = `제${esc(S.round)}회 학교운영위원회 ${esc(S.mtype)} 회기 결정의 건`;
+    const useS = S.useSession!==false, off = useS ? 1 : 0; // 회기 결정의 건을 넣으면 실제 안건은 2번부터
+    // 결정값에 따른 의결 멘트
+    const decideLine = (name, result) => {
+      const r = result || '원안 가결';
+      if(/수정/.test(r)) return `${name}을(를) 수정하여 결정하고자 하는데 이의 있습니까? '없습니다' 라고 하는 위원 있음 이의가 없으므로 수정 가결되었음을 선포합니다.`;
+      if(/부결/.test(r)) return `${name}에 대하여 표결한 결과 부결되었음을 선포합니다.`;
+      if(/보류/.test(r)) return `${name}은(는) 추가 검토를 위해 보류하기로 하겠습니다.`;
+      if(/조건부/.test(r)) return `${name}을(를) 조건부로 결정하고자 하는데 이의 있습니까? '없습니다' 라고 하는 위원 있음 이의가 없으므로 조건부 가결되었음을 선포합니다.`;
+      return `${name}을(를) 원안대로 결정하고자 하는데 이의 있습니까? '없습니다' 라고 하는 위원 있음 이의가 없으므로 가결되었음을 선포합니다.`;
+    };
+    // 진행 순서표
+    const orderRows = S.scRows.map((r,i)=>`<tr>
+      <td style="width:24mm;">(${ii(r.min, `S.scRows[${i}].min`, '10mm')}분)</td>
+      <td class="l">${esc(r.act)}</td>
+      <td style="width:34mm;">${ii(r.who, `S.scRows[${i}].who`, '28mm')}</td>
+    </tr>`).join('');
+    // 의안 1호: 회기 결정의 건 (1일로 결정)
+    const sessionBlock = !useS ? '' : `
+      <table class="doc sc-tbl">
+        <tr><th style="width:26mm;">의안 1호 상정</th><td class="l">의안 1호 <b>${sessionName}</b>을(를) 상정합니다. &lt; 의사봉 3타 &gt;</td></tr>
+        <tr><th>의결</th><td class="l">본 회의의 회기를 ${esc(S.sessionDays)}일로 정하고자 하는데 이의 있습니까? '없습니다' 라고 하는 위원 있음 이의가 없으므로 회기를 ${esc(S.sessionDays)}일로 결정합니다. &lt; 의사봉 3타 &gt;</td></tr>
+      </table>`;
+    // 안건별 시나리오 블록 (의안 2호부터)
+    const agendaBlocks = ras.map((a,i)=>`
+      <table class="doc sc-tbl">
+        <tr><th style="width:26mm;">안건설명</th><td class="l">다음은 ${ii(S.scPresenter,'S.scPresenter','26mm')}께서 심의안건에 대해 설명하여 주시기 바랍니다. =안건 설명= (안건 설명이 끝나면) ${esc(S.scPresenter)}님 수고하셨습니다.</td></tr>
+        <tr><th>의안 ${i+1+off}호 상정</th><td class="l">의안 ${i+1+off}호 <b>${esc(a.name)}</b>을(를) 상정합니다. &lt; 의사봉 3타 &gt;</td></tr>
+        <tr><th>질의답변</th><td class="l">회의자료를 참고하여 질의 있으신 위원님들은 질의해 주시기 바랍니다. (질의 위원님이 있을 때) ○○○위원님 질의 하시기 바랍니다. - 질의 및 답변 - 추가로 질의하실 위원님 계십니까? - 질의 위원 없음 -</td></tr>
+        <tr><th>의결</th><td class="l">더 이상 질의하실 분이 안계시므로 질의답변을 마치고 의결하도록 하겠습니다. ${decideLine(esc(a.name), a.result)} &lt; 의사봉 3타 &gt;</td></tr>
+      </table>`).join('');
+    // 안건채택: 의안 1호=회기결정, 2호부터 실제 안건
+    const anChae = (useS ? `<b>의안 1호</b> ${sessionName}<br>` : '') + ras.map((a,i)=>`<b>의안 ${i+1+off}호</b> ${esc(a.name)}`).join('<br>');
+    const totalItems = ras.length + off;
+    return `
+    <div class="sc-doc">
+    <div style="text-align:center; font-size:15pt; font-weight:700;">${esc(S.year)}학년도 ${esc(S.school)}</div>
+    <div style="text-align:center; margin:3mm 0;"><span style="border:1.5px solid #000; padding:2mm 10mm; font-size:14pt; font-weight:700;">제 ${esc(S.round)} 회 운영위원회</span></div>
+    <div style="text-align:center; font-size:19pt; font-weight:700; letter-spacing:.5em; margin:6mm 0;">회 의 진 행 시 나 리 오</div>
+
+    <h3 style="font-size:13pt; margin:5mm 0 2mm;">□ 개 요</h3>
+    <table class="doc sc-tbl">
+      <tr><th style="width:26mm;">ㅇ 일 시</th><td class="l">${fmtK(S.mdate,true)||'　'} ${esc(S.mtime)}</td></tr>
+      <tr><th>ㅇ 장 소</th><td class="l">${bl(S.place)}</td></tr>
+    </table>
+    <div style="margin:2mm 0 1mm; font-weight:700;">ㅇ 회의안건</div>
+    ${useS ? `<div class="indent">1) ${sessionName}</div>` : ''}
+    ${ras.map((a,i)=>`<div class="indent">${i+1+off}) ${esc(a.name)}</div>`).join('')}
+
+    <h3 style="font-size:13pt; margin:6mm 0 2mm;">□ 진행 순서</h3>
+    <table class="doc sc-tbl">
+      <tr><th style="width:24mm;">시 간</th><th>진 행 내 용</th><th style="width:34mm;">진 행 자</th></tr>
+      ${orderRows}
+    </table>
+
+    <h3 style="font-size:13pt; margin:6mm 0 2mm;">□ 회의 진행 시나리오 &nbsp;[ 위 원 장 ]</h3>
+    <table class="doc sc-tbl">
+      <tr><th style="width:26mm;">인사말씀</th><td class="l">바쁘신 중에도 ${esc(S.school)} 운영위원회에 참석해 주신 위원님들께 진심으로 감사드립니다. 그럼 지금부터 제${esc(S.round)}회 운영위원회를 시작하도록 하겠습니다.</td></tr>
+      <tr><th>개회선언</th><td class="l">${esc(S.school)} 총 ${total}분의 위원님 중 (${att.length})분이 참석하여 성원이 되었으므로 개회를 선언합니다. &lt; 의사봉 3타 &gt;</td></tr>
+      <tr><th>안건채택</th><td class="l">다음은 ${esc(S.year)}학년도 제${esc(S.round)}회 ${esc(S.school)} 운영위원회 심의 안건을 채택하고자 합니다. 안건 내용은 배부해 드린 회의자료와 같이<br>${anChae}<br>'없습니다' 라고 하는 위원 있음 이의가 없으므로 오늘 심의안건 ${totalItems}건으로 채택되었습니다. &lt; 의사봉 3타 &gt;</td></tr>
+    </table>
+    ${sessionBlock}
+    ${agendaBlocks}
+    <table class="doc sc-tbl">
+      <tr><th style="width:26mm;">폐 회</th><td class="l">${esc(S.school)} 운영위원회 업무를 위하여 참석해 주신 위원님들께 다시 한번 감사를 드리며 늘 건강하시고 행복하시기를 기원합니다. 이상으로 ${esc(S.year)}학년도 제${esc(S.round)}회 ${esc(S.school)} 운영위원회를 모두 마치겠습니다. <b>폐회를 선언합니다.</b> &lt; 의사봉 3타 &gt;</td></tr>
+    </table>
+    <div style="text-align:center; font-size:16pt; font-weight:700; letter-spacing:.3em; margin-top:8mm;">${esc(S.school)}</div>
+    </div>`;
+  },
+  rec(){
+    const ii = (v, path, w, ph) => `<input value="${esc(v)}" oninput="${path}=this.value" placeholder="${ph||''}" style="border:none; border-bottom:1px dashed #999; background:#fffdf3; font-family:inherit; font-size:inherit; width:${w}; padding:1px 2px;">`;
+    const iiC = (v, path, w) => `<input value="${esc(v)}" oninput="${path}=this.value" style="border:none; border-bottom:1px dashed #999; background:#fffdf3; font-family:inherit; font-size:inherit; text-align:center; width:${w}; padding:1px 2px;">`;
+    const rows = S.recList.map((r,i)=>`<tr>
+      <td>${iiC(r.name, `S.recList[${i}].name`, '16mm')}</td>
+      <td>${iiC(r.birth, `S.recList[${i}].birth`, '20mm')}</td>
+      <td>${iiC(r.role, `S.recList[${i}].role`, '20mm')}</td>
+      <td class="l">${ii(r.addr, `S.recList[${i}].addr`, '96%')}</td>
+      <td></td>
+    </tr>`).join('');
+    const cnt = S.recList.length;
+    return `
+    <div class="rec-doc">
+    <div class="org">${council()}</div>
+    <div class="row"><div class="lab">수 신</div><div>개방이사추천위원회 위원</div></div>
+    <div class="row"><div class="lab">(경 유)</div></div>
+    <div class="row"><div class="lab">제 목</div><div><b>개방이사추천위원회 구성을 위한 위원 추천</b></div></div>
+    <br>
+    <div style="line-height:1.85;">1. <input value="${esc(S.recLawArt)}" oninput="S.recLawArt=this.value" style="border:none; border-bottom:1px dashed #999; background:#fffdf3; font-family:inherit; font-size:inherit; width:74mm; padding:1px 2px;">에 의거 개방이사 추천위원회의 구성을 위해 학교운영위원회에서 ${cnt}인을 추천하고자 합니다.</div>
+    <div class="doc-title" style="letter-spacing:.4em;">개 방 이 사 추 천 위 원 명 단</div>
+    <table class="doc rec-tbl">
+      <colgroup><col style="width:16%"><col style="width:17%"><col style="width:16%"><col style="width:42%"><col style="width:9%"></colgroup>
+      <tr><th>성명</th><th>생년월일</th><th>구성원</th><th>주소</th><th>비고</th></tr>
+      ${rows}
+    </table>
+    <div class="no-print" style="margin-top:3mm; text-align:right;">
+      <button class="btn sm" onclick="S.recList.push({name:'',birth:'',role:'',addr:''}); render()">＋ 추천위원 추가</button>
+      <button class="btn sm" onclick="if(S.recList.length>1){S.recList.pop(); render()}">− 마지막 삭제</button>
+    </div>
+    <div class="sign">${council()}위원장</div>
+    ${docFooter()}
+    </div>`;
+  },
+  d10(){ return `
+    <div class="org" style="font-size:16pt">가 정 통 신 문</div>
+    <div style="text-align:center; font-size:10.5pt; margin-top:-4mm; margin-bottom:4mm">${esc(S.school)} · ${bl(S.tel)}</div>
+    <div class="doc-title">${roundYr()} 학교운영위원회 회의 결과 안내</div>
+    <div>학부모님 가정에 건강과 행복이 가득하시길 기원합니다.</div>
+    <div>${fmtK(S.mdate)} 개최된 ${roundYr()} 학교운영위원회의 심의 결과를 아래와 같이 안내드립니다.</div>
+    ${agendaTable(true)}
+    <div class="indent">※ 회의록 전문은 학교 홈페이지 학교운영위원회 자료실에 게시됩니다.</div>
+    <br><br>
+    <div style="text-align:center; font-size:12pt">${resultDay()}</div>
+    <div class="sign">${council()}위원장</div>`;
+  },
+};
+
+function render(){
+  if(cur === 'home'){ renderHome(); return; }
+  if(cur === 'base'){ renderBase(); return; }
+  $('content').innerHTML = `<div class="paper-wrap"><div class="paper">${RENDER[cur]()}</div></div>`;
+}
+
+/* ───────────── 엑셀 업로드 ───────────── */
+function uploadExcel(e, kind){
+  const file = e.target.files[0];
+  if(!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const wb = XLSX.read(r.result, {type:'array'});
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, defval:''});
+      const data = rows.map(row => row.map(c => String(c).trim())).filter(row => row.some(c => c));
+      if(!data.length){ alert('데이터가 없습니다.'); return; }
+      // 첫 행이 헤더(제목행)이면 제외
+      const head = data[0].join('');
+      const body = (/안건|성명|구분|이름|연번|번호/.test(head)) ? data.slice(1) : data;
+      if(kind === 'agenda'){
+        const items = body.map(row => {
+          // 첫 칸이 숫자(연번)면 한 칸 밀기
+          const off = /^\d+$/.test(row[0]) ? 1 : 0;
+          return {name: row[off]||'', dept: row[off+1]||'', result:'', speak:'', yes:'', no:'', etc:''};
+        }).filter(a => a.name);
+        if(!items.length){ alert('안건명을 찾을 수 없습니다. 양식을 확인하세요.'); return; }
+        S.agendas = items;
+        alert(`안건 ${items.length}건을 불러왔습니다.`);
+      }else{
+        const items = body.map(row => {
+          const off = /^\d+$/.test(row[0]) ? 1 : 0;
+          return {type: row[off]||'교원위원', name: row[off+1]||'', email: row[off+2]||'', note: row[off+3]||'', attend:true};
+        }).filter(m => m.name);
+        if(!items.length){ alert('위원 성명을 찾을 수 없습니다. 양식을 확인하세요.'); return; }
+        S.members = items;
+        alert(`위원 ${items.length}명을 불러왔습니다.`);
+      }
+      render();
+    }catch(err){ alert('엑셀을 읽을 수 없습니다: ' + err.message); }
+  };
+  r.readAsArrayBuffer(file);
+  e.target.value = '';
+}
+function dlSheet(rows, name, fname){
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = rows[0].map((_,i)=>({wch: i===1?40:14}));
+  XLSX.utils.book_append_sheet(wb, ws, name);
+  XLSX.writeFile(wb, fname);
+}
+function tmplAgenda(){
+  dlSheet([
+    ['안건명','제안부서','발언내용(회의록)','찬성','반대','결정','기타사항(회의록)'],
+    ['2026학년도 ○○ 운영계획 변경(안)','행정실','위원(○○○) 질의함\n담당자 답변함','6','0','원안 가결',''],
+    ['2026학년도 학교규칙 개정(안)','교무실','','6','0','원안 가결',''],
+  ], '안건', '안건목록_업로드양식.xlsx');
+}
+function tmplMember(){
+  dlSheet([
+    ['구분','성명','이메일','비고'],
+    ['위원장','○○○','',''],
+    ['교원위원','○○○','',''],
+    ['학부모위원','○○○','',''],
+  ], '위원명단', '운영위원명단_업로드양식.xlsx');
+}
+
+/* ───────────── 통합 기초자료 업로드 ───────────── */
+const FIELD_MAP = {
+  '기관명':'school', '우편번호':'zip', '주소':'addr', '전화':'tel', '전송':'fax', '팩스':'fax',
+  '이메일':'email', '홈페이지':'web', '학교홈페이지':'web', '근거 규정 조항':'ruleArt', '근거규정조항':'ruleArt',
+  '문서번호 앞이름':'docPrefix', '문서번호앞이름':'docPrefix', '문서번호':'docNo',
+  '공고번호 앞이름':'noticePrefix', '공고번호앞이름':'noticePrefix', '공고번호':'noticeNo',
+  '회의록 등록번호':'regNo', '등록번호':'regNo', '공개여부':'open',
+  '담당자':'chargeName', '간사 직위':'secTitle', '간사직위':'secTitle', '간사 성명':'secName', '간사성명':'secName',
+  '학년도':'year', '회의 회차':'round', '회의회차':'round', '회차':'round', '회의 차수':'round', '회의차수':'round', '회의 구분':'mtype', '회의구분':'mtype',
+  '회의 날짜':'mdate', '회의날짜':'mdate', '시작 시간':'mtime', '시작시간':'mtime',
+  '종료 시간':'endTime', '종료시간':'endTime', '회의 장소':'place', '회의장소':'place',
+  '시행일':'sendDate', '시행(공고)일':'sendDate', '공고일':'sendDate',
+  '결과 통보일':'resultDate', '결과통보일':'resultDate', '결과 문서번호':'resultDocNo', '결과문서번호':'resultDocNo', '결과 공고번호':'resultNoticeNo', '결과공고번호':'resultNoticeNo',
+  '회기':'sessionDays', '회기(일)':'sessionDays', '회기 결정':'useSession', '회기결정':'useSession', '회기 결정의 건':'useSession', '의견제출 이메일':'opinEmail', '의견제출이메일':'opinEmail',
+  '출석 교직원':'attendStaff', '출석교직원':'attendStaff', '기타 사항':'etcNote', '기타사항':'etcNote',
+};
+function toISO(v){ // 엑셀 날짜(Date/직렬번호/문자열) → yyyy-mm-dd
+  if(v === '' || v == null) return '';
+  if(v instanceof Date && !isNaN(v)){
+    return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
+  }
+  if(typeof v === 'number'){
+    const d = new Date(Date.UTC(1899,11,30) + Math.round(v)*86400000);
+    return d.toISOString().slice(0,10);
+  }
+  const s = String(v).trim().replace(/[.\/]/g,'-').replace(/-+$/,'');
+  const m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  return m ? `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}` : s;
+}
+function toHM(v){ // 엑셀 시간(Date/소수/문자열) → HH:MM
+  if(v === '' || v == null) return '';
+  if(v instanceof Date && !isNaN(v)){
+    return `${String(v.getHours()).padStart(2,'0')}:${String(v.getMinutes()).padStart(2,'0')}`;
+  }
+  if(typeof v === 'number'){ // 0~1 소수 = 하루 중 시각
+    const mins = Math.round((v % 1) * 24 * 60);
+    return `${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`;
+  }
+  const s = String(v).trim();
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  return m ? `${m[1].padStart(2,'0')}:${m[2]}` : s;
+}
+function uploadAll(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const wb = XLSX.read(r.result, {type:'array'});
+      const pick = re => wb.SheetNames.find(n => re.test(n));
+      const rowsOf = n => n ? XLSX.utils.sheet_to_json(wb.Sheets[n], {header:1, defval:''})
+                              .filter(row => row.some(c => String(c).trim())) : [];
+      let cntF = 0, cntA = 0, cntM = 0;
+
+      // 1) 기본정보 (항목 | 값)
+      rowsOf(pick(/기본|정보|설정/)).forEach(row => {
+        const label = String(row[0]).trim(), val = row[1];
+        const key = FIELD_MAP[label];
+        if(!key || val === '' || val == null) return;
+        if(key === 'mdate' || key === 'sendDate' || key === 'resultDate') S[key] = toISO(val);
+        else if(key === 'mtime' || key === 'endTime') S[key] = toHM(val);
+        else if(key === 'useSession') S.useSession = !/^(빼기|뺌|제외|아니오|아니요|n|no|x|false|0)$/i.test(String(val).trim());
+        else S[key] = String(val).trim();
+        cntF++;
+      });
+
+      // 2) 안건 (안건명 | 제안부서)
+      const ar = rowsOf(pick(/안건/));
+      if(ar.length){
+        const body = /안건|번호|연번/.test(ar[0].join('')) ? ar.slice(1) : ar;
+        const items = body.map(row => {
+          const off = /^\d+$/.test(String(row[0]).trim()) ? 1 : 0;
+          return {name:String(row[off]||'').trim(), dept:String(row[off+1]||'').trim(),
+                  result:'', speak:'', yes:'', no:'', etc:''};
+        }).filter(a => a.name);
+        if(items.length){ S.agendas = items; cntA = items.length; }
+      }
+
+      // 3) 위원명단 (구분 | 성명 | 이메일 | 비고)
+      const mr = rowsOf(pick(/위원|명단/));
+      if(mr.length){
+        const body = /구분|성명|이름|연번/.test(mr[0].join('')) ? mr.slice(1) : mr;
+        const items = body.map(row => {
+          const off = /^\d+$/.test(String(row[0]).trim()) ? 1 : 0;
+          return {type:String(row[off]||'교원위원').trim(), name:String(row[off+1]||'').trim(),
+                  email:String(row[off+2]||'').trim(), note:String(row[off+3]||'').trim(), attend:true};
+        }).filter(m => m.name);
+        if(items.length){ S.members = items; cntM = items.length; }
+      }
+
+      if(!cntF && !cntA && !cntM){ alert('읽을 데이터가 없습니다. 통합 양식을 확인하세요.'); return; }
+      render();
+      alert(`불러오기 완료\n· 기본정보 ${cntF}개 항목\n· 안건 ${cntA}건\n· 위원 ${cntM}명`);
+    }catch(err){ alert('엑셀을 읽을 수 없습니다: ' + err.message); }
+  };
+  r.readAsArrayBuffer(file);
+  e.target.value = '';
+}
+function tmplAll(){
+  const wb = XLSX.utils.book_new();
+  const info = [
+    ['항목','값'],
+    ['── 학교 정보 ──',''],
+    ['기관명','○○학교'],['우편번호',''],['주소',''],['전화',''],['전송',''],
+    ['이메일',''],['홈페이지',''],['근거 규정 조항','제20조'],
+    ['── 문서번호 · 담당자 ──',''],
+    ['문서번호 앞이름','○○학교운영위'],['문서번호','1'],
+    ['공고번호 앞이름','○○학교 공고'],['공고번호','2026-1'],
+    ['회의록 등록번호','○○학교-'],['공개여부','공개'],
+    ['담당자',''],['간사 직위','행정실장'],['간사 성명',''],
+    ['── 회의 정보 ──',''],
+    ['학년도','2026'],['회의 회차','1'],['회의 구분','임시회'],
+    ['회의 날짜','2026-06-25'],['시작 시간','11:00'],['종료 시간','12:00'],
+    ['회의 장소','○○학교 회의실'],['시행(공고)일','2026-06-16'],
+    ['회기(일)','1'],['회기 결정','넣기'],['의견제출 이메일',''],
+    ['결과 통보일',''],['결과 문서번호',''],['결과 공고번호',''],
+    ['출석 교직원','교감, 행정실장, 담당자 ○○○'],['기타 사항',''],
+  ];
+  const wsI = XLSX.utils.aoa_to_sheet(info); wsI['!cols'] = [{wch:22},{wch:34}];
+  XLSX.utils.book_append_sheet(wb, wsI, '기본정보');
+
+  const wsA = XLSX.utils.aoa_to_sheet([
+    ['안건명','제안부서','발언내용(회의록)','찬성','반대','결정','기타사항(회의록)'],
+    ['2026학년도 ○○ 운영계획 변경(안)','행정실','위원(○○○) 질의함\n담당자 답변함','6','0','원안 가결',''],
+    ['2026학년도 학교규칙 개정(안)','교무실','','6','0','원안 가결',''],
+  ]); wsA['!cols'] = [{wch:40},{wch:12},{wch:30},{wch:6},{wch:6},{wch:12},{wch:24}];
+  XLSX.utils.book_append_sheet(wb, wsA, '안건');
+
+  const wsM = XLSX.utils.aoa_to_sheet([
+    ['구분','성명','이메일','비고'],
+    ['위원장','○○○','',''],
+    ['교원위원','○○○','',''],
+    ['학부모위원','○○○','',''],
+    ['지역위원','○○○','',''],
+  ]); wsM['!cols'] = [{wch:14},{wch:14},{wch:26},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, wsM, '위원명단');
+
+  XLSX.writeFile(wb, '학운위_기초자료_통합양식.xlsx');
+}
+
+/* ───────────── 저장/불러오기 ───────────── */
+function saveJSON(){
+  const blob = new Blob([JSON.stringify(S,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `학운위_${S.year}학년도_제${S.round}회_${S.school}.json`;
+  a.click();
+}
+function loadJSON(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{ S = Object.assign(S, JSON.parse(r.result)); render(); alert('불러오기 완료'); }
+    catch(err){ alert('파일을 읽을 수 없습니다: ' + err.message); }
+  };
+  r.readAsText(file);
+  e.target.value = '';
+}
+
+renderNav();
+render();
+
+/* ================= 한글(HWPX) 저장 =================
+   미리보기 용지(.paper)에 보이는 칸(td·격자 div)의 화면 위치를 재서 한글 표 하나로 합친다.
+   - 위아래로 맞붙은 표·격자는 하나의 표로 합침 (선 위치를 모아 행·열 격자를 만들고 병합 칸으로 배치)
+   - 미리보기에서 직접 고친 내용(contenteditable)도 그대로 들어감
+   - 용지 1장 = 한글 1쪽 (다음 용지는 쪽 나눔)
+   - zip 은 압축 없이(STORE) 직접 묶음 — 외부 라이브러리 없음
+   사용: saveHwpx('content','파일이름') — 법인회계Master 와 같은 코드 */
+const HWPX={
+  PAGE_W:59528,PAGE_H:84188,                 // A4 (HWPUNIT: 1mm ≈ 283.46)
+  MARGIN:{left:4252,right:4252,top:4252,bottom:4252}, // 인쇄 여백 15mm (@page 와 같게)
+  FONT:'함초롬바탕',
+  SNAP:3,                                     // 이 픽셀 이내의 선은 같은 선으로 봄
+  NOPRINT:'.no-print,.noprint'
+};
+function hwpxEsc(s){return String(s).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function hwpxColor(css){ // 'rgb(242, 242, 242)' → '#F2F2F2' (투명·흰색이면 null)
+  const m=String(css).match(/rgba?\(([^)]+)\)/);if(!m)return null;
+  const v=m[1].split(',').map(x=>parseFloat(x));
+  if(v.length>3&&v[3]===0)return null;
+  if(v[0]>=254&&v[1]>=254&&v[2]>=254)return null;
+  return '#'+v.slice(0,3).map(n=>Math.round(n).toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+function hwpxAlign(el,cs){
+  if(cs.position==='absolute'&&el.parentElement){ // 따로 띄운 글(예: 적요 칸 오른쪽 금액)은 가까운 쪽으로 정렬
+    const r=el.getBoundingClientRect(),pr=el.parentElement.getBoundingClientRect();
+    if(pr.right-r.right<r.left-pr.left)return 'RIGHT';
+  }
+  if(cs.display==='flex'||cs.display==='grid'){
+    if(cs.justifyContent==='center')return 'CENTER';
+    if(/end|right/.test(cs.justifyContent))return 'RIGHT';
+  }
+  const t=cs.textAlign;
+  if(t==='center'||t==='-webkit-center')return 'CENTER';
+  if(t==='right'||t==='end'||t==='-webkit-right')return 'RIGHT';
+  if(t==='justify')return 'JUSTIFY';
+  return 'LEFT';
+}
+function hwpxHidden(el){const cs=getComputedStyle(el);return cs.display==='none'||cs.visibility==='hidden'||el.matches(HWPX.NOPRINT);}
+/* 요소 안의 글을 문단 목록으로 — 자식이 모두 블록이면 자식마다(정렬·글자크기 각자), 아니면 줄 단위 */
+function hwpxParas(el){
+  if(hwpxHidden(el))return [];
+  const kids=[...el.childNodes];
+  const elKids=kids.filter(n=>n.nodeType===1&&!hwpxHidden(n));
+  const directText=kids.some(n=>n.nodeType===3&&n.textContent.trim());
+  const allBlock=elKids.length>0&&!directText&&elKids.every(k=>k.tagName!=='BR'&&!/^inline/.test(getComputedStyle(k).display));
+  if(allBlock)return elKids.flatMap(hwpxParas);
+  const cs=getComputedStyle(el);
+  const lines=(el.innerText||'').replace(/ /g,' ').replace(/\r/g,'').split('\n');
+  while(lines.length&&!lines[0].trim())lines.shift();
+  while(lines.length&&!lines[lines.length-1].trim())lines.pop();
+  const pt=parseFloat(cs.fontSize)*0.75, bold=(parseInt(cs.fontWeight,10)||400)>=600, align=hwpxAlign(el,cs);
+  const lh=parseFloat(cs.lineHeight)/parseFloat(cs.fontSize);           // 'normal'이면 NaN
+  const ls=isNaN(lh)?130:Math.min(300,Math.max(100,Math.round(lh*100)));
+  return lines.map(t=>({text:t,pt,bold,align,ls}));
+}
+function hwpxBordered(el){const cs=getComputedStyle(el);return ['Top','Right','Bottom','Left'].some(s=>hwpxSide(cs,s));}
+function hwpxVisKids(el){return [...el.children].filter(k=>!hwpxHidden(k)&&k.getBoundingClientRect().width>0);}
+/* 가로 줄(flex row) 안에 글 상자가 2개 이상 — 칸으로 나눠 위치를 살림 (예: "년도 법인회계 … 증제 1 호", 감사 서명줄, 표지 세입·세출 상자) */
+function hwpxFlexRow(el){
+  const cs=getComputedStyle(el);
+  if(!/flex/.test(cs.display)||!/^row/.test(cs.flexDirection))return false;
+  if([...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim()))return false;
+  const kids=hwpxVisKids(el);
+  return kids.length>=2&&kids.every(k=>k.tagName!=='TABLE'&&!k.querySelector('table'));
+}
+/* 이 요소(또는 안쪽)에 표처럼 다뤄야 할 것이 있나: 표·격자·가로 줄·테두리 상자 */
+function hwpxHasBoxes(el){
+  if(el.querySelector('table'))return true;
+  return [...el.querySelectorAll('*')].some(d=>!hwpxHidden(d)&&(getComputedStyle(d).display==='grid'||hwpxFlexRow(d)||hwpxBordered(d)));
+}
+/* 용지 한 장을 블록 목록으로: {type:'boxes',boxes:[...]} 또는 {type:'text',el} (화면 순서) */
+function hwpxBlocks(paper){
+  const out=[];
+  const addBoxes=(list)=>{
+    if(!list.length)return;
+    const top=Math.min(...list.map(b=>b.rect.top)),bottom=Math.max(...list.map(b=>b.rect.bottom));
+    const last=out[out.length-1];
+    if(last&&last.type==='boxes'&&top<=last.bottom+HWPX.SNAP){last.boxes.push(...list);last.bottom=Math.max(last.bottom,bottom);last.top=Math.min(last.top,top);}
+    else out.push({type:'boxes',boxes:list,top,bottom});
+  };
+  const box=(el)=>({el,rect:el.getBoundingClientRect()});
+  const walk=(node)=>{
+    for(const ch of node.children){
+      if(hwpxHidden(ch))continue;
+      const r=ch.getBoundingClientRect();if(!(r.width>0&&r.height>0))continue;
+      const cs=getComputedStyle(ch);
+      if(ch.tagName==='TABLE'){
+        const list=[];
+        for(const row of ch.rows)for(const cell of row.cells){const cr=cell.getBoundingClientRect();if(cr.width>0&&cr.height>0)list.push(box(cell));}
+        addBoxes(list);
+      }else if(cs.display==='grid'||hwpxFlexRow(ch)){
+        const kids=hwpxVisKids(ch).map(box);
+        if(cs.display!=='grid'&&!hwpxBordered(ch)&&!kids.some(k=>hwpxBordered(k.el))){
+          // 테두리 없는 가로 줄: 글 사이 빈 공간을 반씩 나눠 칸을 넓힘(한글에서 줄바꿈 방지),
+          // 원래 글이 붙어 있던 쪽으로 정렬해 위치 유지
+          kids.sort((a,b)=>a.rect.left-b.rect.left);
+          const orig=kids.map(k=>({l:k.rect.left,rt:k.rect.right}));
+          kids.forEach((k,i)=>{
+            const L=i===0?r.left:(orig[i-1].rt+orig[i].l)/2;
+            const R=i===kids.length-1?r.right:(orig[i].rt+orig[i+1].l)/2;
+            const dl=orig[i].l-L,dr=R-orig[i].rt;
+            k.align=Math.abs(dl-dr)<4?'CENTER':(dl<dr?'LEFT':'RIGHT');
+            k.rect={left:L,right:R,top:r.top,bottom:r.bottom};
+          });
+        }
+        addBoxes(kids);
+      }else if(hwpxBordered(ch)&&!ch.querySelector('table')&&![...ch.querySelectorAll('*')].some(d=>!hwpxHidden(d)&&(getComputedStyle(d).display==='grid'||hwpxFlexRow(d)))){
+        addBoxes([box(ch)]);                         // 테두리 있는 상자 하나 = 칸 하나
+      }else if(hwpxHasBoxes(ch)){
+        walk(ch);
+      }else if((ch.innerText||'').trim()){
+        const kids=hwpxVisKids(ch);
+        const direct=[...ch.childNodes].some(n=>n.nodeType===3&&n.textContent.trim());
+        if(kids.length>1&&!direct&&kids.every(k=>!/^inline/.test(getComputedStyle(k).display)))walk(ch); // 블록이 여러 개면 하나씩(사이 간격 살림)
+        else out.push({type:'text',el:ch,top:r.top,bottom:r.bottom});
+      }
+    }
+  };
+  walk(paper);
+  return out;
+}
+/* 선 위치 모으기: 가까운 값끼리 합쳐 정렬된 선 목록 */
+function hwpxLines(vals){
+  const s=[...vals].sort((a,b)=>a-b),lines=[];
+  for(const v of s){if(!lines.length||v-lines[lines.length-1]>HWPX.SNAP)lines.push(v);}
+  return lines;
+}
+function hwpxIdx(lines,v){let bi=0,bd=Infinity;lines.forEach((x,i)=>{const d=Math.abs(x-v);if(d<bd){bd=d;bi=i;}});return bi;}
+function hwpxSide(cs,side){return parseFloat(cs['border'+side+'Width'])>0.3&&cs['border'+side+'Style']!=='none'&&cs['border'+side+'Style']!=='hidden';}
+
+/* 입력칸(input·select·textarea)의 값은 글로 읽히지 않으므로, 잠깐 같은 자리에 글(span)로 바꿔 놓고 변환한 뒤 되돌림 */
+function hwpxBuild(papers){
+  const swaps=[];
+  papers.forEach(p=>p.querySelectorAll('input,select,textarea').forEach(c=>{
+    if(hwpxHidden(c)||c.type==='hidden'||c.type==='file')return;
+    const v=(c.type==='checkbox'||c.type==='radio')?(c.checked?'☑':'☐'):c.tagName==='SELECT'?((c.options[c.selectedIndex]||{}).text||''):c.value;
+    const sp=document.createElement('span');sp.textContent=v||'　';sp.style.whiteSpace='pre-wrap';
+    c.after(sp);swaps.push([c,sp,c.style.display]);c.style.display='none';
+  }));
+  try{return hwpxBuildCore(papers);}
+  finally{swaps.forEach(([c,sp,d])=>{sp.remove();c.style.display=d;});}
+}
+function hwpxBuildCore(papers){
+  const charPrs=[],charIds={},paraPrs=[],paraIds={},bfs=[],bfIds={};
+  const charId=(pt,bold)=>{const h=Math.max(100,Math.round(pt*100)),k=h+'|'+(bold?1:0);if(!(k in charIds)){charIds[k]=charPrs.length;charPrs.push({h,bold});}return charIds[k];};
+  const paraId=(align,ls,left=0,right=0,prev=0)=>{const k=[align,ls,left,right,prev].join('|');if(!(k in paraIds)){paraIds[k]=paraPrs.length;paraPrs.push({align,ls,left,right,prev});}return paraIds[k];};
+  const bfId=(t,r,b,l,fill)=>{const k=[t,r,b,l].map(x=>x?1:0).join('')+'|'+(fill||'');if(!(k in bfIds)){bfIds[k]=bfs.length+1;bfs.push({t,r,b,l,fill});}return bfIds[k];};
+  bfId(false,false,false,false,null);   // id 1 = 테두리 없음
+  bfId(true,true,true,true,null);        // id 2 = 표 기본(가는 실선)
+  charId(10,false);paraId('JUSTIFY',160);// id 0 = 바탕글
+  const tinyChar=charId(1,false),tinyPara=paraId('LEFT',100); // 쪽 설정만 싣는 빈 문단용
+  const bodyW=HWPX.PAGE_W-HWPX.MARGIN.left-HWPX.MARGIN.right;
+  const paraXml=(p,ls,ind)=>`<hp:p paraPrIDRef="${paraId(p.align,ls,ind?ind.left:0,ind?ind.right:0,ind?ind.prev:0)}" styleIDRef="0"><hp:run charPrIDRef="${charId(p.pt,p.bold)}"><hp:t>${hwpxEsc(p.text)}</hp:t></hp:run></hp:p>`;
+  // 위 간격만 주는 빈 문단 (1pt 글자) — 표 앞 여백·표지의 큰 여백용
+  const spacer=(hu)=>`<hp:p paraPrIDRef="${paraId('LEFT',100,0,0,Math.max(0,hu-100))}" styleIDRef="0"><hp:run charPrIDRef="${tinyChar}"><hp:t></hp:t></hp:run></hp:p>`;
+  let tblSeq=0;const body=[];const prv=[];
+  papers.forEach((paper,pi)=>{
+    const pcs=getComputedStyle(paper),pr=paper.getBoundingClientRect();
+    const cLeft=pr.left+parseFloat(pcs.borderLeftWidth)+parseFloat(pcs.paddingLeft);
+    const cRight=pr.right-parseFloat(pcs.borderRightWidth)-parseFloat(pcs.paddingRight);
+    const S=bodyW/(cRight-cLeft);                             // 화면 px → HWPUNIT
+    const firstIdx=body.length;
+    const cTop=pr.top+parseFloat(pcs.borderTopWidth)+parseFloat(pcs.paddingTop);
+    const cBottom=pr.bottom-parseFloat(pcs.borderBottomWidth)-parseFloat(pcs.paddingBottom);
+    let lastBottom=cTop;
+    // 위 간격(px→HU). 한글 줄 높이가 조금 더 커서 5% 줄이고, 아래쪽에 붙은 글(표지 법인명 등)은
+    // 쪽 끝 90% 안에 들어오도록 간격을 줄여 다음 쪽으로 밀리지 않게 함 (한 장짜리 용지만)
+    const onePage=(cBottom-cTop)<=(HWPX.PAGE_H-HWPX.MARGIN.top-HWPX.MARGIN.bottom)/S*1.02;
+    const gapHU=(top,bottom)=>{
+      let g=Math.max(0,top-lastBottom);
+      const over=(bottom-cTop)-(cBottom-cTop)*0.9;
+      if(onePage&&over>0)g=Math.max(0,g-over);
+      return Math.round(g*S*0.95);
+    };
+    // 표 바로 다음의 간격은 한글이 다음 문단의 '위 간격'을 무시하므로 앞 표의 아래 바깥 여백으로 넣음
+    let lastTbl=-1;
+    const gapAfterTable=(g)=>{
+      if(lastTbl<0||lastTbl!==body.length-1)return false;
+      body[lastTbl]=body[lastTbl].replace('<hp:outMargin left="0" right="0" top="0" bottom="0"/>',`<hp:outMargin left="0" right="0" top="0" bottom="${g}"/>`);
+      return true;
+    };
+    for(const blk of hwpxBlocks(paper)){
+      if(blk.type==='text'){
+        const el=blk.el,ecs=getComputedStyle(el),er=el.getBoundingClientRect();
+        const left=Math.max(0,Math.round((er.left+parseFloat(ecs.borderLeftWidth)+parseFloat(ecs.paddingLeft)-cLeft)*S));
+        const right=Math.max(0,Math.round((cRight-er.right+parseFloat(ecs.borderRightWidth)+parseFloat(ecs.paddingRight))*S));
+        let prev=gapHU(er.top+parseFloat(ecs.paddingTop),er.bottom);
+        if(gapAfterTable(prev))prev=0;
+        for(const p of hwpxParas(el)){body.push(paraXml(p,p.ls,{left,right,prev}));prev=0;prv.push(p.text);}
+        lastBottom=er.bottom;
+        continue;
+      }
+      const g=gapHU(blk.top,blk.bottom);
+      if(!gapAfterTable(g)&&g>150)body.push(spacer(g));
+      lastBottom=blk.bottom;
+      const boxes=blk.boxes;
+      const xs=hwpxLines(boxes.flatMap(b=>[b.rect.left,b.rect.right]));
+      const ys=hwpxLines(boxes.flatMap(b=>[b.rect.top,b.rect.bottom]));
+      const nc=xs.length-1,nr=ys.length-1;
+      if(nc<1||nr<1)continue;
+      // 선 표시 지도: h[y선][열칸], v[x선][행칸]
+      const H=ys.map(()=>new Array(nc).fill(false)),V=xs.map(()=>new Array(nr).fill(false));
+      const occ=Array.from({length:nr},()=>new Array(nc).fill(-1));
+      const cells=[];
+      for(const b of boxes){
+        const c0=hwpxIdx(xs,b.rect.left),c1=hwpxIdx(xs,b.rect.right),r0=hwpxIdx(ys,b.rect.top),r1=hwpxIdx(ys,b.rect.bottom);
+        if(c1<=c0||r1<=r0)continue;
+        let clash=false;for(let r=r0;r<r1;r++)for(let c=c0;c<c1;c++)if(occ[r][c]>=0)clash=true;
+        if(clash){console.warn('[HWPX] 겹치는 칸 건너뜀:',b.el.innerText);continue;}
+        const idx=cells.length;for(let r=r0;r<r1;r++)for(let c=c0;c<c1;c++)occ[r][c]=idx;
+        const cs=getComputedStyle(b.el);
+        const side={Top:hwpxSide(cs,'Top'),Right:hwpxSide(cs,'Right'),Bottom:hwpxSide(cs,'Bottom'),Left:hwpxSide(cs,'Left')};
+        // 칸 가장자리가 감싸는 상자(격자·줄·표지 상자)의 테두리와 겹치면 그 선도 칸 테두리로 (용지까지 올라가며 확인)
+        for(let a=b.el.parentElement;a&&a!==paper&&!a.classList.contains('paper');a=a.parentElement){
+          if(/^(TR|TBODY|THEAD|TFOOT|TABLE)$/.test(a.tagName))continue;
+          const cr=a.getBoundingClientRect(),ccs=getComputedStyle(a),n=HWPX.SNAP;
+          if(Math.abs(b.rect.top-cr.top)<=n&&hwpxSide(ccs,'Top'))side.Top=true;
+          if(Math.abs(b.rect.bottom-cr.bottom)<=n&&hwpxSide(ccs,'Bottom'))side.Bottom=true;
+          if(Math.abs(b.rect.left-cr.left)<=n&&hwpxSide(ccs,'Left'))side.Left=true;
+          if(Math.abs(b.rect.right-cr.right)<=n&&hwpxSide(ccs,'Right'))side.Right=true;
+        }
+        for(let c=c0;c<c1;c++){if(side.Top)H[r0][c]=true;if(side.Bottom)H[r1][c]=true;}
+        for(let r=r0;r<r1;r++){if(side.Left)V[c0][r]=true;if(side.Right)V[c1][r]=true;}
+        let valign='CENTER';
+        if(b.el.tagName==='TD'||b.el.tagName==='TH'){if(cs.verticalAlign==='top')valign='TOP';else if(cs.verticalAlign==='bottom')valign='BOTTOM';}
+        else if(cs.display==='flex'||cs.display==='grid'){if(/start|top/.test(cs.alignItems))valign='TOP';else if(/end|bottom/.test(cs.alignItems))valign='BOTTOM';}
+        else valign='TOP';
+        const paras=hwpxParas(b.el);if(b.align)paras.forEach(p=>p.align=b.align);
+        cells.push({r0,r1,c0,c1,paras,fill:hwpxColor(cs.backgroundColor),valign,pt:parseFloat(cs.fontSize)*0.75});
+      }
+      // 빈 자리는 테두리 없는 빈 칸으로 채움 (한글 표는 빈 구멍을 허용하지 않음)
+      for(let r=0;r<nr;r++)for(let c=0;c<nc;c++)if(occ[r][c]<0){occ[r][c]=cells.length;cells.push({r0:r,r1:r+1,c0:c,c1:c+1,paras:[],fill:null,valign:'CENTER',pt:10});}
+      const X=xs.map(x=>Math.round((x-xs[0])*S)),Y=ys.map(y=>Math.round((y-ys[0])*S));
+      const any=(arr)=>arr.some(Boolean);
+      const byRow=Array.from({length:nr},()=>[]);
+      for(const c of cells){
+        const t=any(H[c.r0].slice(c.c0,c.c1)),bt=any(H[c.r1].slice(c.c0,c.c1)),l=any(V[c.c0].slice(c.r0,c.r1)),rt=any(V[c.c1].slice(c.r0,c.r1));
+        const bf=bfId(t,rt,bt,l,c.fill);
+        const ps=c.paras.length?c.paras:[{text:'',pt:c.pt,bold:false,align:'CENTER'}];
+        const inner=ps.map(p=>paraXml(p,130)).join('');
+        ps.forEach(p=>p.text&&prv.push(p.text));
+        byRow[c.r0].push({c0:c.c0,xml:
+          `<hp:tc name="" header="0" hasMargin="0" protect="0" editable="0" dirty="0" borderFillIDRef="${bf}">`+
+          `<hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="${c.valign}" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0">${inner}</hp:subList>`+
+          `<hp:cellAddr colAddr="${c.c0}" rowAddr="${c.r0}"/><hp:cellSpan colSpan="${c.c1-c.c0}" rowSpan="${c.r1-c.r0}"/>`+
+          `<hp:cellSz width="${X[c.c1]-X[c.c0]}" height="${Y[c.r1]-Y[c.r0]}"/><hp:cellMargin left="141" right="141" top="141" bottom="141"/></hp:tc>`});
+      }
+      const rows=byRow.map(list=>'<hp:tr>'+list.sort((a,b)=>a.c0-b.c0).map(x=>x.xml).join('')+'</hp:tr>').join('');
+      // 본문 위에 자리를 차지하며 놓이는 표(쪽 경계에서 나뉨) — 가운데 놓인 상자는 가로 위치도 맞춤
+      const float=true;
+      const hOff=Math.max(0,Math.round((xs[0]-cLeft)*S));
+      const pos=`<hp:pos treatAsChar="0" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="COLUMN" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="${hOff}"/>`;
+      const tbl=`<hp:tbl id="${++tblSeq}" zOrder="0" numberingType="TABLE"${float?' textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None"':''} pageBreak="CELL" repeatHeader="0" rowCnt="${nr}" colCnt="${nc}" cellSpacing="0" borderFillIDRef="2" noShading="0">`+
+        `<hp:sz width="${X[nc]}" widthRelTo="ABSOLUTE" height="${Y[nr]}" heightRelTo="ABSOLUTE" protect="0"/>${pos}`+
+        `<hp:outMargin left="0" right="0" top="0" bottom="0"/><hp:inMargin left="283" right="283" top="141" bottom="141"/>${rows}</hp:tbl>`;
+      // 표를 싣는 문단은 1pt 글자 — 보통 글자면 표마다 빈 줄 높이(약 5mm)가 더해져 아래로 밀림
+      body.push(`<hp:p paraPrIDRef="${tinyPara}" styleIDRef="0"><hp:run charPrIDRef="${tinyChar}">${tbl}</hp:run></hp:p>`);
+      lastTbl=body.length-1;
+    }
+    // 둘째 장부터는 새 쪽에서 시작
+    if(pi>0&&body.length>firstIdx)body[firstIdx]=body[firstIdx].replace('<hp:p ','<hp:p pageBreak="1" ');
+  });
+  // 쪽 설정(secPr)은 첫 문단 첫 run 에 — 표 문단에는 못 실으므로 1pt 빈 문단을 앞에 둠
+  const m=HWPX.MARGIN;
+  const secPr=`<hp:secPr textDirection="HORIZONTAL" spaceColumns="1134" tabStop="8000" outlineShapeIDRef="1" memoShapeIDRef="0" textVerticalWidthHead="0" masterPageCnt="0">`+
+    `<hp:grid lineGrid="0" charGrid="0" wonggojiFormat="0"/><hp:startNum pageStartsOn="BOTH" page="0" pic="0" tbl="0" equation="0"/>`+
+    `<hp:visibility hideFirstHeader="0" hideFirstFooter="0" hideFirstMasterPage="0" border="SHOW_ALL" fill="SHOW_ALL" hideFirstPageNum="0" hideFirstEmptyLine="0" showLineNumber="0"/>`+
+    `<hp:pagePr landscape="WIDELY" width="${HWPX.PAGE_W}" height="${HWPX.PAGE_H}" gutterType="LEFT_ONLY"><hp:margin header="0" footer="0" gutter="0" left="${m.left}" right="${m.right}" top="${m.top}" bottom="${m.bottom}"/></hp:pagePr>`+
+    `<hp:footNotePr><hp:autoNumFormat type="DIGIT" userChar="" prefixChar="" suffixChar=")" supscript="0"/><hp:noteLine length="-1" type="SOLID" width="0.12 mm" color="#000000"/><hp:noteSpacing betweenNotes="283" belowLine="567" aboveLine="850"/><hp:numbering type="CONTINUOUS" newNum="1"/><hp:placement place="EACH_COLUMN" beneathText="0"/></hp:footNotePr>`+
+    `<hp:endNotePr><hp:autoNumFormat type="DIGIT" userChar="" prefixChar="" suffixChar=")" supscript="0"/><hp:noteLine length="14692344" type="SOLID" width="0.12 mm" color="#000000"/><hp:noteSpacing betweenNotes="0" belowLine="567" aboveLine="850"/><hp:numbering type="CONTINUOUS" newNum="1"/><hp:placement place="END_OF_DOCUMENT" beneathText="0"/></hp:endNotePr>`+
+    `</hp:secPr><hp:ctrl><hp:colPr id="" type="NEWSPAPER" layout="LEFT" colCount="1" sameSz="1" sameGap="0"/></hp:ctrl>`;
+  if(body.length&&!body[0].includes('<hp:tbl ')){
+    body[0]=body[0].replace(/<hp:run charPrIDRef="(\d+)">/,`<hp:run charPrIDRef="$1">${secPr}`);
+  }else{
+    body.unshift(`<hp:p paraPrIDRef="${tinyPara}" styleIDRef="0"><hp:run charPrIDRef="${tinyChar}">${secPr}<hp:t></hp:t></hp:run></hp:p>`);
+  }
+  const NS='xmlns:hp="http://www.hancom.co.kr/hwpml/2011/paragraph"';
+  const section=`<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n<hs:sec xmlns:hs="http://www.hancom.co.kr/hwpml/2011/section" ${NS}>\n${body.join('\n')}\n</hs:sec>`;
+  // ---- header.xml ----
+  const langs=['HANGUL','LATIN','HANJA','JAPANESE','OTHER','SYMBOL','USER'];
+  const font=`<hh:font id="0" face="${HWPX.FONT}" type="TTF" isEmbedded="0"><hh:typeInfo familyType="FCAT_GOTHIC" weight="6" proportion="4" contrast="0" strokeVariation="1" armStyle="1" letterform="1" midline="1" xHeight="1"/></hh:font>`;
+  const side=(n,on)=>on?`<hh:${n} type="SOLID" width="0.12 mm" color="#000000"/>`:`<hh:${n} type="NONE" width="0.1 mm" color="#000000"/>`;
+  const bfXml=bfs.map((b,i)=>`<hh:borderFill id="${i+1}" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0"><hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/>`+
+    side('leftBorder',b.l)+side('rightBorder',b.r)+side('topBorder',b.t)+side('bottomBorder',b.b)+
+    (b.fill?`<hc:fillBrush><hc:winBrush faceColor="${b.fill}" hatchColor="#000000" alpha="0"/></hc:fillBrush>`:'')+`</hh:borderFill>`).join('');
+  const cpXml=charPrs.map((c,i)=>`<hh:charPr id="${i}" height="${c.h}" textColor="#000000" shadeColor="none" useFontSpace="0" useKerning="0" symMark="NONE" borderFillIDRef="1"${c.bold?' bold="1"':''}>`+
+    `<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/><hh:ratio hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>`+
+    `<hh:spacing hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/><hh:relSz hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>`+
+    `<hh:offset hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>${c.bold?'<hh:bold/>':''}</hh:charPr>`).join('');
+  const ppXml=paraPrs.map((p,i)=>`<hh:paraPr id="${i}" tabPrIDRef="0" condense="0" fontLineHeight="0" snapToGrid="0" suppressLineNumbers="0" checked="0" textDir="AUTO">`+
+    `<hh:align horizontal="${p.align}" vertical="BASELINE"/><hh:heading type="NONE" idRef="0" level="0"/>`+
+    `<hh:breakSetting breakLatinWord="KEEP_WORD" breakNonLatinWord="BREAK_WORD" widowOrphan="0" keepWithNext="0" keepLines="0" pageBreakBefore="0" lineWrap="BREAK"/>`+
+    `<hh:autoSpacing eAsianEng="0" eAsianNum="0"/><hh:margin><hc:intent value="0" unit="HWPUNIT"/><hc:left value="${p.left}" unit="HWPUNIT"/><hc:right value="${p.right}" unit="HWPUNIT"/><hc:prev value="${p.prev}" unit="HWPUNIT"/><hc:next value="0" unit="HWPUNIT"/></hh:margin>`+
+    `<hh:lineSpacing type="PERCENT" value="${p.ls}"/><hh:border borderFillIDRef="1" offsetLeft="0" offsetRight="0" offsetTop="0" offsetBottom="0" connect="0" ignoreMargin="0"/></hh:paraPr>`).join('');
+  const heads=Array.from({length:7},(_,i)=>`<hh:paraHead start="1" level="${i+1}" align="LEFT" useInstWidth="1" autoIndent="1" widthAdjust="0" textOffsetType="PERCENT" textOffset="50" numFormat="DIGIT" charPrIDRef="4294967295" checkable="0"/>`).join('');
+  const header=`<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n<hh:head xmlns:hh="http://www.hancom.co.kr/hwpml/2011/head" ${NS} xmlns:hc="http://www.hancom.co.kr/hwpml/2011/core" version="1.4" secCnt="1">`+
+    `<hh:beginNum page="1" footnote="1" endnote="1" pic="1" tbl="1" equation="1"/><hh:refList>`+
+    `<hh:fontfaces itemCnt="7">${langs.map(l=>`<hh:fontface lang="${l}" fontCnt="1">${font}</hh:fontface>`).join('')}</hh:fontfaces>`+
+    `<hh:borderFills itemCnt="${bfs.length}">${bfXml}</hh:borderFills>`+
+    `<hh:charProperties itemCnt="${charPrs.length}">${cpXml}</hh:charProperties>`+
+    `<hh:tabProperties itemCnt="1"><hh:tabPr id="0" autoTabLeft="0" autoTabRight="0"/></hh:tabProperties>`+
+    `<hh:numberings itemCnt="1"><hh:numbering id="1" start="0">${heads}</hh:numbering></hh:numberings><hh:bullets itemCnt="0"/>`+
+    `<hh:paraProperties itemCnt="${paraPrs.length}">${ppXml}</hh:paraProperties>`+
+    `<hh:styles itemCnt="1"><hh:style id="0" type="PARA" name="바탕글" engName="Normal" paraPrIDRef="0" charPrIDRef="0" nextStyleIDRef="0" langID="1042" lockForm="0"/></hh:styles>`+
+    `</hh:refList><hh:compatibleDocument targetProgram="HWP2018"><hh:layoutCompatibility/></hh:compatibleDocument></hh:head>`;
+  const container=`<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n<ocf:container xmlns:ocf="urn:oasis:names:tc:opendocument:xmlns:container" xmlns:hpf="http://www.hancom.co.kr/schema/2011/hpf"><ocf:rootfiles><ocf:rootfile full-path="Contents/content.hpf" media-type="application/hwpml-package+xml"/></ocf:rootfiles></ocf:container>`;
+  const hpf=`<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n<opf:package xmlns:opf="http://www.idpf.org/2007/opf/" xmlns:hpf="http://www.hancom.co.kr/schema/2011/hpf" xmlns:hh="http://www.hancom.co.kr/hwpml/2011/head"><opf:metadata><opf:meta name="generator" content="법인회계Master"/></opf:metadata>`+
+    `<opf:manifest><opf:item id="header" href="Contents/header.xml" media-type="application/xml"/><opf:item id="section0" href="Contents/section0.xml" media-type="application/xml"/></opf:manifest>`+
+    `<opf:spine><opf:itemref idref="header" linear="no"/><opf:itemref idref="section0" linear="yes"/></opf:spine></opf:package>`;
+  return [
+    ['mimetype','application/hwp+zip'],
+    ['META-INF/container.xml',container],
+    ['Contents/content.hpf',hpf],
+    ['Contents/header.xml',header],
+    ['Contents/section0.xml',section],
+    ['Preview/PrvText.txt',prv.join('\r\n').slice(0,1000)]
+  ];
+}
+/* 압축 없는(STORE) zip — mimetype 이 맨 앞이어야 한글이 HWPX 로 인식 */
+function hwpxZip(files){
+  const enc=new TextEncoder();
+  const crcT=hwpxZip.t||(hwpxZip.t=Array.from({length:256},(_,n)=>{let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;return c>>>0;}));
+  const crc=(d)=>{let c=0xFFFFFFFF;for(let i=0;i<d.length;i++)c=crcT[(c^d[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0;};
+  const parts=[],central=[];let off=0;
+  const u16=(v)=>[v&0xFF,(v>>>8)&0xFF],u32=(v)=>[v&0xFF,(v>>>8)&0xFF,(v>>>16)&0xFF,(v>>>24)&0xFF];
+  for(const [name,text] of files){
+    const nm=enc.encode(name),data=enc.encode(text),c=crc(data);
+    const common=[...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(c),...u32(data.length),...u32(data.length),...u16(nm.length),...u16(0)];
+    const local=new Uint8Array([...u32(0x04034b50),...common]);
+    parts.push(local,nm,data);
+    central.push(new Uint8Array([...u32(0x02014b50),...u16(20),...common,...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),nm);
+    off+=local.length+nm.length+data.length;
+  }
+  const cdSize=central.reduce((a,b)=>a+b.length,0);
+  const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cdSize),...u32(off),...u16(0)]);
+  return new Blob([...parts,...central,end],{type:'application/hwp+zip'});
+}
+function saveHwpx(hostId,fileBase){
+  const papers=[...document.querySelectorAll('#'+hostId+' .paper')].filter(p=>p.getBoundingClientRect().width>0);
+  if(!papers.length){alert('미리보기를 먼저 열어 주세요.');return;}
+  let blob;
+  try{blob=hwpxZip(hwpxBuild(papers));}
+  catch(e){console.error(e);alert('한글 파일을 만드는 중 문제가 생겼어요. PDF 저장을 이용해 주세요.\n('+e.message+')');return;}
+  const name=String(fileBase||'문서').replace(/[\\/:*?"<>|]/g,'_')+'.hwpx';
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);
+}
+function saveHWPX(){
+  const docName=DOCS.find(d=>d.id===cur).name.replace(/^[0-9]+\.\s*/,'').replace(/[🏠📢👤\s]/g,'');
+  saveHwpx('content',`${S.year}학년도_제${S.round}회_${docName}_${S.school}`);
+}
+</script>
+<footer class="design-author-credit" style="text-align:center;padding:16px;font:12px/1.8 Malgun Gothic,sans-serif;color:#647892">제작자: 정주고등학교 박지은 / 문의: ican6363@naver.com</footer></body>
+</html>
