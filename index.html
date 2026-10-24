@@ -230,7 +230,7 @@
     .mcard .d{padding-right:36px}
   }
 
-  /* ===== 서식 생성 화면 (시안2) ===== */
+  /* ===== 도구함 화면 (시안2) ===== */
   .tnav a{position:relative}
   .tnav a.on{color:#1f63c6}
   .tnav a.on::after{content:"";position:absolute;left:-10px;right:-10px;bottom:-24px;height:3px;border-radius:3px;background:#1f63c6}
@@ -365,7 +365,7 @@
     <nav class="tnav">
       <a class="home" onclick="goHome()"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 3 2.5 11h2.8v9h5.2v-6h3v6h5.2v-9h2.8Z"/></svg>홈</a>
       <a data-p="sec-calc" onclick="showPage('sec-calc','계산')">계산</a><i>·</i>
-      <a data-p="sec-forms" onclick="showPage('sec-forms','서식 생성')">서식</a><i>·</i>
+      <a data-p="sec-forms" onclick="showPage('sec-forms','도구함')">도구함</a><i>·</i>
       <a data-p="guide" onclick="showPage('guide','실무 지침')">지침</a><i>·</i>
       <a data-p="sec-links" onclick="showPage('sec-links','자주 쓰는 사이트')">사이트</a>
     </nav>
@@ -392,11 +392,11 @@
   <div class="wrap2">
     <div class="menu2">
       <div class="mcard c1" onclick="showPage('sec-calc','계산')"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><rect x="8" y="5.5" width="8" height="4" rx=".8"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></span><span class="t">계산기</span><span class="d">여비 · 초과근무 · 일할 · 날짜</span><span class="go"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
-      <div class="mcard c2" onclick="showPage('sec-forms','서식 생성')"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/><path d="M8.5 8h5M8.5 12h3M8.5 16h4"/><path d="m19.5 3.5 1 1a1.4 1.4 0 0 1 0 2L15 12l-2.5.5.5-2.5 5.5-5.5a1.4 1.4 0 0 1 2 0Z"/></svg></span><span class="t">서식 생성</span><span class="d">대장 · 평가 · 인수인계 · 자동서식</span><span class="go"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+      <div class="mcard c2" onclick="showPage('sec-forms','도구함')"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/><path d="M8.5 8h5M8.5 12h3M8.5 16h4"/><path d="m19.5 3.5 1 1a1.4 1.4 0 0 1 0 2L15 12l-2.5.5.5-2.5 5.5-5.5a1.4 1.4 0 0 1 2 0Z"/></svg></span><span class="t">도구함</span><span class="d">대장 · 평가 · 자동서식 · 점검 · 취합</span><span class="go"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
       <div class="mcard c3" onclick="showPage('guide','실무 지침')"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5v-15Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/></svg></span><span class="t">실무 지침</span><span class="d">회계 · 복무 · 계약 · 예결산</span><span class="go"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
       <div class="mcard c4" onclick="showPage('sec-links','자주 쓰는 사이트')"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg></span><span class="t">자주 쓰는 사이트</span><span class="d">GAI 허브 · 제작도구 · 교행노트</span><span class="go"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
     </div>
-    <div class="qhead"><h2><svg viewBox="0 0 24 24" width="22" height="22" fill="#1b8fb0"><path d="M12.5 2c.6 3.2-1 5-2.6 6.8C8.3 10.6 7 12.3 7 14.8 7 18.2 9.4 21 12.6 21c3.4 0 5.9-2.6 5.9-6.1 0-2.9-1.5-4.6-2.6-5.9-.1 1.6-.8 2.7-1.9 3.3.4-3.5-.2-7-1.5-9.3Z"/></svg>오늘 많이 찾는 업무</h2><a onclick="showPage('sec-forms','서식 생성')">전체보기 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    <div class="qhead"><h2><svg viewBox="0 0 24 24" width="22" height="22" fill="#1b8fb0"><path d="M12.5 2c.6 3.2-1 5-2.6 6.8C8.3 10.6 7 12.3 7 14.8 7 18.2 9.4 21 12.6 21c3.4 0 5.9-2.6 5.9-6.1 0-2.9-1.5-4.6-2.6-5.9-.1 1.6-.8 2.7-1.9 3.3.4-3.5-.2-7-1.5-9.3Z"/></svg>오늘 많이 찾는 업무</h2><a onclick="showPage('sec-forms','도구함')">전체보기 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
     <div class="qlist">
       <a class="qitem" onclick="openCalc('여비')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg><span>국내출장 여비</span></a>
       <a class="qitem" onclick="openCalc('초과근무')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>초과근무수당</span></a>
@@ -477,7 +477,7 @@
 <section id="sec-forms" class="panel l3page">
   <div class="wrap2 lay3">
     <aside class="lside">
-      <div class="ls-head"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>서식 생성</div>
+      <div class="ls-head"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>도구함</div>
       <nav class="ls-list">
         <a class="on" data-f="all" onclick="fcat('all')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M7.5 9h2M12 9h4.5M7.5 13h2M12 13h4.5M7.5 17h2M12 17h4.5"/></svg><span>전체 서식</span><b>10</b></a>
         <a data-f="g-mulpum" onclick="fcat('g-mulpum')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5 12 4l8.5 4.5v8L12 21l-8.5-4.5Z"/><path d="M3.5 8.5 12 13l8.5-4.5M12 13v8"/></svg><span>물품</span><b>4</b></a>
