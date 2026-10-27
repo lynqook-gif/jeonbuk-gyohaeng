@@ -161,3 +161,18 @@
 
 /* TOOL-TITLE-20261026: keep each tool's original (sometimes editable) heading. */
 @media screen{body.brand-portal #tmodal-title{display:none!important}}
+
+/* TOOL-MODAL-LAYOUT-20261027 (Claude, 배치만): 도구 창 위 막대를 얇게, 닫기 버튼은 아래 도구의 오른쪽 끝선(카카오 문의 버튼 끝)에 맞춤. 색은 Codex */
+@media screen{
+ .tmodal-bar{min-height:44px;padding:6px max(24px,calc((100vw - 1280px) / 2))!important;justify-content:flex-end!important;box-sizing:border-box}
+ .tmodal-bar button{min-height:32px;padding:5px 12px!important;font-size:13px!important}
+}
+@media screen and (max-width:600px){.tmodal-bar{padding:6px 16px!important}}
+
+/* TOOL-MODAL-COLORS-20261027 (Codex): screen colors only. */
+@media screen{
+ #toolModal .tmodal-bar{background:#eef5fd;color:#203650;box-shadow:inset 0 -1px 0 #d5dfeb}
+ #toolModal .tmodal-bar button{background:#ffffff;color:#1e3a5f;box-shadow:inset 0 0 0 1px #d5dfeb}
+ #toolModal .tmodal-bar button:hover{background:#e1edfc;color:#174f91;box-shadow:inset 0 0 0 1px #afc5df}
+ #toolModal .tmodal-bar button:focus-visible{background:#e1edfc;color:#174f91;outline-color:#174f91;box-shadow:inset 0 0 0 2px #174f91}
+}
