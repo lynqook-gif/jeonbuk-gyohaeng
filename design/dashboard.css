@@ -199,3 +199,11 @@
 /* TOOLBOX-ICON-20261028 (Claude): 도구함 세입·예산·학운위·공통문서 카드에도 아이콘 표시 (index.html의 .mini-row 아이콘 숨김을 되돌림 → 12개 카드 같은 모양) */
 @media screen{body.brand-portal .l3page .mini-row .lc-ic{display:grid!important}}
 @media screen{body.brand-portal #design-hero[hidden]{display:none!important}}
+/* TOOL-CLOSE-20261028 (Claude, 배치만 — 색은 위 TOOL-MODAL-COLORS 그대로): 도구 창 위 따로 있던 닫기 막대를 없애고,
+   닫기 버튼을 도구 맨 위 줄 오른쪽 끝(카카오 문의 버튼 옆)에 같은 크기로 겹침. 도구 쪽은 data-in-portal일 때 --tl-close(PC 72px·휴대폰 62px)만큼 비워 둠 */
+@media screen{
+ #toolModal .tmodal-bar{position:absolute!important;top:0;right:0;left:auto;z-index:5;height:84px;min-height:0!important;padding:0 max(24px,calc((100vw - 1280px) / 2))!important;background:transparent!important;box-shadow:none!important;align-items:center}
+ #toolModal .tmodal-bar button{height:38px;min-height:0!important;padding:0 14px!important;font-size:12px!important;border-radius:7px;white-space:nowrap}
+}
+@media screen and (max-width:700px){#toolModal .tmodal-bar{height:64px}#toolModal .tmodal-bar button{height:35px;padding:0 10px!important;font-size:11px!important}}
+@media screen and (max-width:600px){#toolModal .tmodal-bar{padding:0 16px!important}}
