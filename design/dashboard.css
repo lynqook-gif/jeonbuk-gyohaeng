@@ -177,27 +177,22 @@
  #toolModal .tmodal-bar button:focus-visible{background:#e1edfc;color:#174f91;outline-color:#174f91;box-shadow:inset 0 0 0 2px #174f91}
 }
 
-/* PORTAL-BANNER-20261028 (Claude): 전북 포털 상단 = Codex 배너 그림(design/portal-banner.webp, 위아래 흰 여백 자름 2172x540).
-   PC(1200px 이상): 높이 265px 유지, 그림 전체(제목·캐릭터)가 보이게 contain + 양옆은 같은 그림 흐리게. 검색창은 그림 부제목 아래에 겹침.
-   1199px 이하: 그림을 폭에 맞춰 위에, 검색창은 그 아래(700px 이하는 양옆 꽃만 조금 잘라 크게). 원래 제목 글자는 화면 읽기용으로만 남김 */
+/* PORTAL-BANNER-20261028 (Claude): 전북 포털 상단 = Codex 가로 긴 배너(design/portal-banner-wide.webp 3240x536, 6:1).
+   글자·캐릭터는 가운데 1840px 안, 양옆은 배경만 → 폭이 달라도 cover로 양옆만 잘림.
+   PC(1200px 이상): 높이 265px 유지, 검색창은 부제목 아래 겹침(그림 가운데 기준 px 위치). 1199px 이하: 가운데 부분 그림 위·검색창 아래.
+   원래 제목 글자는 화면 읽기용으로만 남김 */
 @media screen{
- body.brand-portal #design-hero{position:relative!important;isolation:isolate;overflow:hidden!important;background:#eaf3fc!important}
+ body.brand-portal #design-hero{position:relative!important;overflow:hidden!important;background:#eaf3fc url("portal-banner-wide.webp") 50% 50%/cover no-repeat!important}
  body.brand-portal #design-hero .desk-copy{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;margin:0!important;padding:0!important}
  body.brand-portal #design-hero .desk-mascot{display:none!important}
 }
 @media screen and (min-width:1200px){
- body.brand-portal #design-hero{display:block!important;height:265px!important;min-height:0!important;padding:0!important;container-type:size}
- body.brand-portal #design-hero::before,body.brand-portal #design-hero::after{content:""!important;display:block!important;position:absolute;pointer-events:none}
- body.brand-portal #design-hero::before{inset:-24px;z-index:-2;background:url("portal-banner.webp") center/cover no-repeat;filter:blur(18px) saturate(1.1);opacity:.85}
- body.brand-portal #design-hero::after{inset:0;z-index:-1;background:url("portal-banner.webp") center/contain no-repeat;-webkit-mask:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent);mask:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent)}
- body.brand-portal #design-hero .hsearch{--iw:min(100cqw,100cqh * 4.0222);--ih:calc(var(--iw) / 4.0222);position:absolute!important;z-index:2;margin:0!important;max-width:none!important;
-  left:calc((100cqw - var(--iw)) / 2 + var(--iw) * .095);top:calc((100cqh - var(--ih)) / 2 + var(--ih) * .69);width:max(320px,calc(var(--iw) * .6))!important}
+ body.brand-portal #design-hero{display:block!important;height:265px!important;min-height:0!important;padding:0!important}
+ body.brand-portal #design-hero .hsearch{position:absolute!important;z-index:2;margin:0!important;max-width:none!important;left:calc(50% - 426px);top:168px;width:600px!important}
 }
-@supports not (width:1cqw){@media screen and (min-width:1200px){body.brand-portal #design-hero .hsearch{left:9.5%;top:66%;width:60%!important}}}
 @media screen and (max-width:1199px){
- body.brand-portal #design-hero{display:block!important;height:auto!important;min-height:0!important;padding:0 0 14px!important}
- body.brand-portal #design-hero::before{content:""!important;display:block!important;aspect-ratio:4.0222;background:url("portal-banner.webp") 50% 0/100% auto no-repeat}
- body.brand-portal #design-hero::after{display:none!important}
+ body.brand-portal #design-hero{display:block!important;height:auto!important;min-height:0!important;padding:0 0 14px!important;background:#eaf3fc!important}
+ body.brand-portal #design-hero::before{content:""!important;display:block!important;aspect-ratio:3.3;background:url("portal-banner-wide.webp") 50% 50%/cover no-repeat}
  body.brand-portal #design-hero .hsearch{position:relative!important;margin:12px 14px 0!important;width:auto!important;max-width:none!important}
 }
-@media screen and (max-width:700px){body.brand-portal #design-hero::before{aspect-ratio:3.59;background-size:112% auto}}
+@media screen and (max-width:700px){body.brand-portal #design-hero::before{aspect-ratio:3.5}}
