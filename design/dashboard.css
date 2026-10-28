@@ -196,3 +196,5 @@
  body.brand-portal #design-hero .hsearch{position:relative!important;margin:12px 14px 0!important;width:auto!important;max-width:none!important}
 }
 @media screen and (max-width:700px){body.brand-portal #design-hero::before{aspect-ratio:3.5}}
+/* TOOLBOX-ICON-20261028 (Claude): 도구함 세입·예산·학운위·공통문서 카드에도 아이콘 표시 (index.html의 .mini-row 아이콘 숨김을 되돌림 → 12개 카드 같은 모양) */
+@media screen{body.brand-portal .l3page .mini-row .lc-ic{display:grid!important}}
