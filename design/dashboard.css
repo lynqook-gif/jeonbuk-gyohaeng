@@ -177,25 +177,118 @@
  #toolModal .tmodal-bar button:focus-visible{background:#e1edfc;color:#174f91;outline-color:#174f91;box-shadow:inset 0 0 0 2px #174f91}
 }
 
-/* PORTAL-BANNER-20261028 (Claude): 전북 포털 상단 = Codex 가로 긴 배너(design/portal-banner-wide.webp 3240x536, 6:1).
-   글자·캐릭터는 가운데 1840px 안, 양옆은 배경만 → 폭이 달라도 cover로 양옆만 잘림.
-   PC(1200px 이상): 높이 265px 유지, 검색창은 부제목 아래 겹침(그림 가운데 기준 px 위치). 1199px 이하: 가운데 부분 그림 위·검색창 아래.
-   원래 제목 글자는 화면 읽기용으로만 남김 */
-@media screen{
- body.brand-portal #design-hero{position:relative!important;overflow:hidden!important;background:#eaf3fc url("portal-banner-wide.webp") 50% 50%/cover no-repeat!important}
- body.brand-portal #design-hero .desk-copy{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;margin:0!important;padding:0!important}
- body.brand-portal #design-hero .desk-mascot{display:none!important}
+/* Winter home banner and compact site shortcuts. */
+@media screen {
+ body.brand-portal #design-hero {
+  box-sizing:border-box;
+  display:grid!important;
+  position:relative!important;
+  isolation:isolate;
+  overflow:hidden!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"copy mascot" "search mascot";
+  align-content:center;
+  align-items:center;
+  gap:14px 24px;
+  height:auto!important;
+  min-height:245px!important;
+  padding:24px clamp(24px,8vw,125px)!important;
+  background:radial-gradient(ellipse at 78% 100%,#466d92 0%,transparent 55%),linear-gradient(115deg,#182f50,#1e3a5f 60%,#31587e)!important;
+ }
+ body.brand-portal #design-hero .desk-copy {
+  grid-area:copy;
+  position:relative!important;
+  z-index:1;
+  width:auto!important;
+  min-width:0;
+ }
+ body.brand-portal #design-hero .desk-eyebrow {color:#c6def5!important}
+ body.brand-portal #design-hero h1 {color:#fff!important}
+ body.brand-portal #design-hero h1 span {color:#c6e3ff!important}
+ body.brand-portal #design-hero .desk-copy>p {color:#e2edf9!important;margin-bottom:0}
+ body.brand-portal #design-hero .desk-mascot {
+  grid-area:mascot;
+  display:block!important;
+  position:relative!important;
+  inset:auto!important;
+  width:clamp(150px,20vw,250px)!important;
+  height:224px!important;
+  background:url("portal-cocoa.webp") center/contain no-repeat!important;
+  filter:drop-shadow(0 6px 12px #0c213b80)!important;
+ }
+ body.brand-portal #design-hero .hsearch {
+  grid-area:search;
+  position:relative!important;
+  width:100%!important;
+  max-width:600px!important;
+  min-width:0;
+  margin:0!important;
+ }
+ body.brand-portal #design-hero::before,
+ body.brand-portal #design-hero::after {
+  content:"";
+  display:block!important;
+  position:absolute;
+  inset:-144px 0 0;
+  z-index:0;
+  pointer-events:none;
+  background:
+   radial-gradient(circle at 19px 31px,#ecf6ff80 1px,transparent 2px),
+   radial-gradient(circle at 85px 87px,#fff9 1.3px,transparent 2.5px);
+  background-size:144px 144px;
+  mask-image:linear-gradient(90deg,transparent 12%,#0008 54%,#000);
+  animation:portal-snow 19s linear infinite;
+ }
+ body.brand-portal #design-hero::after {
+  background-position:54px 29px;
+  opacity:.65;
+  animation-duration:29s;
+ }
+ body.brand-portal #menu .desk-related-sites>div {
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  gap:8px;
+ }
+ body.brand-portal #menu .desk-related-sites a {
+  box-sizing:border-box;
+  min-width:0;
+  min-height:76px;
+  max-width:100%;
+  padding:8px 4px;
+  gap:5px 3px;
+  display:grid;
+  grid-template-columns:auto auto;
+  grid-template-rows:28px auto;
+  justify-content:center;
+  align-content:start;
+  align-items:center;
+  text-align:center;
+  color:#1e3a5f;
+ }
+ body.brand-portal #menu .photo-related-icon {grid-column:1/-1;justify-self:center}
+ body.brand-portal #menu .menu2 {display:none!important}
+ body.brand-portal #design-hero .winter-lettering {display:block;width:min(100%,420px);height:auto}
+
 }
-@media screen and (min-width:1200px){
- body.brand-portal #design-hero{display:block!important;height:265px!important;min-height:0!important;padding:0!important}
- body.brand-portal #design-hero .hsearch{position:absolute!important;z-index:2;margin:0!important;max-width:none!important;left:calc(50% - 426px);top:168px;width:600px!important}
+@keyframes portal-snow {to {transform:translateY(144px)}}
+@media (prefers-reduced-motion:reduce) {
+ body.brand-portal #design-hero::before,
+ body.brand-portal #design-hero::after {animation:none}
 }
-@media screen and (max-width:1199px){
- body.brand-portal #design-hero{display:block!important;height:auto!important;min-height:0!important;padding:0 0 14px!important;background:#eaf3fc!important}
- body.brand-portal #design-hero::before{content:""!important;display:block!important;aspect-ratio:3.3;background:url("portal-banner-wide.webp") 50% 50%/cover no-repeat}
- body.brand-portal #design-hero .hsearch{position:relative!important;margin:12px 14px 0!important;width:auto!important;max-width:none!important}
+@media screen and (max-width:700px) {
+ body.brand-portal #design-hero {
+  grid-template-columns:minmax(0,1fr) clamp(85px,28vw,140px);
+  grid-template-areas:"copy mascot" "search search";
+  gap:12px 8px;
+  padding:16px!important;
+  min-height:0!important;
+ }
+ body.brand-portal #design-hero h1 {font-size:clamp(20px,6.1vw,29px)!important}
+ body.brand-portal #design-hero .desk-mascot {width:100%!important;height:143px!important}
 }
-@media screen and (max-width:700px){body.brand-portal #design-hero::before{aspect-ratio:3.5}}
+@media screen and (max-width:800px) {
+ body.brand-portal #menu .desk-related-sites>div {grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
 /* TOOLBOX-ICON-20261028 (Claude): 도구함 세입·예산·학운위·공통문서 카드에도 아이콘 표시 (index.html의 .mini-row 아이콘 숨김을 되돌림 → 12개 카드 같은 모양) */
 @media screen{body.brand-portal .l3page .mini-row .lc-ic{display:grid!important}}
 @media screen{body.brand-portal #design-hero[hidden]{display:none!important}}
