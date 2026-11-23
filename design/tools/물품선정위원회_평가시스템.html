@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>물품선정위원회 평가</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f3ee;--surface:#fefcf8;--border:#d8d2c4;--border-light:#e8e2d6;
+  --text:#1a1714;--text-sub:#6b6560;--text-hint:#a09a92;
+  --accent:#2c4a7c;--accent-light:#e8eef7;
+  --accent2:#8b4513;--accent2-light:#fdf3ec;
+  --success:#2d6a4f;--success-light:#e8f5ef;
+  --danger:#a33030;--danger-light:#faeaea;
+  --warning:#7a5c00;--warning-light:#fdf8e3;
+  --radius:6px;--radius-lg:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
+
+/* HEADER */
+.site-header{background:var(--accent);color:#fff;padding:14px 28px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-md)}
+.header-title-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:0;flex-wrap:wrap}
+#pageTitleDisplay{font-size:19px;font-weight:700;letter-spacing:-.3px;cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.45);padding-bottom:1px;white-space:nowrap}
+#pageTitleDisplay:hover{border-bottom-color:rgba(255,255,255,.9)}
+#pageTitleInput{font-size:17px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.55);border-radius:var(--radius);color:#fff;padding:3px 8px;display:none;width:300px;outline:none}
+.header-edit-hint{font-size:11px;opacity:.5;flex-shrink:0}
+.header-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.header-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:var(--radius);padding:5px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap}
+.header-btn:hover{background:rgba(255,255,255,.3)}
+
+/* LAYOUT */
+.main-wrap{max-width:1100px;margin:0 auto;padding:24px 18px 80px}
+
+/* TABS */
+.tab-bar{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:4px;margin-bottom:22px;box-shadow:var(--shadow)}
+.tab-btn{flex:1;padding:9px 10px;border:none;background:transparent;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;color:var(--text-sub);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab-btn:hover{color:var(--text);background:var(--border-light)}
+.tab-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(44,74,124,.3)}
+.tab-num{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.25);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.tab-btn:not(.active) .tab-num{background:var(--border);color:var(--text-sub)}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border-light);flex-wrap:wrap;gap:8px}
+.card-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--accent);border-radius:2px}
+
+/* BADGES */
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;background:var(--accent-light);color:var(--accent);border:1px solid rgba(44,74,124,.2)}
+.badge-warn{background:var(--warning-light);color:var(--warning);border-color:rgba(122,92,0,.2)}
+.badge-success{background:var(--success-light);color:var(--success);border-color:rgba(45,106,79,.2)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:7px 9px;background:#f0ede6;color:var(--text-sub);font-weight:600;font-size:12px;border-bottom:1px solid var(--border)}
+.tbl td{padding:7px 9px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(44,74,124,.025)}
+
+/* INPUTS */
+input[type=text],input[type=number],select,textarea{font-family:'Noto Sans KR',sans-serif;font-size:13px;padding:5px 9px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);transition:border-color .15s;outline:none}
+input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(44,74,124,.1);background:#fff}
+input[type=number]{width:68px;text-align:center}
+textarea{width:100%;resize:vertical;line-height:1.5}
+
+/* BUTTONS */
+.btn{font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;padding:7px 15px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:all .15s}
+.btn:hover{background:var(--bg);border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#1e3760;border-color:#1e3760;color:#fff}
+.btn-sm{font-size:11px;padding:3px 8px;background:var(--danger-light);color:var(--danger);border-color:rgba(163,48,48,.2)}
+.btn-sm:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-add{font-size:12px;padding:4px 10px;background:var(--success-light);color:var(--success);border-color:rgba(45,106,79,.2)}
+.btn-add:hover{background:var(--success);color:#fff}
+.btn-reset{font-size:12px;padding:5px 12px;background:var(--accent2-light);color:var(--accent2);border-color:rgba(139,69,19,.2)}
+.btn-reset:hover{background:var(--accent2);color:#fff}
+
+.form-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.entry-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius);background:var(--bg);margin-bottom:6px;border:1px solid var(--border-light)}
+.entry-num{width:22px;height:22px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.sep{height:1px;background:var(--border-light);margin:10px 0}
+
+/* CRITERIA SETUP */
+.field-group{border:1px solid var(--border-light);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden}
+.field-group-header{display:flex;align-items:center;gap:8px;background:#f0ede6;padding:9px 14px;border-bottom:1px solid var(--border-light)}
+.field-group-body{padding:12px 16px}
+.criteria-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.subj-grades{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 12px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border-light);margin-top:6px}
+.grade-item{display:flex;flex-direction:column;align-items:center;gap:3px}
+.grade-item label{font-size:12px;color:var(--text-sub);font-weight:600}
+.grade-item input{width:68px;text-align:center}
+.obj-opts-wrap{margin-top:6px;padding:10px 12px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border-light)}
+.obj-opt-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.obj-opt-row:last-child{margin-bottom:0}
+.obj-opt-row input[type=text]{flex:1;min-width:0}
+.crit-hint{font-size:12px;color:var(--text-hint);margin-top:3px}
+
+/* SCORE MATRIX */
+.eval-block{margin-bottom:20px;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md)}
+.eval-block-header{display:flex;align-items:center;gap:10px;background:var(--accent);color:#fff;padding:11px 18px;cursor:pointer;user-select:none}
+.ev-name{font-size:14px;font-weight:700}
+.ev-dept{font-size:12px;opacity:.7;margin-top:1px}
+.eval-block-body{border:1px solid var(--border-light);border-top:none;background:var(--surface)}
+.eval-block-body.collapsed{display:none}
+.score-matrix-wrap{overflow-x:auto}
+.score-matrix{width:100%;border-collapse:collapse;font-size:13px}
+.score-matrix th{padding:8px 10px;background:#f0ede6;color:var(--text-sub);font-weight:600;font-size:11px;border-bottom:1px solid var(--border);border-right:1px solid var(--border-light);white-space:nowrap;text-align:center}
+.score-matrix th.col-company{text-align:left;min-width:120px;position:sticky;left:0;z-index:2;background:#e8e4dc}
+.score-matrix th.col-total{background:var(--accent-light)!important;color:var(--accent)!important;min-width:72px}
+.score-matrix td{padding:8px 10px;border-bottom:1px solid var(--border-light);border-right:1px solid var(--border-light);vertical-align:middle}
+.score-matrix td.td-company{font-weight:600;font-size:12px;background:#faf8f4;white-space:nowrap;position:sticky;left:0;z-index:1;min-width:120px}
+.score-matrix td.td-total{text-align:center;font-weight:700;color:var(--accent);background:var(--accent-light);font-size:14px;min-width:72px}
+.score-matrix tr:last-child td{border-bottom:none}
+.score-matrix th:last-child,.score-matrix td:last-child{border-right:none}
+.cell-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:90px}
+.cell-val{font-weight:700;font-size:13px;color:var(--accent)}
+.score-matrix select{font-size:11px;padding:3px 4px;width:100%}
+.score-matrix input[type=number]{width:60px;font-size:12px;padding:3px 5px;text-align:center}
+
+/* SAVE BAR */
+.save-bar{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border-light);padding:10px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 -2px 12px rgba(0,0,0,.07);z-index:20}
+.save-msg{font-size:12px;color:var(--success);font-weight:500;display:none}
+
+/* AVG / RADIO */
+.radio-group{display:flex;gap:16px;flex-wrap:wrap}
+.radio-label{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.radio-label input[type=radio]{accent-color:var(--accent)}
+.avg-selector{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;width:fit-content}
+.avg-opt{padding:6px 13px;font-size:12px;font-weight:500;background:var(--surface);color:var(--text-sub);cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif;border-right:1px solid var(--border);transition:all .15s}
+.avg-opt:last-child{border-right:none}
+.avg-opt.active{background:var(--accent);color:#fff}
+.avg-opt:hover:not(.active){background:var(--accent-light)}
+
+/* RANKING */
+.rank-item{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--border-light);border-radius:var(--radius-lg);margin-bottom:10px;background:var(--surface);box-shadow:var(--shadow)}
+.rank-medal{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;flex-shrink:0}
+.medal-1{background:linear-gradient(135deg,#ffe566,#b8860b);color:#fff}
+.medal-2{background:linear-gradient(135deg,#c8d8e8,#708090);color:#fff}
+.medal-3{background:linear-gradient(135deg,#d4a55a,#8b6914);color:#fff}
+.medal-n{background:var(--bg);color:var(--text-hint);border:1px solid var(--border);font-size:14px}
+.rank-info{flex:1}
+.rank-name{font-size:15px;font-weight:700}
+.rank-product{font-size:12px;color:var(--text-sub);margin-top:1px}
+.rank-scores{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap}
+.rank-score-chip{font-size:12px;padding:2px 10px;border-radius:10px;font-weight:500}
+.chip-normal{background:var(--accent-light);color:var(--accent)}
+.chip-trimmed{background:var(--success-light);color:var(--success)}
+.eval-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.eval-chip{font-size:11px;padding:1px 8px;border-radius:10px;background:var(--bg);color:var(--text-sub);border:1px solid var(--border-light)}
+
+/* MISC */
+.pts-warn{font-size:12px;color:var(--danger);padding:6px 10px;background:var(--danger-light);border-radius:var(--radius);border:1px solid rgba(163,48,48,.2);margin-top:8px;display:none}
+.info-box{background:var(--accent-light);border-left:3px solid var(--accent);border-radius:0 var(--radius) var(--radius) 0;padding:10px 14px;font-size:12px;color:var(--text-sub);margin-bottom:12px}
+.nav-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.detail-wrap{overflow-x:auto}
+.site-footer{text-align:center;padding:22px 16px;border-top:1px solid var(--border-light);color:var(--text-hint);font-size:12px;margin-top:48px}
+.site-footer strong{color:var(--text-sub)}
+
+/* ════════════════════
+   PRINT STYLES
+════════════════════ */
+@media print{
+  @page{
+    size:A4 portrait;
+    margin:10mm 12mm;
+    margin-header:0;margin-footer:0;
+  }
+  html,body{
+    margin:0;padding:0;
+    background:#fff;
+    font-family:'Noto Sans KR',sans-serif;
+    font-size:10pt;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  head title{display:none}
+  .no-print,.site-header,.tab-bar,.save-bar,.nav-actions,.site-footer{display:none!important}
+  #tab-setup,#tab-score{display:none!important}
+  .main-wrap{padding:0;max-width:100%;margin:0}
+
+  /* ── 순위 결과 출력 ── */
+  /* 순위 출력 제목 */
+  #tab-result::before{
+    content: attr(data-title);
+    display:block;text-align:center;
+    font-size:15pt;font-weight:700;
+    margin-bottom:8mm;padding-bottom:4mm;
+    border-bottom:2px solid #333;
+  }
+  .card{
+    box-shadow:none;border:1px solid #ccc;
+    break-inside:avoid;margin-bottom:6px;padding:8px 10px;
+  }
+  .card-title::before{display:none}
+  .card-title{font-size:11pt;font-weight:700}
+
+  /* 순위 카드 컴팩트 */
+  .rank-item{
+    box-shadow:none;border:1px solid #ccc;
+    break-inside:avoid;
+    padding:6px 10px;margin-bottom:5px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .rank-medal{width:28px;height:28px;font-size:12pt}
+  .rank-name{font-size:11pt}
+  .rank-product{font-size:9pt}
+  .rank-score-chip{font-size:9pt;padding:1px 7px}
+  .eval-chip{font-size:8.5pt;padding:1px 6px}
+
+  /* 상세 테이블 */
+  .tbl{font-size:9pt;width:100%;border-collapse:collapse}
+  .tbl th{padding:4px 6px;font-size:8.5pt;background:#e8eef7;border:1px solid #bbb}
+  .tbl td{padding:4px 6px;border:1px solid #ddd}
+
+  /* 상세표 열 너비 자동 조정 */
+  .detail-wrap{overflow:visible}
+  .detail-wrap table{table-layout:auto;font-size:8.5pt}
+  .detail-wrap th,.detail-wrap td{
+    padding:3px 5px;font-size:8.5pt;
+    white-space:normal;word-break:keep-all;
+  }
+
+  /* 평가표 출력 */
+  #printSheets{display:block!important}
+  .avg-selector{display:none!important}
+
+  /* ── 평가표 한 장 ── */
+  .psheet{
+    height:277mm;
+    min-height:277mm;max-height:277mm;
+    overflow:hidden;
+    page-break-after:always;page-break-inside:avoid;
+    display:flex;flex-direction:column;
+  }
+  .psheet:last-child{page-break-after:auto}
+  .ptbl{height:100%}
+  .ptbl tbody{height:100%}
+  .ptbl tbody tr{height:1px}
+  .ptbl tbody tr td{height:inherit}
+}
+  .ptbl{height:100%}
+  .ptbl tbody{height:100%}
+  .ptbl tbody tr{height:1px} /* 균등 분배 트릭 */
+  .ptbl tbody tr td{height:inherit}
+}
+#printSheets{display:none}
+
+/* ── 출력용 평가표 서식 ── */
+.psheet{
+  width:100%;font-family:'Noto Sans KR',sans-serif;
+  page-break-after:always;
+  /* height를 100%로 강제해 한 장 내에 배치 */
+  display:flex;flex-direction:column;
+  box-sizing:border-box;
+}
+.psheet:last-child{page-break-after:auto}
+
+/* 제목 */
+.psheet-title{
+  text-align:center;font-size:15pt;font-weight:700;
+  margin-bottom:3.5mm;letter-spacing:-.3px;flex-shrink:0;
+}
+
+/* 상단 정보 바 */
+.psheet-info{
+  display:flex;align-items:stretch;
+  border:1.5px solid #444;
+  margin-bottom:3mm;font-size:9.5pt;overflow:hidden;flex-shrink:0;
+}
+.psheet-info .pi-cell{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 10px;border-right:1px solid #444;flex:1;
+}
+.psheet-info .pi-cell:last-child{border-right:none}
+.psheet-info .pi-lbl{
+  font-weight:700;white-space:nowrap;background:#e8eef7;
+  padding:4px 10px;margin:-4px 6px -4px -10px;
+  align-self:stretch;display:flex;align-items:center;
+  border-right:1px solid #aaa;
+}
+.psheet-info .pi-val{flex:1;font-size:9pt}
+
+/* 메인 평가표: flex-grow로 남은 공간 채움
+   열: 평가분야(10%) | 평가항목(배점)(13%) | 세부기준(33%) | 평가점수(29%) | 비고(15%) */
+.ptbl{
+  width:100%;border-collapse:collapse;
+  font-size:9pt;table-layout:fixed;line-height:1.45;
+  flex:1;               /* 남은 세로 공간 채우기 */
+}
+.ptbl th,.ptbl td{border:1px solid #555;padding:5px 7px;vertical-align:middle}
+.ptbl thead th{background:#dce6f4;font-weight:700;text-align:center;font-size:9pt}
+
+.ptbl .col-field {width:10%}
+.ptbl .col-item  {width:13%}
+.ptbl .col-detail{width:42%}
+.ptbl .col-score {width:24%}
+.ptbl .col-note  {width:11%}
+
+.ptbl .td-field{
+  text-align:center;font-weight:700;background:#f0f5fc;
+  vertical-align:middle;font-size:8.5pt;word-break:keep-all;
+}
+.ptbl .td-item{
+  text-align:center;vertical-align:middle;
+  word-break:keep-all;font-size:8.5pt;line-height:1.35;
+}
+.ptbl .td-item .pts{font-size:8pt;color:#555;display:block;margin-top:1px}
+.ptbl .td-detail{vertical-align:top;padding:5px 6px;font-size:8.5pt;line-height:1.45}
+.ptbl .td-score{vertical-align:middle;padding:4px 6px}
+.ptbl .td-note{text-align:center;vertical-align:middle;font-size:8pt}
+
+/* 주관: 등급 2×2 그리드 */
+.score-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:3px 6px;
+  font-size:8.5pt;
+}
+.score-grid .sg-item{
+  display:flex;align-items:center;gap:3px;white-space:nowrap;
+}
+.score-grid .sg-box{
+  display:inline-block;width:10px;height:10px;
+  border:1px solid #333;flex-shrink:0;
+}
+
+/* 객관: 빈 칸 */
+.score-obj{
+  font-size:9pt;text-align:center;padding:2px 0;
+}
+
+/* 합계 행 - 높이 고정 */
+.ptbl .tr-total td{
+  background:#e8eef7;font-weight:700;text-align:center;font-size:10pt;
+  padding:6px 8px;
+}
+
+/* ── 서명란: 2줄, 가운데 정렬 ── */
+.psheet-sign{
+  margin-top:6mm;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:4mm;
+  font-size:10pt;
+}
+.psheet-sign .sign-date{
+  text-align:center;letter-spacing:2px;font-size:10pt;
+}
+.psheet-sign .sign-row{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  flex-wrap:nowrap;
+}
+.psheet-sign .sign-field{
+  display:flex;align-items:center;gap:4px;white-space:nowrap;
+}
+.sign-field .sf-lbl{font-weight:700;font-size:10pt}
+.sign-field .sf-space{
+  display:inline-block;
+  width:72px;
+}
+
+@media(max-width:600px){
+  .tab-btn span:not(.tab-num){display:none}
+  .tab-num{margin:0}
+  .subj-grades{grid-template-columns:repeat(2,1fr)}
+}
+.print-detail-section{display:none}
+.screen-detail{display:block}
+
+/* 출력 전용 상세 테이블 */
+.print-detail-title{font-size:11pt;font-weight:700;margin-bottom:3mm;padding-bottom:2mm;border-bottom:1.5px solid #333}
+.print-eval-label{font-size:9pt;font-weight:700;background:#f0ede6;padding:3px 8px;margin-bottom:1mm;border-left:3px solid #2c4a7c}
+.print-detail-tbl{width:100%;border-collapse:collapse;font-size:8pt;table-layout:fixed}
+.print-detail-tbl th,.print-detail-tbl td{border:1px solid #999;padding:3px 5px;text-align:center;vertical-align:middle}
+.print-detail-tbl thead th{background:#e8eef7;font-weight:700}
+.print-detail-tbl .pdt-co{width:18%;text-align:left;background:#f5f8ff}
+.print-detail-tbl .pdt-item{font-size:7.5pt;line-height:1.3}
+.print-detail-tbl .pdt-total{background:#dce6f4;font-weight:700;width:9%}
+.print-detail-tbl .pdt-co-val{text-align:left;font-weight:600;font-size:8pt;background:#fafafa}
+.print-detail-tbl .pdt-total-val{font-weight:700;background:#e8eef7;color:#2c4a7c}
+
+@media print{
+  /* 화면 상세 숨기고 출력 상세 표시 */
+  .screen-detail{display:none!important}
+  .print-detail-section{display:block!important}
+  /* 순위와 상세를 한 장에 */
+  #tab-result .card{break-inside:avoid}
+  /* 상세 위원별 블록 페이지 넘김 방지 */
+  .print-detail-section > div{break-inside:avoid}
+}
+
+/* ── 개발자 모드 ── */
+.dev-tab-btn{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+  color:rgba(255,255,255,.6);border-radius:var(--radius);padding:5px 11px;
+  font-size:11px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;
+  transition:all .15s;
+}
+.dev-tab-btn:hover{background:rgba(255,255,255,.22);color:#fff}
+
+/* 비밀번호 오버레이 */
+#devLock{
+  position:fixed;inset:0;background:rgba(20,20,40,.82);
+  display:flex;align-items:center;justify-content:center;
+  z-index:999;backdrop-filter:blur(4px);
+}
+.dev-lock-box{
+  background:var(--surface);border-radius:var(--radius-lg);
+  padding:32px 36px;box-shadow:var(--shadow-md);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  min-width:300px;
+}
+.dev-lock-box h3{font-size:16px;font-weight:700;color:var(--accent)}
+.dev-lock-box p{font-size:12px;color:var(--text-sub);text-align:center}
+.dev-lock-input{
+  width:100%;text-align:center;font-size:18px;letter-spacing:6px;
+  padding:10px;border:2px solid var(--border);border-radius:var(--radius);
+}
+.dev-lock-input:focus{border-color:var(--accent);outline:none}
+.dev-lock-err{font-size:12px;color:var(--danger);display:none}
+
+/* 개발자 탭 내부 */
+#tab-dev{display:none}
+.dev-section{margin-bottom:20px}
+.target-rank-wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.company-rank-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:var(--radius);
+  background:var(--bg);border:1px solid var(--border-light);
+  margin-bottom:8px;flex-wrap:wrap;
+}
+.company-rank-row .cr-name{font-weight:600;min-width:120px}
+.company-rank-row .cr-rank select{font-size:13px;padding:4px 8px}
+
+/* 결과 프리뷰 */
+.gen-result-area{margin-top:14px}
+.gen-score-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.gen-score-tbl th{background:#f0ede6;padding:5px 8px;border-bottom:1px solid var(--border);text-align:center;font-size:11px;color:var(--text-sub)}
+.gen-score-tbl td{padding:5px 8px;border-bottom:1px solid var(--border-light);text-align:center;vertical-align:middle}
+.gen-score-tbl td:first-child{text-align:left;font-weight:500}
+.apply-btn-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+
+.warn-badge{display:inline-flex;align-items:center;gap:4px;background:var(--warning-light);color:var(--warning);border:1px solid rgba(122,92,0,.2);border-radius:var(--radius);padding:4px 10px;font-size:12px;font-weight:500}
+</style>
+<style>
+/* Screen design shared by the 12 embedded HTML tools.
+   Embedded inline for offline use. Original print styles remain authoritative. */
+@media screen {
+ :root{--navy:#1e3a5f;--navy2:#294f7d;--accent:#2775ce;--accent-soft:#edf4ff;--primary:#2775ce;--ink:#243b58;--muted:#60758c;--line:#dbe5ef}
+ body{font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif!important;background:#f4f7fb;color:#243b58;line-height:1.65;letter-spacing:-.02em}
+ button,input,select,textarea{font-family:inherit!important}
+ h1,h2,h3,h4{font-family:inherit!important;line-height:1.5;letter-spacing:-.025em}
+ h1{font-size:clamp(21px,3vw,28px)}
+ h2{font-size:21px}h3{font-size:18px}
+ p,.hint,.sub,.note,.guide{line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}
+ .hint,.sub,.note{font-size:13px}
+ body>header,header.site-header,.site-header,.header{background:#1e3a5f;color:#fff;box-shadow:none;border-bottom:0}
+ .site-header h1,.site-header h2,.header h1,.header h2,body>header h1{color:inherit}
+ .sidebar{background:#1e3a5f;color:#fff;box-shadow:none}
+ .sidebar .nav button.active,.sidebar .nav button.on{background:#2775ce;color:#fff}
+ .card,.input-card,.setting-card,.panel.left,.panel.right,.sec.guide{border:1px solid #dbe5ef;border-radius:12px;box-shadow:none;background:#fff}
+ .card,.input-card,.setting-card{padding:20px}
+ .section-title{color:#1e3a5f;font-weight:700;line-height:1.6}
+ .toolbar,.controls,.header-actions{gap:10px;flex-wrap:wrap}
+ .toolbar{background:#fff;border-color:#dbe5ef;border-radius:10px}
+ button,.btn,.header-btn,.calc-btn{border-radius:8px!important;min-height:40px;font-size:14px;font-weight:600;line-height:1.5;box-shadow:none!important}
+ .btn-primary,.btn-blue,.btn-navy,.btn-main,button.primary,.calc-btn{background:#1e3a5f!important;border-color:#1e3a5f!important;color:#fff!important}
+ .btn-line,.btn-sub,.btn.ghost,button.ghost{background:#fff;border:1px solid #cbd9e9;color:#1e3a5f}
+ .tab-bar,.tabs,.subnav{gap:8px;border-color:#dbe5ef}
+ .tab-btn,.tabs>.tab,.subnav>button{border-radius:8px;min-height:44px;font-size:14px;font-weight:600;line-height:1.6;word-break:keep-all}
+ .tab-btn.active,.tabs>.tab.active,.tabs>.tab.on,.subnav>button.active,.subnav>button.on{background:#1e3a5f!important;border-color:#1e3a5f!important;color:#fff!important}
+ .field input,.field select,.field textarea,.fld input,.fld select,.config-item input,.config-item select,.setting-card input,.setting-card select,.left input,.left select,.left textarea{border:1px solid #ccd9e8;border-radius:7px;min-height:42px;padding:9px 11px;font-size:15px;background:#fff;color:#243b58}
+ .field label,.fld label,.config-item label{font-size:14px;line-height:1.6;color:#465e79}
+ .drop{border-color:#a9c5e5;border-radius:10px;background:#f7faff;color:#1e3a5f}
+ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2775ce66;outline-offset:2px}
+ .credit,.maker,.sidebar .foot{line-height:1.8;font-size:12px}
+}
+@media screen and (max-width:600px){
+ .card,.input-card,.setting-card{padding:16px}
+ .toolbar,.controls,.header-actions{gap:8px}
+ .toolbar button,.controls button,.header-actions button{font-size:13px;padding:9px 12px}
+ .field input,.field select,.field textarea,.fld input,.fld select,.config-item input,.config-item select,.setting-card input,.setting-card select,.left input,.left select,.left textarea{font-size:16px}
+ .tab-bar,.tabs,.subnav{flex-wrap:wrap}
+ .tab-btn,.tabs>.tab,.subnav>button{font-size:13px;padding:10px 12px}
+}
+
+/* 2026-10-13: approved blue workspace design; screen only. */
+@media screen {
+ :root{--bg:#f3f8ff;--surface:#fff;--border:#d3dfef;--border-light:#e3edf9;--text:#26364d;--text-sub:#60728c;--text-hint:#72839b;--accent:#0866e8;--accent-light:#eaf3ff;--rule:#d3dfef;--rule-2:#e3edf9;--ink-2:#465e79;--ink-3:#72839b}
+ body{background:linear-gradient(135deg,#f5f9ff,#edf5ff);color:#26364d}
+ body>header,header.site-header,.site-header,.header{background:#fff;color:#163b66;border-bottom:1px solid #dce8f7;box-shadow:0 3px 16px #163b6606}
+ body>header p,.header p{color:#647892}
+ .site-header{padding:20px 28px;flex-wrap:wrap;gap:18px}
+ #pageTitleDisplay{font-size:24px;white-space:normal;border-bottom-color:#b6ccea}
+ #pageTitleInput{background:#f7faff;color:#163b66;border-color:#b6ccea;max-width:100%}
+ .header-edit-hint{color:#647892;opacity:1}
+ .header-btn,.dev-tab-btn{background:#fff;color:#0963dc;border:1px solid #7dafff;padding:9px 15px}
+ .header-btn:hover{background:#edf5ff}
+ .dev-tab-btn{color:#738299;border-color:#dbe5f2}
+ .main-wrap{max-width:1180px;padding:20px 18px 60px}
+ .card,.input-card,.setting-card,.panel.left,.panel.right,.sec.guide{border-color:#dce8f7;border-radius:14px;box-shadow:0 4px 20px #1e3a5f04;background:#fff}
+ .card{margin-bottom:16px;padding:22px 24px}
+ .card-title,.section-title{font-size:19px;color:#163b66}
+ .card-title::before{width:4px;height:22px;background:#0866e8}
+ .card-header{border-bottom-color:#dce8f7;padding-bottom:12px;gap:12px}
+ .btn-primary,.btn-blue,.btn-main,button.primary,.calc-btn{background:#0866e8!important;border-color:#0866e8!important;color:#fff!important}
+ .btn-navy{background:#1e3a5f!important}
+ .btn-reset{background:#fff;color:#0963dc;border-color:#9fc2f7}
+ .btn-add{background:#eaf3ff;color:#0963dc;border-color:#b6d5ff}
+ .btn-sm{background:#fff3f4;color:#d8414b;border-color:#ffd3d8;min-height:32px}
+ .btn:disabled,button:disabled{opacity:.5;cursor:not-allowed}
+ .tab-bar,.tabs,nav.steps{background:#fff;border:1px solid #dce8f7;border-radius:12px;padding:4px;gap:4px;box-shadow:0 3px 12px #1e3a5f03}
+ .tab-btn{min-height:50px;font-size:15px}
+ .tab-num{width:34px;height:34px;font-size:13px;background:#eaf3ff;color:#0963dc}
+ .tab-btn.active .tab-num{background:#eaf3ff;color:#0963dc}
+ nav.steps .step{flex:1;border-radius:8px;border-color:transparent}
+ nav.steps .step[aria-selected=true]{background:#1e3a5f;color:#fff;box-shadow:none}
+ nav.steps .step[aria-selected=true] em{color:#cbdcf2}
+ nav.steps .step .num{border-radius:50%;width:30px;height:30px}
+ .subnav .sub[aria-selected=true]{color:#0963dc;border-bottom-color:#0963dc}
+ .field-group{border-color:#dce8f7;border-radius:12px;background:#fff}
+ .field-group-header{background:#eff6ff;border-color:#dce8f7;padding:12px 16px;gap:12px}
+ .field-group-header input[type=text]{font-size:16px;font-weight:700;color:#163b66}
+ .field-group-body{padding:16px 18px}
+ .criteria-row{gap:10px;margin-bottom:10px}
+ .crit-hint{color:#647892;margin:5px 0}
+ input[type=text],input[type=number],input[type=date],select,textarea{background:#fff;color:#26364d;border-color:#cbd9eb;border-radius:7px;font-size:14px;padding:8px 10px}
+ input[type=checkbox],input[type=radio]{accent-color:#0866e8}
+ .field-group textarea{line-height:1.65}
+ .entry-num{background:#dcecff;color:#0963dc;width:30px;height:30px;font-size:13px}
+ .tbl th,.score-matrix th,.score-matrix th.col-company{background:#eff6ff;color:#465e79}
+ .score-matrix td.td-company{background:#f8fbff}
+ .subj-grades,.obj-opts-wrap,.entry-item{background:#f5f9ff}
+ .save-bar{background:#f2f7ff;border-color:#dce8f7;justify-content:center;box-shadow:0 -4px 18px #1e3a5f04}
+ .drop,.drop-zone,#drop{border-color:#adcef6;background:#f6faff;border-radius:12px}
+ .manual,.rule-box,.howto{border-color:#dce8f7;border-radius:10px;background:#f5f9ff}
+ .howto div{background:#f5f9ff}.howto b{color:#0963dc}
+ header.doc{border-bottom:1px solid #dce8f7;color:#163b66}
+ .toolbar{border-color:#dce8f7;padding:16px;box-shadow:0 3px 16px #163b6604}
+ .credit,.maker{color:#647892;text-align:center}
+}
+@media screen and (max-width:700px){
+ .site-header{padding:16px;gap:12px}.header-actions{width:100%;gap:8px;flex-shrink:1}
+ .header-actions button{flex:1 1 auto}#pageTitleDisplay{font-size:21px}
+ .card{padding:16px}.main-wrap{padding:16px 12px 40px}
+ .card-title,.section-title{font-size:17px}.tab-btn{padding:9px 6px;font-size:13px;gap:6px}.tab-num{width:26px;height:26px}
+ .field-group-header{flex-wrap:wrap;padding:12px}.field-group-header input[type=text]{min-width:0;flex-basis:60%}
+ .field-group-body{padding:12px}.criteria-row input[type=text]{min-width:0}
+ input[type=text],input[type=number],input[type=date],select,textarea{font-size:16px}
+ nav.steps .step{flex-basis:100%}.settings-row{flex-wrap:wrap}.setting-card{min-width:0!important}
+ .subj-grades{grid-template-columns:repeat(2,1fr)}
+}
+
+@media print{.design-author-credit{display:none!important}}
+</style>
+<style id="supply-evaluation-design">
+/* 물품선정위원회: screen layout only. Print rules and application scripts stay intact. */
+@media screen{
+ :root{--bg:#f4f7fb;--surface:#fff;--border:#d9e3ef;--border-light:#e7edf5;--text:#243b56;--text-sub:#65798f;--text-hint:#8191a4;--accent:#1e3a5f;--accent-light:#edf3fb;--radius:8px;--radius-lg:12px;--shadow:none;--shadow-md:none}
+ body{background:#f4f7fb!important;color:#243b56;font-size:14px;line-height:1.7;letter-spacing:-.025em}
+ .site-header{padding:23px 34px;background:#fff!important;border-bottom:1px solid #dce5f0;box-shadow:none;gap:24px;align-items:center}
+ .header-title-wrap{gap:4px 12px;align-content:center}
+ .header-title-wrap:before{content:'교행e · 물품 업무';display:block;flex:0 0 100%;color:#4979ac;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:4px}
+ #pageTitleDisplay{font-size:25px;color:#1e3a5f;line-height:1.45;border-bottom-color:#c8d6e5;white-space:normal;letter-spacing:-1px}
+ .header-edit-hint{font-size:11px;color:#8293a6;opacity:1}
+ .header-actions{gap:7px;align-items:center}
+ .header-btn{min-height:38px;padding:8px 12px;font-size:12px;background:#fff;color:#365a83;border:1px solid #d1deec;border-radius:7px;box-shadow:none}
+ .header-btn:hover{background:#f0f5fb;color:#1e3a5f}
+ .dev-tab-btn{min-height:34px;background:transparent!important;color:#8c99a9!important;border:1px solid #e2e8f0!important;font-size:11px;padding:6px 9px}
+ .main-wrap{width:100%;max-width:1440px;padding:24px 30px 48px}
+ .tab-bar{padding:0 2px;margin-bottom:27px;background:transparent;border:0;border-bottom:1px solid #d6e0ec;border-radius:0;box-shadow:none;gap:22px}
+ .tab-btn{flex:none;min-height:53px;padding:12px 7px 14px;gap:10px;font-size:15px;color:#7c8ca0;border-radius:0;border-bottom:3px solid transparent;box-shadow:none!important}
+ .tab-btn:hover{background:transparent;color:#1e3a5f}
+ .tab-btn.active{background:transparent!important;color:#1c63b6!important;border-bottom-color:#2774cb}
+ .tab-num,.tab-btn:not(.active) .tab-num{width:24px;height:24px;font-size:11px;border-radius:7px;background:#e8eef5;color:#8495a8}
+ .tab-btn.active .tab-num{background:#e1edfc;color:#2367b4}
+ #tab-setup:not([style*="display: none"]):not([style*="display:none"]){display:grid!important;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+ #tab-setup>.card{margin:0;min-width:0}
+ #tab-setup>.card:nth-child(1){grid-column:1/-1;padding:22px 25px}
+ #tab-setup>.card:nth-child(1)>.card-header{border:0;padding:0;margin-bottom:15px}
+ #tab-setup>.card:nth-child(1)>.form-row{margin:0;gap:25px!important}
+ #tab-setup>.card:nth-child(1)>.form-row>div:first-child{max-width:740px}
+ #tab-setup>.card:nth-child(2){grid-column:1;grid-row:2/5}
+ #tab-setup>.card:nth-child(n+3):nth-child(-n+5){grid-column:2}
+ #tab-setup>.nav-actions{grid-column:1/-1;margin:0;padding:18px 0 0;border-top:1px solid #dce5ef;display:flex;justify-content:flex-end}
+ .card{padding:23px 24px;border:1px solid #dce5ef;background:#fff;border-radius:12px;box-shadow:none}
+ .card-header{padding-bottom:16px;margin-bottom:19px;gap:12px;border-color:#e6edf5;align-items:center}
+ .card-title{font-size:17px;color:#203e60;letter-spacing:-.5px;line-height:1.55}
+ .card-title:before{display:none}
+ .badge{border-radius:6px;background:#eff5fc;border:0;color:#4072a8;font-size:11px;padding:5px 9px;font-weight:700;white-space:nowrap}
+ #totalBadge{background:#e8f2ff;color:#2367b4}
+ .btn{min-height:39px;padding:8px 12px;font-size:13px;font-weight:600;border:1px solid #d1ddea;border-radius:7px;box-shadow:none!important}
+ .btn-primary{background:#256cc2!important;border-color:#256cc2!important;color:white!important}
+ .btn-primary:hover{background:#1e5ca8!important}
+ .btn-reset{background:white;color:#718399;border-color:#d9e2ee;font-size:11px;min-height:34px;padding:6px 9px}
+ .btn-sm{min-height:30px;padding:4px 8px;font-size:11px;border-color:#f2d9dc;color:#c86970;background:#fff7f7}
+ .btn-add{background:#f1f7fd;border-color:#cddff1;color:#356f9f;font-size:12px;min-height:34px}
+ .field-group{background:#fff;border:1px solid #dce5f0;border-radius:9px;margin-bottom:18px;overflow:hidden}
+ .field-group:last-child{margin-bottom:0}
+ .field-group-header{padding:12px 15px;gap:10px;background:#f2f6fb;border-bottom:1px solid #e1e9f2;flex-wrap:wrap}
+ .field-group-header input[type=text]{flex:1;min-width:140px!important;width:auto!important;padding:7px 9px;font-size:15px;font-weight:700;border:1px solid transparent;background:transparent;color:#244569}
+ .field-group-header input[type=text]:focus{border-color:#a8bfdc;background:white}
+ .field-group-header select{max-width:126px;font-size:12px;min-height:35px}
+ .field-group-body{padding:16px}
+ .criteria-row{margin-bottom:17px!important;gap:8px!important}
+ .criteria-row:last-child{margin-bottom:0!important}
+ .criteria-row input[type=text]{min-width:0}
+ .criteria-row textarea{font-size:13px;line-height:1.8;padding:10px 12px;min-height:65px}
+ .crit-hint{font-size:11px;color:#8495a8;margin:3px 0 6px}
+ input[type=text],input[type=number],input[type=date],select,textarea{min-height:40px;border:1px solid #d4deeb;background:#fff;color:#2a405d;font-size:14px;padding:8px 10px;border-radius:7px}
+ input:focus,select:focus,textarea:focus{border-color:#6b9bd0!important;box-shadow:0 0 0 3px #eaf2fc!important}
+ .entry-num{width:25px;height:25px;border-radius:6px;background:#e9f1fb;color:#4b7daf;font-size:11px}
+ #tab-setup>.card:nth-child(n+3):nth-child(-n+4)>.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0}
+ #tab-setup>.card:nth-child(n+3):nth-child(-n+4)>.form-row input{width:100%!important;min-width:0}
+ #tab-setup>.card:nth-child(n+3):nth-child(-n+4)>.form-row button{grid-column:1/-1;width:100%}
+ #companyList .entry-item,#evaluatorList .entry-item{display:grid;grid-template-columns:25px minmax(0,1fr) auto;gap:8px;padding:12px 0;border:0;border-bottom:1px solid #e6edf5;background:transparent;border-radius:0}
+ #companyList .entry-item input,#evaluatorList .entry-item input{width:100%!important;min-width:0;font-size:12px;min-height:34px}
+ #companyList .entry-item input:nth-of-type(2),#evaluatorList .entry-item input:nth-of-type(2){grid-column:2;grid-row:2}
+ #companyList .entry-item .btn-sm,#evaluatorList .entry-item .btn-sm{grid-column:3;grid-row:1/3;align-self:center}
+ .radio-group{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+ .radio-label{font-size:13px;line-height:1.8}
+ .info-box{font-size:12px;line-height:1.9;color:#647c96;border-color:#e3ebf4;background:#f5f8fc;padding:12px 14px;border-radius:7px}
+ .eval-block{border:1px solid #dce5ef;border-radius:10px;box-shadow:none;margin-bottom:20px}
+ .eval-block-header{background:#edf3fa;color:#24476d;padding:15px 18px;border-bottom:1px solid #dce5ef}
+ .ev-name{font-size:15px}.ev-dept{opacity:1;color:#7a8ca2}
+ .eval-block-body{border:0}
+ .score-matrix th,.score-matrix th.col-company{background:#f5f8fc;color:#64788e;font-size:12px;padding:12px}
+ .score-matrix td{padding:12px 10px;border-color:#e6edf5}
+ .score-matrix td.td-company{background:#fbfcfe}
+ .score-matrix input{border-color:#d4e0ee;background:white}
+ .tbl th{background:#f2f6fb;font-size:12px;padding:13px 12px;color:#5d748d}
+ .tbl td{padding:13px 12px;border-color:#e8edf4}
+ .save-bar{padding:15px 20px;background:#fffffff2;border:1px solid #dce5ef;border-radius:9px;box-shadow:0 5px 18px #243b5608;justify-content:flex-end;backdrop-filter:blur(8px)}
+ .site-footer{padding:25px 18px;color:#8291a3;font-size:12px}
+ .design-author-credit{margin:0 30px;padding:22px 12px!important;border-top:1px solid #dce5ef;color:#7b8da1!important;background:transparent}
+}
+@media screen and (max-width:1150px){
+ .site-header{padding:20px 24px;gap:18px}.header-actions{width:100%}.main-wrap{padding:22px 20px 40px}
+ #tab-setup:not([style*="display: none"]):not([style*="display:none"]){grid-template-columns:minmax(0,1fr) 280px;gap:16px}
+ .card{padding:20px}.field-group-body{padding:13px}.field-group-header{padding:11px}
+}
+@media screen and (max-width:900px){
+ #tab-setup:not([style*="display: none"]):not([style*="display:none"]){grid-template-columns:1fr}
+ #tab-setup>.card,#tab-setup>.card:nth-child(2),#tab-setup>.card:nth-child(n+3):nth-child(-n+5){grid-column:1;grid-row:auto}
+ #tab-setup>.card:nth-child(n+3):nth-child(-n+4)>.form-row{grid-template-columns:1fr 1fr auto}
+ #tab-setup>.card:nth-child(n+3):nth-child(-n+4)>.form-row button{grid-column:auto}
+}
+@media screen and (max-width:600px){
+ .site-header{padding:17px 16px;gap:14px}.header-title-wrap:before{font-size:10px}#pageTitleDisplay{font-size:22px}.header-edit-hint{font-size:10px}
+ .header-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.header-btn{font-size:12px;padding:8px}.dev-tab-btn{grid-column:1/-1;justify-self:end}
+ .main-wrap{padding:16px 12px 36px}.tab-bar{gap:0;justify-content:space-between;margin-bottom:18px}.tab-btn{flex:1;gap:5px;font-size:12px;min-height:48px;padding:10px 3px}.tab-num{width:21px;height:21px}
+ .card,#tab-setup>.card:nth-child(1){padding:17px 15px}.card-title{font-size:16px}.card-header{gap:11px;padding-bottom:13px;margin-bottom:15px}.card-header>div{gap:6px!important}
+ input[type=text],input[type=number],input[type=date],select,textarea{font-size:16px}
+ #tab-setup>.card:nth-child(1)>.form-row{gap:14px!important}#tab-setup>.card:nth-child(1)>.form-row>div{min-width:0!important;width:100%;flex-basis:100%!important}
+ .field-group-header input[type=text]{flex-basis:calc(100% - 55px);font-size:14px;min-width:0!important}.field-group-header select{flex:1;max-width:none}.field-group-body{padding:12px 10px}
+ .criteria-row>div{max-width:100%;flex-wrap:wrap!important}.criteria-row input[type=number]{width:56px}.criteria-row textarea{font-size:14px}
+ #tab-setup>.card:nth-child(n+3):nth-child(-n+4)>.form-row{grid-template-columns:1fr 1fr}#tab-setup>.card:nth-child(n+3):nth-child(-n+4)>.form-row button{grid-column:1/-1}
+ .save-bar{padding:12px;gap:8px;flex-wrap:wrap}.design-author-credit{margin:0 12px}
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+.xl-zone{margin-top:18px;padding-top:16px;border-top:1px solid #e6edf5}
+.xl-zone .xl-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.xl-zone .xl-head b{font-size:14px;color:#203e60}
+.xl-drop{display:block;border:1.5px dashed #b9cde4;border-radius:9px;background:#f7faff;padding:16px;text-align:center;cursor:pointer;color:#47698f;font-size:13px;line-height:1.7}
+.xl-drop:hover,.xl-drop.hot{border-color:#2774cb;background:#eaf3fe}
+.xl-drop input{display:none}
+.xl-drop small{display:block;color:#8495a8;font-size:11.5px}
+@media print{.xl-zone{display:none!important}}
+</style>
+<style id="brand-tool-2026">
+@media screen{
+ :root{--navy:#243b59;--navy2:#365879;--accent:#2679df;--primary:#2679df;--ink:#243b59;--muted:#63758c;--line:#dce5ef;--bg:#f7f9fc;--border:#dce5ef;--surface:#fff}
+ body{background:#f7f9fc!important;color:#243b59;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif!important;letter-spacing:-.02em;line-height:1.7}
+ button,input,select,textarea{font-family:inherit!important}h1,h2,h3{letter-spacing:-.04em;line-height:1.5}
+ .brand-tool-strip{display:flex;align-items:center;gap:20px;background:#eef5fd;border-bottom:1px solid #dce5ef;padding:13px 28px;min-height:80px;margin:0 0 20px;color:#243b59}
+ .brand-tool-strip img{width:112px;height:56px;object-fit:contain}.brand-tool-strip>div{flex:1;min-width:0}.brand-tool-strip strong{display:none!important;font-size:16px;font-weight:700}.brand-tool-strip small{font-size:12px;color:#63758c}.brand-tool-strip a{font-size:12px;color:#3b3522;background:#ffe56b;border:1px solid #f0d25c;border-radius:7px;padding:8px 12px;text-decoration:none;white-space:nowrap}
+ .brand-tool-character{display:block;width:45px;height:75px;flex-shrink:0;background-image:url(data:image/webp;base64,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);background-size:500% 100%;background-position:0% 50%}
+ body>header,header.site-header,.site-header,.header{background:#fff!important;color:#243b59!important;border-bottom:1px solid #dce5ef!important;box-shadow:none!important}
+ .sidebar{background:#f0f4fa!important;color:#243b59!important;border-right:1px solid #dce5ef!important;box-shadow:none!important}.sidebar :is(button,a){font-size:15px!important;color:#314861!important;font-weight:500!important;line-height:1.6!important}.sidebar :is(button,a).active,.sidebar :is(button,a).on{background:#dceafd!important;color:#155bb0!important;border-left:3px solid #2884ee!important}.sidebar h1,.sidebar h2,.sidebar .brand{color:#243b59!important}
+ .card,.input-card,.setting-card,.panel.left,.panel.right,.sec.guide{background:#fff!important;border:1px solid #dce5ef!important;border-radius:12px!important;box-shadow:none!important}.card-title,.section-title{color:#243b59!important;font-size:19px!important}
+ .toolbar,.controls{border-color:#dce5ef!important;box-shadow:none!important;gap:10px}.toolbar{background:#fff!important;border-radius:10px!important}
+ button,.btn,.header-btn,.calc-btn{font-size:14px;font-weight:600;line-height:1.6;border-radius:7px!important;box-shadow:none!important}
+ .btn-primary,.btn-blue,.btn-main,button.primary,.calc-btn{background:#2679df!important;border-color:#2679df!important;color:white!important}.btn.ghost,.btn-line,.btn-sub{background:#fff!important;border-color:#c8d8e9!important;color:#365879!important}
+ .tab-bar,.tabs,.subnav{background:#eef3f9!important;border-color:#dce5ef!important;box-shadow:none!important;border-radius:9px!important;padding:5px;gap:5px}.tab-btn,.tabs>.tab,.subnav>button{font-size:14px!important;font-weight:550!important;color:#526b87!important;border-radius:6px!important}.tab-btn.active,.tabs>.tab.active,.tabs>.tab.on,.subnav>button.active,.subnav>button.on{background:#dceafd!important;color:#155bb0!important;border-color:#c0d6ee!important}
+ input:not([type=checkbox]):not([type=radio]):not([type=file]),select,textarea{border-color:#cbd8e8;border-radius:7px;color:#243b59;line-height:1.6}.hint,.sub,.note,.desc{color:#63758c;line-height:1.8}.drop,.drop-zone{background:#f2f7fe!important;border-color:#adc9e9!important;border-radius:10px!important}
+ a[href^="mailto:"]{display:none!important}.brand-tool-footer{padding:25px 16px;text-align:center;font-size:12px;color:#63758c}.brand-tool-footer a{color:#365879;margin-left:15px}.credit,.design-author-credit,.maker{display:none!important}
+ @media(max-width:700px){.brand-tool-strip{padding:12px;gap:10px}.brand-tool-strip img{width:80px;height:40px}.brand-tool-strip small,.brand-tool-character{display:none}.brand-tool-strip strong{font-size:14px}.brand-tool-strip a{font-size:11px;padding:7px}}
+}
+@media print{.brand-tool-strip,.brand-tool-footer{display:none!important}}
+
+/* Codex color tokens, 2026-10-27. Screen only; no geometry overrides. */
+@media screen {
+ :root{--tc-primary:#1e3a5f;--tc-hover:#294e7b;--tc-head:#eef5fd;--tc-page:#f7f9fc;--tc-surface:#ffffff;--tc-border:#d5dfeb;--tc-ink:#203650;--tc-text:#344b65;--tc-muted:#63758c;--tc-tab:#e1edfc;--tc-tab-ink:#174f91;--tc-danger:#ad3342;--tc-danger-bg:#fff1f2;--tc-radius:12px;--tc-shadow:0 2px 8px rgba(30,58,95,.045);--navy:var(--tc-primary);--navy2:var(--tc-hover);--accent:var(--tc-primary);--primary:var(--tc-primary);--ink:var(--tc-ink);--muted:var(--tc-muted);--line:var(--tc-border);--border:var(--tc-border);--surface:var(--tc-surface);--bg:var(--tc-page)}
+ body{background:var(--tc-page)!important;color:var(--tc-text)!important}
+ .brand-tool-strip,body>header,header.site-header,.site-header,body>.header,body>.toolbar,body>.wrap>header{background:var(--tc-head)!important;border-bottom-color:var(--tc-border)!important;box-shadow:inset 0 -1px 0 var(--tc-border)!important;color:var(--tc-ink)!important}
+ h1,h2,h3,h4,.card-title,.section-title,.sidebar .brand{color:var(--tc-ink)!important}
+ .hint,.sub,.note,.desc,.help,.muted,small,.header-edit-hint,.brand-tool-footer{color:var(--tc-muted)!important}
+ .card,.input-card,.setting-card,.panel,.panel.left,.panel.right,.sec.guide,.guide,.modal-content{background-color:var(--tc-surface)!important;border-color:var(--tc-border)!important;border-radius:var(--tc-radius)!important;box-shadow:var(--tc-shadow)!important}
+ button,.btn,.header-btn,.calc-btn,.btn-line,.btn-navy{background:var(--tc-surface)!important;color:var(--tc-primary)!important;border-color:var(--tc-border)!important;box-shadow:none!important;border-radius:7px!important}
+ .btn:not(.ghost):not(.btn-secondary):not(.btn-line):not(.btn-gray):not(.btn-reset):not(.btn-danger),.btn-primary,.btn-blue,.btn-main,.btn-navy,button.primary,button.ok,.calc-btn{background:var(--tc-primary)!important;border-color:var(--tc-primary)!important;color:var(--tc-surface)!important}
+ button:hover,.btn:hover{background:var(--tc-head)!important;color:var(--tc-primary)!important;border-color:var(--tc-primary)!important}
+ .btn:not(.ghost):not(.btn-secondary):not(.btn-line):not(.btn-gray):not(.btn-reset):not(.btn-danger):hover,.btn-primary:hover,.btn-blue:hover,.btn-main:hover,.btn-navy:hover,button.primary:hover,button.ok:hover,.calc-btn:hover{background:var(--tc-hover)!important;color:var(--tc-surface)!important;border-color:var(--tc-hover)!important}
+ .btn.ghost,.btn-secondary,.btn-line,.btn-sub,.btn-gray,.btn-reset,.header-btn,.dev-tab-btn{background:var(--tc-surface)!important;color:var(--tc-primary)!important;border-color:var(--tc-border)!important}
+ .sidebar,.tab-bar,.tabs,.subnav,nav.steps{background:var(--tc-head)!important;border-color:var(--tc-border)!important}
+ .tab-btn,.tabs>.tab,.subnav>button,nav.steps>.step,.sidebar .nav button,.avg-opt{background:var(--tc-surface)!important;color:var(--tc-text)!important;border-color:var(--tc-border)!important;box-shadow:none!important}
+ .tab-btn.active,.tab-btn.on,.tabs>.tab.active,.tabs>.tab.on,.subnav>button.active,.subnav>button.on,.subnav>button[aria-selected=true],nav.steps>.step[aria-selected=true],.sidebar .nav button.active,.sidebar .nav button.on,.avg-opt.active{background:var(--tc-tab)!important;color:var(--tc-tab-ink)!important;border-color:var(--tc-tab-ink)!important;box-shadow:none!important}
+ .tab-num{background:var(--tc-head)!important;color:var(--tc-text)!important}.active>.tab-num{background:var(--tc-tab-ink)!important;color:var(--tc-surface)!important}
+ .btn-danger,.btn-delete,.delbtn,.xbtn,button.x,button.xa,button[title*="삭제"],button[title="빼기"],button[aria-label*="빼기"],button[onclick*="delRow("],button[onclick*="removeCompany("],button[onclick*="removeEvaluator("]{background:var(--tc-danger-bg)!important;color:var(--tc-danger)!important;border-color:var(--tc-danger)!important}
+ input,select,textarea{border-color:var(--tc-border)!important;color:var(--tc-ink)!important;accent-color:var(--tc-primary)}
+ input::placeholder,textarea::placeholder{color:var(--tc-muted)!important}
+ .drop,.drop-zone,.info-box{background-color:var(--tc-head)!important;border-color:var(--tc-border)!important;color:var(--tc-text)!important}
+ .brand-tool-footer a{color:var(--tc-primary)!important}
+ button:disabled,.btn:disabled{background:var(--tc-head)!important;color:var(--tc-muted)!important;border-color:var(--tc-border)!important}
+}
+
+/* Quiet navigation and single header rule, 2026-10-27. Color only. */
+@media screen{
+ .tl-merge{box-shadow:none!important}
+ .tl-merge+.site-header,.tl-merge+header,.tl-merge+.header,.tl-merge+.toolbar,.tl-merge+.wrap>header{border-bottom-color:transparent!important;box-shadow:inset 0 -1px 0 var(--tc-border)!important}
+ .tab-bar .tab-btn,.tabs>.tab,.subnav>button{background:transparent!important;border-color:transparent!important;color:var(--tc-text)!important;box-shadow:none!important}
+ .tab-bar .tab-btn:hover,.tabs>.tab:hover,.subnav>button:hover{background:rgba(30,58,95,.045)!important;color:var(--tc-primary)!important;border-color:transparent!important}
+ .tab-bar .tab-btn.active,.tab-bar .tab-btn.on,.tabs>.tab.active,.tabs>.tab.on,.subnav>button.active,.subnav>button.on,.subnav>button[aria-selected=true]{background:var(--tc-tab)!important;color:var(--tc-tab-ink)!important;border-color:transparent!important;box-shadow:none!important}
+ .sidebar .nav button{background:transparent!important;color:var(--tc-text)!important;border-color:transparent!important;box-shadow:none!important}
+ .sidebar .nav button:hover{background:rgba(30,58,95,.055)!important;color:var(--tc-primary)!important;border-color:transparent!important}
+ .sidebar .nav button.active,.sidebar .nav button.on{background:var(--tc-tab)!important;color:var(--tc-tab-ink)!important;border-color:transparent!important;box-shadow:none!important}
+ .topbar{background:var(--tc-page)!important;border-color:var(--tc-border)!important;box-shadow:none!important}
+ .topbar .title,#pageTitle{background:transparent!important;color:var(--tc-ink)!important;border-color:transparent!important;box-shadow:none!important}
+}
+</style>
+<style id="tool-layout-2026">
+/* 도구함 공통 배치 (Claude 담당, 2026-10-27) — 폭·간격·위치만. 색은 넣지 않는다(색은 Codex)
+   맨 위 줄·본문·크레딧이 같은 시작선(--tl-gut, 화면 폭 vw 기준이라 안쪽 상자에서도 같은 값)을 쓰고, 간격은 --tl-gap 하나로 맞춘다
+   도구별 파일(design/tool-layout/<도구>.css)에서 본문 상자에 padding-inline:var(--tl-gut) 등을 준다
+   .tl-merge = 안내띠(로고·문의)를 도구 제목줄 위에 겹쳐 한 줄로 (배치넣기.js가 도구별 파일에 tl-merge가 있으면 붙임)
+   제목줄 쪽은 도구별 파일에서 padding-left:var(--tl-hl) / padding-right:var(--tl-hr), min-height:var(--tl-head) */
+@media screen{
+ :root{--tl-wrap:1280px;--tl-gut:max(24px,calc((100vw - var(--tl-wrap)) / 2));--tl-gap:20px;--tl-pad:24px;--tl-head:84px;--tl-logo:84px;--tl-right:224px;--tl-close:0px;
+  --tl-hl:calc(var(--tl-gut) + var(--tl-logo) + 24px);--tl-hr:calc(var(--tl-gut) + var(--tl-right) + var(--tl-close))}
+ /* 포털 도구 창 안(openTool이 html에 data-in-portal을 붙임)에서는 오른쪽 끝에 포털의 닫기 버튼이 오므로 그만큼 비움 */
+ html[data-in-portal]{--tl-close:72px}
+ /* 안내띠: 겹치지 않는 도구도 한 줄 높이로 낮게 */
+ .brand-tool-strip{margin:0!important;min-height:0!important;height:var(--tl-head);padding:0 calc(var(--tl-gut) + var(--tl-close)) 0 var(--tl-gut)!important;gap:12px!important;box-sizing:border-box}
+ .brand-tool-strip img{width:var(--tl-logo)!important;height:42px!important}
+ .brand-tool-strip .brand-tool-character{width:36px!important;height:60px!important}
+ .brand-tool-strip a{white-space:nowrap}
+ .brand-tool-footer,.design-author-credit{margin:0 var(--tl-gut)!important}
+ /* 물품선정위원회 형식(.site-header·.main-wrap·.tab-bar·.card) 도구 */
+ .site-header{padding:16px var(--tl-gut)!important;margin:0!important}
+ .main-wrap{max-width:none!important;margin:0!important;padding:var(--tl-gap) var(--tl-gut) 48px!important}
+ .tab-bar{margin:0 0 var(--tl-gap)!important;padding:6px!important;gap:4px!important;align-items:stretch}
+ .tab-btn{min-height:44px!important;padding:8px 16px!important;gap:8px!important;align-items:center}
+ .main-wrap .card{padding:var(--tl-pad)!important;margin:0 0 var(--tl-gap)!important}
+ .main-wrap .card-header{margin-bottom:16px!important;padding-bottom:12px!important}
+ .main-wrap .info-box{margin-bottom:var(--tl-gap)}
+ .main-wrap .nav-actions{margin-top:var(--tl-gap)!important;justify-content:flex-end}
+}
+/* PC: 안내띠를 제목줄 위에 겹쳐 한 줄로 — 왼쪽 로고 | 제목 … 버튼 | 캐릭터·문의 */
+@media screen and (min-width:701px){
+ body:has(>.tl-merge){position:relative}
+ .tl-merge{position:absolute!important;top:0;left:0;right:0;background:transparent!important;border:0!important;pointer-events:none;z-index:1000}
+ .tl-merge>*{pointer-events:auto}
+ .tl-merge>div{visibility:hidden}
+}
+@media screen and (max-width:700px){
+ .brand-tool-strip{height:64px}
+ .brand-tool-strip img{width:72px!important;height:36px!important}
+}
+@media screen and (max-width:600px){
+ :root{--tl-gut:16px;--tl-gap:14px;--tl-pad:16px}
+ .tab-btn{padding:8px 6px!important}
+}
+@media screen and (max-width:700px){html[data-in-portal]{--tl-close:62px}}
+
+/* 물품선정위원회 배치 (Claude, 2026-10-27): tl-merge 제목줄 한 줄 / 기본 설정 = 출력 설정 → 업체 | 평가위원(나란히) → 평균 방식 → 평가 항목. 색은 넣지 않음 */
+@media screen and (min-width:701px){
+ .tl-merge+.site-header{min-height:var(--tl-head);padding:12px var(--tl-hr) 12px var(--tl-hl)!important;align-items:center!important;flex-wrap:wrap;gap:12px 16px!important}
+ .tl-merge+.site-header>.header-actions{margin-left:auto;flex-wrap:nowrap!important;width:auto!important}
+ .tl-merge+.site-header>.header-title-wrap{flex:0 0 auto;display:grid!important;grid-template-columns:auto auto;justify-content:start;align-items:center}
+ .tl-merge+.site-header>.header-title-wrap:before{grid-column:1/-1}
+ .tl-merge+.site-header .header-edit-hint{white-space:nowrap}
+}
+/* 좁은 PC·태블릿: 제목 아래에 버튼을 한 줄로 */
+@media screen and (min-width:701px) and (max-width:1300px){
+ .tl-merge+.site-header{padding-right:var(--tl-gut)!important}
+ .tl-merge+.site-header>.header-title-wrap{min-height:calc(var(--tl-head) - 24px);padding-right:calc(var(--tl-right) - var(--tl-gut))}
+ .tl-merge+.site-header>.header-actions{flex:1 0 100%;margin-left:0;flex-wrap:wrap!important}
+ .tl-merge+.site-header .dev-tab-btn{margin-left:auto}
+}
+@media screen{
+ #tab-setup:not([style*="display: none"]):not([style*="display:none"]){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:var(--tl-gap)!important;align-items:stretch!important}
+ #tab-setup>*{grid-column:1/-1!important;grid-row:auto!important;margin:0!important}
+ #tab-setup>.card:nth-child(1){order:1}
+ #tab-setup>.card:nth-child(3){order:2;grid-column:1!important}
+ #tab-setup>.card:nth-child(4){order:2;grid-column:2!important}
+ #tab-setup>.card:nth-child(5){order:3}
+ #tab-setup>.card:nth-child(2){order:4}
+ #tab-setup>.nav-actions{order:5;padding-top:var(--tl-gap)!important}
+ /* 업체·위원 한 줄: 번호 | 이름 | 제품명·소속 | 삭제 */
+ #companyList .entry-item,#evaluatorList .entry-item{grid-template-columns:25px minmax(0,1fr) minmax(0,1fr) auto!important;align-items:center;padding:8px 0!important}
+ #companyList .entry-item input:nth-of-type(2),#evaluatorList .entry-item input:nth-of-type(2),
+ #companyList .entry-item .btn-sm,#evaluatorList .entry-item .btn-sm{grid-column:auto!important;grid-row:auto!important}
+ #tab-setup>.card:nth-child(3)>.form-row,#tab-setup>.card:nth-child(4)>.form-row{display:grid!important;grid-template-columns:25px minmax(0,1fr) minmax(0,1fr) auto!important;gap:8px!important;margin:12px 0 0!important}
+ #tab-setup>.card:nth-child(3)>.form-row:before,#tab-setup>.card:nth-child(4)>.form-row:before{content:'+';text-align:center;font-weight:700;opacity:.5}
+ #tab-setup>.card:nth-child(3)>.form-row button,#tab-setup>.card:nth-child(4)>.form-row button{grid-column:auto!important;width:auto!important}
+ /* 출력 설정 카드: 제목 → 입력칸 → 엑셀 등록 간격을 16·20으로 */
+ #tab-setup>.card:nth-child(1)>.card-header{margin-bottom:16px!important;padding:0!important}
+ #tab-setup>.card:nth-child(1)>.form-row{display:grid!important;grid-template-columns:minmax(0,1fr) 200px;gap:16px!important;align-items:end!important;margin:0!important}
+ #tab-setup>.card:nth-child(1)>.form-row>div{min-width:0!important;max-width:none!important;gap:6px!important}
+ #tab-setup>.card:nth-child(1) .xl-zone{margin-top:20px;padding-top:20px}
+ #tab-setup>.card:nth-child(1) .xl-head{gap:8px 12px;margin-bottom:12px}
+ #tab-setup>.card:nth-child(1) .xl-head span{flex-basis:100%}
+ #tab-setup>.card:nth-child(5) .radio-group{flex-direction:row!important;flex-wrap:wrap;gap:8px 28px!important}
+}
+@media screen and (max-width:900px){
+ #tab-setup>.card:nth-child(3),#tab-setup>.card:nth-child(4){grid-column:1/-1!important}
+}
+/* 휴대폰에서 단계 탭이 숫자만 보이던 것 → 이름도 보이게 */
+@media screen and (max-width:600px){
+ .tab-btn span:not(.tab-num){display:inline!important;white-space:nowrap}
+}
+</style>
+</head>
+<body><div class="brand-tool-strip tl-merge"><img src="data:image/webp;base64,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" alt="교행e"><div><strong>물품선정위원회 평가</strong><small>교행e 도구함 · 넣은 파일과 입력한 내용은 이 컴퓨터 안에서만 처리돼요.</small></div><span class="brand-tool-character" aria-hidden="true"></span><a href="https://open.kakao.com/o/g4Tap2Ri" target="_blank" rel="noopener">카카오 오픈채팅 문의 ↗</a></div>
+
+<header class="site-header no-print">
+  <div class="header-title-wrap">
+    <div id="pageTitleDisplay" onclick="startEditTitle()" title="눌러서 제목 고치기">물품선정위원회 평가</div>
+    <input id="pageTitleInput" type="text" placeholder="제목 입력" onblur="finishEditTitle()" onkeydown="if(event.key==='Enter')finishEditTitle()">
+    <span class="header-edit-hint">✎ 눌러서 고치기</span>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="exportJSON()">💾 작업 저장</button>
+    <button class="header-btn" onclick="document.getElementById('fileInput').click()">📂 작업 불러오기</button>
+    <button class="header-btn" onclick="printSheets()">🖨 평가표 인쇄 / PDF 저장</button>
+    <button class="header-btn" onclick="printResult()">🖨 순위 인쇄 / PDF 저장</button>
+    <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importJSON(event)">
+    <button class="dev-tab-btn" onclick="openDevLock()">🔧 개발자모드</button>
+  </div>
+</header>
+
+<!-- 개발자 비밀번호 오버레이 -->
+<div id="devLock" style="display:none">
+  <div class="dev-lock-box">
+    <h3>🔒 개발자 모드</h3>
+    <p>개발자 전용 기능이에요.<br>비밀번호를 입력해 주세요.</p>
+    <input class="dev-lock-input" type="password" id="devPwInput" placeholder="••••••"
+      onkeydown="if(event.key==='Enter')checkDevPw()">
+    <button class="btn btn-primary" style="width:100%" onclick="checkDevPw()">확인</button>
+    <span class="dev-lock-err" id="devPwErr">비밀번호가 틀렸어요.</span>
+    <button class="btn" style="font-size:12px;color:var(--text-hint)" onclick="closeDevLock()">취소</button>
+  </div>
+</div>
+
+<div class="main-wrap">
+
+  <!-- 출력 전용: 평가표 서식 -->
+  <div id="printSheets"></div>
+
+  <!-- TABS -->
+  <div class="tab-bar no-print">
+    <button class="tab-btn active" onclick="showTab('setup')"><span class="tab-num">1</span><span>기본 설정</span></button>
+    <button class="tab-btn" onclick="showTab('score')"><span class="tab-num">2</span><span>점수 입력</span></button>
+    <button class="tab-btn" onclick="showTab('result')"><span class="tab-num">3</span><span>결과 · 순위</span></button>
+    <button class="tab-btn" id="devTabBtn" onclick="showTab('dev')" style="display:none;background:linear-gradient(135deg,#1a1a2e,#2c4a7c);color:#aad4ff;flex:0 0 auto;padding:9px 16px"><span>🔧 개발자모드</span></button>
+  </div>
+
+  <details class="tl-howto no-print" open style="margin:0 0 14px;padding:10px 14px;border:1px solid var(--tc-border,#d5dfeb);border-radius:10px;background:var(--tc-head,#eef5fd);font-size:13.5px;line-height:1.7"><summary style="cursor:pointer;font-weight:700">사용 방법</summary><ol style="margin:6px 0 0;padding-left:20px"><li><b>기본 설정</b> → 평가 항목·업체·위원을 적거나 「⬇ 양식 받기」 양식으로 올려요.</li><li><b>점수 입력</b> → 위원별 점수를 넣고 [점수 반영]을 눌러요.</li><li><b>결과 · 순위</b> → 순위를 확인하고 평가표·순위를 인쇄해요.</li></ol></details><style>@media print{.tl-howto{display:none!important}}</style>
+  <!-- TAB 1 -->
+  <div id="tab-setup">
+    <div class="card">
+      <div class="card-header"><span class="card-title">평가표 출력 설정</span></div>
+      <div class="form-row" style="align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:220px">
+          <label style="font-size:12px;color:var(--text-sub);font-weight:600">평가표 제목 (출력 시 상단에 표시)</label>
+          <input type="text" id="sheetTitle" placeholder="예) 물품선정위원회 평가표" style="width:100%" oninput="state.sheetTitle=this.value">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:180px">
+          <label style="font-size:12px;color:var(--text-sub);font-weight:600">평가일 (출력 시 자동 기재)</label>
+          <input type="date" id="evalDate" style="width:100%" oninput="state.evalDate=this.value">
+        </div>
+      </div>
+      <div class="xl-zone no-print">
+        <div class="xl-head"><b>📗 엑셀로 한 번에 등록</b>
+          <button class="btn btn-add" onclick="downloadXlTemplate()">⬇ 양식 받기</button>
+          <span style="font-size:12px;color:#8495a8">양식에 업체·제품, 평가위원, 점수(객관·주관)를 적어서 올리면 자동으로 채워져요.</span></div>
+        <label class="xl-drop" id="xlDrop">양식 엑셀 파일을 여기에 끌어다 놓거나 <u>눌러서 고르세요</u> (.xlsx)
+          <small>올리면 업체·평가위원 목록이 엑셀 내용으로 바뀌어요. 평가 항목·배점은 그대로 둬요.</small>
+          <input type="file" id="xlFile" accept=".xlsx,.xls"></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">평가 항목 및 배점 설정</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span class="badge" id="totalBadge">합계: 100점</span>
+          <button class="btn btn-reset no-print" onclick="resetCriteria()">기본값 초기화</button>
+          <button class="btn btn-primary no-print" onclick="addFieldGroup()">+ 평가분야 추가</button>
+        </div>
+      </div>
+      <div id="ptsWarn" class="pts-warn">⚠ 배점 합계가 100점이 아니에요. 지금: <span id="ptsTotal">0</span>점</div>
+      <div id="fieldGroupsWrap"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">업체 및 제품 등록</span>
+        <span class="badge" id="companyCountBadge">0개</span>
+      </div>
+      <div id="companyList" style="margin-bottom:10px"></div>
+      <div class="form-row">
+        <input type="text" id="newCompanyName" placeholder="업체명" style="width:130px">
+        <input type="text" id="newProductName" placeholder="제품명 (예: 제품1)" style="width:170px">
+        <button class="btn btn-primary" onclick="addCompany()">+ 추가</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">평가위원 등록</span>
+        <span class="badge" id="evalCountBadge">0명</span>
+      </div>
+      <div id="evaluatorList" style="margin-bottom:10px"></div>
+      <div class="form-row">
+        <input type="text" id="newEvalName" placeholder="위원 성명" style="width:130px">
+        <input type="text" id="newEvalDept" placeholder="소속" style="width:150px">
+        <button class="btn btn-primary" onclick="addEvaluator()">+ 추가</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">평균 산출 방식</span></div>
+      <div class="radio-group">
+        <label class="radio-label"><input type="radio" name="avgMode" value="normal" checked onchange="state.avgMode=this.value"> 일반 평균</label>
+        <label class="radio-label"><input type="radio" name="avgMode" value="trimmed" onchange="state.avgMode=this.value"> 최고·최저 제외 평균</label>
+        <label class="radio-label"><input type="radio" name="avgMode" value="both" onchange="state.avgMode=this.value"> 둘 다 표시</label>
+      </div>
+      <div class="info-box" style="margin-top:12px;margin-bottom:0">최고·최저 제외 평균은 위원이 3명 이상일 때 적용돼요.</div>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-primary" onclick="showTab('score')">다음: 점수 입력 →</button>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div id="tab-score" style="display:none">
+    <div class="info-box no-print">
+      <strong>① 객관 항목</strong>은 업체별로 한 번만 넣으면 모든 위원에게 적용돼요.<br>
+      <strong>② 주관 항목</strong>은 위원별로 각각 입력하세요. 입력 후 <strong>점수 반영</strong>을 누르세요.
+    </div>
+    <div id="scoreBlocks"></div>
+    <div class="save-bar no-print">
+      <button class="btn btn-primary" onclick="saveAllScores()">점수 반영</button>
+      <button class="btn" onclick="showTab('result')">결과 보기 →</button>
+      <span class="save-msg" id="saveMsg">✓ 점수를 반영했어요.</span>
+    </div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div id="tab-result" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">업체별 최종 순위</span>
+        <div class="avg-selector no-print">
+          <button class="avg-opt active" onclick="setAvgMode('normal',this)">일반 평균</button>
+          <button class="avg-opt" onclick="setAvgMode('trimmed',this)">최고·최저 제외</button>
+          <button class="avg-opt" onclick="setAvgMode('both',this)">둘 다 표시</button>
+        </div>
+      </div>
+      <div id="rankingArea"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">위원별 점수 상세</span></div>
+      <div class="detail-wrap" id="detailTable"></div>
+    </div>
+    <div class="nav-actions no-print">
+      <button class="btn" onclick="showTab('score')">← 점수 입력</button>
+      <button class="btn btn-primary" onclick="printResult()">🖨 순위 인쇄 / PDF 저장</button>
+      <button class="btn" onclick="printSheets()">🖨 평가표 인쇄 / PDF 저장</button>
+    </div>
+  </div>
+
+  <!-- TAB DEV -->
+  <div id="tab-dev" style="display:none">
+    <div class="card" style="border-color:#2c4a7c;background:linear-gradient(135deg,#f0f4ff,#fefcf8)">
+      <div class="card-header" style="border-color:#c8d8f0">
+        <span class="card-title" style="color:var(--accent)">🔧 개발자 모드</span>
+        <span class="warn-badge">⚠ 관계자 외 사용 금지</span>
+      </div>
+      <div class="info-box" style="margin-bottom:16px">
+        객관 점수를 직접 입력한 뒤, 1등 업체를 지정하면 <strong>주관 항목 점수만 자동 생성</strong>해요.<br>
+        <span style="color:var(--danger);font-weight:600">※ 미리보기 확인 후 적용해야 점수 입력 탭에 반영돼요.</span>
+      </div>
+
+      <!-- STEP 1: 객관 점수 입력 -->
+      <div class="dev-section">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text-sub)">① 객관 점수 입력 <span style="font-size:11px;font-weight:400;color:var(--text-hint)">— 업체별 1회 입력 (점수 입력 탭과 같이 써요)</span></div>
+        <div id="devObjInputArea"></div>
+      </div>
+
+      <!-- STEP 2: 1등 업체 지정 -->
+      <div class="dev-section">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text-sub)">② 1등 업체 지정</div>
+        <div id="devRankRows"></div>
+        <div style="font-size:11px;color:var(--text-hint);margin-top:6px">1등 업체는 주관 항목에서 높은 등급이, 나머지는 중간 등급 위주로 무작위 배분돼요.</div>
+      </div>
+
+      <!-- STEP 3: 옵션 + 생성 -->
+      <div class="dev-section">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-sub)">③ 주관 점수 자동 생성</div>
+        <label style="font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:12px">
+          <input type="checkbox" id="devTrimmedMode" style="accent-color:var(--accent)">
+          최고·최저 제외 평균 기준으로 1등 확인
+        </label>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="devGenerate()">⚡ 주관 점수 생성</button>
+          <button class="btn" onclick="devGenerate()">🔄 다시 생성</button>
+        </div>
+      </div>
+
+      <!-- 결과 프리뷰 -->
+      <div class="gen-result-area" id="devResultArea" style="display:none">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-sub)">④ 생성 결과 미리보기</div>
+        <div id="devPreviewTables"></div>
+        <div class="apply-btn-row">
+          <button class="btn btn-primary" onclick="devApply()">✅ 점수 입력 탭에 적용</button>
+          <button class="btn" onclick="devGenerate()">🔄 다시 생성</button>
+          <span id="devApplyMsg" style="font-size:12px;color:var(--success);font-weight:500;display:none">✓ 적용했어요. 점수 입력 탭을 확인해 주세요.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 업체 추가 카드 -->
+    <div class="card" style="margin-top:4px">
+      <div class="card-header"><span class="card-title">업체 추가</span></div>
+      <div class="form-row">
+        <input type="text" id="devNewCoName" placeholder="업체명" style="width:130px">
+        <input type="text" id="devNewCoProd" placeholder="제품명" style="width:160px">
+        <button class="btn btn-primary" onclick="devAddCompany()">+ 추가</button>
+        <span style="font-size:11px;color:var(--text-hint)">기본 설정 탭과 같이 바뀌어요</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+/* ══ DEFAULT DATA ══ */
+const DEFAULT_STATE={
+  title:'물품선정위원회 평가',
+  fieldGroups:[
+    {
+      id:'fg1', name:'제품의 적정성', type:'subjective',
+      subjGrades:{탁월:15,우수:10,보통:5,미흡:0},
+      items:[
+        {id:'i1',name:'사용의 편리성',    points:15,
+         criteria:'□ 사용목적에 맞게 활용도가 높은가?\n□ 사용조작이 편리하게 제작되었는가?'},
+        {id:'i2',name:'사후관리의 용이성',points:10,
+         criteria:'□ A/S 및 하자보증기간 등 사후관리가 용이한가?'},
+        {id:'i3',name:'디자인 및 제품의 내구성',points:10,
+         criteria:'□ 배치될 장소에 디자인이 어울리는가?\n□ 충격에 강한 재질, 모서리 마감 등 안전사고에서 안전한가?'},
+      ]
+    },
+    {
+      id:'fg2', name:'인증제품 등', type:'objective_select',
+      items:[{id:'i4',name:'기술우수/녹색/에너지절약제품',points:15,
+              criteria:'기술우수제품, 녹색제품, 에너지절약제품 보유 여부'}],
+      opts:[
+        {label:'① 우수조달물품/인증신제품(NEP)/신기술(NET)/성능인증/녹색기술제품확인',score:15},
+        {label:'② 우수재활용제품(GR)/환경표지제품',score:10},
+        {label:'③ 고효율기자재/에너지절약제품/신재생에너지설비/에너지효율1등급',score:5},
+        {label:'해당없음',score:0},
+      ]
+    },
+    {
+      id:'fg3', name:'약자지원', type:'objective_select',
+      items:[{id:'i5',name:'장애인·사회적기업·여성기업 등',points:15,
+              criteria:'중증장애인생산품, 장애인기업제품, 사회적기업제품, 여성기업제품 해당 여부'}],
+      opts:[
+        {label:'① 중증장애인생산품',score:15},
+        {label:'② 장애인기업제품',score:12},
+        {label:'③ 사회적기업제품/사회적협동조합',score:9},
+        {label:'④ 장애인표준사업장',score:6},
+        {label:'⑤ 창업기업',score:4},
+        {label:'⑥ 소기업·소상공인',score:2},
+        {label:'⑦ 여성기업제품',score:1},
+        {label:'해당없음',score:0},
+      ]
+    },
+    {
+      id:'fg4', name:'지역업체', type:'objective_select',
+      items:[{id:'i6',name:'전라북도 지역업체 여부',points:10,
+              criteria:'평가 대상 물품 생산여부와 관계없이 평가\n(납품업체가 조합인 경우: 조합원사의 본사 및 공장 소재지 기준)'}],
+      opts:[
+        {label:'① 본사가 도내에 있음',score:10},
+        {label:'② 지사(공장) 도내에 있음',score:5},
+        {label:'③ 본사·지사 도내에 모두 없음',score:0},
+      ]
+    },
+    {
+      id:'fg5', name:'가격', type:'objective_select',
+      items:[{id:'i7',name:'예산액 대비 제품가격 비율',points:25,
+              criteria:'(구매제품가격합계 ÷ 예산액) × 100으로 산출'}],
+      opts:[
+        {label:'① 75% 미만',score:25},
+        {label:'② 80% 미만',score:20},
+        {label:'③ 85% 미만',score:15},
+        {label:'④ 90% 미만',score:10},
+        {label:'⑤ 95% 미만',score:5},
+        {label:'⑥ 95% 이상',score:0},
+      ]
+    },
+  ],
+  companies:[
+    {id:'c1',name:'A업체',product:'제품1'},
+    {id:'c2',name:'B업체',product:'제품2'},
+    {id:'c3',name:'C업체',product:'제품3'},
+  ],
+  evaluators:[
+    {id:'e1',name:'홍길동',dept:'구매과'},
+    {id:'e2',name:'이순신',dept:'총무과'},
+  ],
+  scores:{},
+  avgMode:'normal',
+  sheetTitle:'',
+  evalDate:'',
+};
+
+let state=deepClone(DEFAULT_STATE);
+let _cnt=300;
+function newId(p='x'){return p+(++_cnt);}
+function deepClone(o){return JSON.parse(JSON.stringify(o));}
+function allItems(){const out=[];state.fieldGroups.forEach(fg=>fg.items.forEach(item=>out.push({fg,item})));return out;}
+
+/* ── TITLE ── */
+function startEditTitle(){
+  const d=document.getElementById('pageTitleDisplay'),i=document.getElementById('pageTitleInput');
+  i.value=d.textContent;d.style.display='none';i.style.display='block';i.focus();i.select();
+}
+function finishEditTitle(){
+  const d=document.getElementById('pageTitleDisplay'),i=document.getElementById('pageTitleInput');
+  const v=i.value.trim()||'물품선정위원회 평가';
+  d.textContent=v;state.title=v;document.title=v+' - 평가시스템';
+  d.style.display='';i.style.display='none';
+}
+
+/* ── SAVE/LOAD ── */
+function exportJSON(){
+  saveAllScores();
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(state.title||'평가시스템')+'.json';a.click();
+}
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      state=JSON.parse(ev.target.result);
+      document.getElementById('pageTitleDisplay').textContent=state.title||'물품선정위원회 평가';
+      document.querySelectorAll('input[name=avgMode]').forEach(r=>{r.checked=(r.value===state.avgMode);});
+      document.getElementById('sheetTitle').value=state.sheetTitle||'';
+      document.getElementById('evalDate').value=state.evalDate||'';
+      renderFieldGroups();renderCompanies();renderEvaluators();showTab('setup');
+      alert('불러왔어요.');
+    }catch(err){alert('파일을 읽지 못했어요. 이 도구에서 「💾 작업 저장」으로 만든 파일인지 확인해 주세요. ('+err.message+')');}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+/* ══════════════════════════════════════
+   PRINT: 평가표 출력 (업체별, 위원 공통 서식)
+══════════════════════════════════════ */
+function printSheets(){
+  saveAllScores();
+  buildPrintSheets();
+
+  document.getElementById('tab-setup').style.display='none';
+  document.getElementById('tab-score').style.display='none';
+  document.getElementById('tab-result').style.display='none';
+  document.getElementById('printSheets').style.display='block';
+
+  const origTitle=document.title;
+  document.title=' ';          // 머리글에 제목 안 나오도록
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{
+      document.title=origTitle;
+      document.getElementById('printSheets').style.display='none';
+      showTab('setup');
+    },600);
+  },100);
+}
+
+function buildPrintSheets(){
+  const wrap=document.getElementById('printSheets');
+  const sheetTitle=state.sheetTitle||(state.title||'물품선정위원회 평가표');
+  // 평가일 포맷
+  let evalDateStr='';
+  if(state.evalDate){
+    const d=new Date(state.evalDate);
+    evalDateStr=`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+  }
+
+  let html='';
+  state.companies.forEach(co=>{
+
+    /* ── 표 행 생성 ── */
+    let rows='';
+    state.fieldGroups.forEach(fg=>{
+      fg.items.forEach((item,ii)=>{
+        const pts=Number(item.points)||0;
+        const isFirst=(ii===0);
+        const rowspan=fg.items.length;
+
+        /* 세부 평가기준 칸 */
+        let detailHtml='';
+        const criLines=(item.criteria||'').split('\n').map(l=>l.trim()).filter(Boolean);
+        if(fg.type==='subjective'){
+          detailHtml=criLines.map(l=>`<div>${esc(l)}</div>`).join('');
+        } else if(fg.type==='objective_select'){
+          if(criLines.length) detailHtml+=`<div style="margin-bottom:2px;font-style:italic">${criLines.map(l=>esc(l)).join(' ')}</div>`;
+          detailHtml+=(fg.opts||[]).map(o=>
+            `<div>□ ${esc(o.label)}&thinsp;→&thinsp;<b>${o.score??0}점</b></div>`
+          ).join('');
+        } else {
+          detailHtml=criLines.map(l=>esc(l)).join('<br>')||'직접 기재';
+        }
+
+        /* 평가점수 칸 */
+        let scoreHtml='';
+        if(fg.type==='subjective'){
+          const g=fg.subjGrades||{탁월:pts,우수:Math.round(pts*.75),보통:Math.round(pts*.5),미흡:Math.round(pts*.25)};
+          scoreHtml=`<div class="score-grid">
+            ${['탁월','우수','보통','미흡'].map(grade=>
+              `<div class="sg-item"><span class="sg-box"></span><span>${grade}(${g[grade]??0}점)</span></div>`
+            ).join('')}
+          </div>`;
+        } else {
+          // 객관: 밑줄 없는 빈 공간
+          scoreHtml=`<div class="score-obj">&nbsp;</div>`;
+        }
+
+        /* 평가분야 셀 (첫 항목만 rowspan) */
+        const fieldCell=isFirst
+          ?`<td class="td-field" rowspan="${rowspan}">${esc(fg.name)}</td>`
+          :'';
+
+        rows+=`<tr>
+          ${fieldCell}
+          <td class="td-item">${esc(item.name)}<span class="pts">(${pts}점)</span></td>
+          <td class="td-detail">${detailHtml}</td>
+          <td class="td-score">${scoreHtml}</td>
+          <td class="td-note"></td>
+        </tr>`;
+      });
+    });
+
+    /* 합계 행 */
+    rows+=`<tr class="tr-total">
+      <td colspan="2" style="text-align:right;padding-right:8px">평 가 점 수 합 계</td>
+      <td style="text-align:center">100점</td>
+      <td></td>
+      <td></td>
+    </tr>`;
+
+    /* 평가일 표시 */
+    const dateCell=evalDateStr
+      ?evalDateStr
+      :'&nbsp;&nbsp;&nbsp;&nbsp;년 &nbsp;&nbsp;&nbsp;월 &nbsp;&nbsp;&nbsp;일';
+
+    html+=`<div class="psheet">
+      <div class="psheet-title">${esc(sheetTitle)}</div>
+      <div class="psheet-info">
+        <div class="pi-cell">
+          <span class="pi-lbl">제품(모델명)</span>
+          <span class="pi-val">${esc(co.name)} &nbsp;/&nbsp; ${esc(co.product)}</span>
+        </div>
+      </div>
+      <table class="ptbl">
+        <thead>
+          <tr>
+            <th class="col-field">평가분야</th>
+            <th class="col-item">평가항목<br><span style="font-weight:400;font-size:7pt">(배점)</span></th>
+            <th class="col-detail">세부 평가기준 및 항목</th>
+            <th class="col-score">평가점수</th>
+            <th class="col-note">비고</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="psheet-sign">
+        <div class="sign-date">${evalDateStr||'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;년 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;일'}</div>
+        <div class="sign-row">
+          <div class="sign-field"><span class="sf-lbl">평가위원</span></div>
+          <div class="sign-field"><span class="sf-lbl">소속:</span><span class="sf-space">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+          <div class="sign-field"><span class="sf-lbl">성명:</span><span class="sf-space">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+          <div class="sign-field"><span class="sf-lbl">서명:</span><span class="sf-space">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  wrap.innerHTML=html;
+}
+
+/* ── PRINT: 순위 출력 ── */
+function printResult(){
+  saveAllScores();renderResult();
+  document.getElementById('printSheets').style.display='none';
+  document.getElementById('printSheets').innerHTML='';
+  document.getElementById('tab-setup').style.display='none';
+  document.getElementById('tab-score').style.display='none';
+  const resultTab=document.getElementById('tab-result');
+  resultTab.style.display='block';
+  // 출력 제목 설정 (CSS ::before 에서 사용)
+  resultTab.setAttribute('data-title', state.title||'물품선정위원회 평가 결과');
+  const origTitle=document.title;
+  document.title=' ';
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{document.title=origTitle;showTab('result');},500);
+  },100);
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ── HELPERS ── */
+function scoreKey(evId,coId,fgId,itId){return `${evId}__${coId}__${fgId}__${itId}`;}
+function calcTotal(evId,coId){
+  let t=0;
+  state.fieldGroups.forEach(fg=>fg.items.forEach(item=>{
+    if(fg.type!=='subjective'){
+      // 객관: 공유 저장소 우선
+      const shk=objSharedKey(coId,fg.id,item.id);
+      const shared=state.scores[shk];
+      t+=shared?shared.score:0;
+    } else {
+      const k=scoreKey(evId,coId,fg.id,item.id);
+      t+=(state.scores[k]?state.scores[k].score:0);
+    }
+  }));
+  return t;
+}
+function trimmedAvg(arr){
+  if(arr.length<=2)return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
+  const s=[...arr].sort((a,b)=>a-b);
+  return s.slice(1,-1).reduce((a,b)=>a+b,0)/(s.length-2);
+}
+function r2(n){return Math.round(n*100)/100;}
+function totalPoints(){return state.fieldGroups.reduce((s,fg)=>s+fg.items.reduce((ss,it)=>ss+(Number(it.points)||0),0),0);}
+function checkTotal(){
+  const t=totalPoints();
+  const b=document.getElementById('totalBadge');
+  b.textContent=`합계: ${t}점`;b.className=t===100?'badge badge-success':'badge badge-warn';
+  document.getElementById('ptsTotal').textContent=t;
+  document.getElementById('ptsWarn').style.display=t!==100?'block':'none';
+}
+
+/* ── TAB 1: FIELD GROUPS ── */
+function renderFieldGroups(){
+  const wrap=document.getElementById('fieldGroupsWrap');wrap.innerHTML='';
+  state.fieldGroups.forEach((fg,fgi)=>{
+    const div=document.createElement('div');div.className='field-group';div.id='fg_'+fg.id;
+    const typeOpts=['subjective','objective_select','objective_direct'].map(v=>
+      `<option value="${v}" ${fg.type===v?'selected':''}>${{subjective:'주관평가',objective_select:'객관(선택)',objective_direct:'객관(직접입력)'}[v]}</option>`).join('');
+    div.innerHTML=`
+      <div class="field-group-header">
+        <div class="entry-num no-print">${fgi+1}</div>
+        <input type="text" value="${fg.name}" style="flex:1;min-width:0;background:#fff;font-weight:600" placeholder="평가분야명" onchange="state.fieldGroups[${fgi}].name=this.value">
+        <select style="width:130px" class="no-print" onchange="changeFgType(${fgi},this.value)">${typeOpts}</select>
+        <button class="btn btn-sm no-print" onclick="removeFieldGroup(${fgi})">삭제</button>
+      </div>
+      <div class="field-group-body" id="fgbody_${fg.id}"></div>`;
+    wrap.appendChild(div);
+    renderFgBody(fg,fgi);
+  });
+  checkTotal();
+}
+
+function renderFgBody(fg,fgi){
+  const body=document.getElementById('fgbody_'+fg.id);if(!body)return;
+  let html='';
+
+  fg.items.forEach((item,ii)=>{
+    html+=`<div class="criteria-row" style="align-items:flex-start;margin-bottom:10px;flex-direction:column;gap:4px">
+      <div style="display:flex;align-items:center;gap:8px;width:100%;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--text-hint);min-width:16px">${ii+1}</span>
+        <input type="text" value="${item.name}" style="flex:1;min-width:120px" placeholder="항목명" onchange="state.fieldGroups[${fgi}].items[${ii}].name=this.value">
+        <span style="font-size:12px;color:var(--text-sub)">배점</span>
+        <input type="number" value="${item.points}" min="0" max="100" style="width:60px" onchange="state.fieldGroups[${fgi}].items[${ii}].points=Number(this.value);checkTotal()">
+        <span style="font-size:11px;color:var(--text-hint)">점</span>
+        ${fg.items.length>1?`<button class="btn btn-sm no-print" onclick="removeItem(${fgi},${ii})">−</button>`:''}
+      </div>
+      <div style="padding-left:24px;width:100%">
+        <div style="font-size:11px;color:var(--text-sub);margin-bottom:3px">세부 평가기준 (출력용)</div>
+        <textarea rows="2" style="width:100%;font-size:12px" placeholder="세부 평가기준 내용 입력 (줄바꿈으로 항목 구분)"
+          onchange="state.fieldGroups[${fgi}].items[${ii}].criteria=this.value">${item.criteria||''}</textarea>
+      </div>
+    </div>`;
+  });
+
+  html+=`<div style="margin:6px 0 4px"><button class="btn btn-add no-print" onclick="addItem(${fgi})">+ 항목 행 추가</button></div>`;
+
+  if(fg.type==='subjective'){
+    const g=fg.subjGrades||{탁월:15,우수:10,보통:5,미흡:0};
+    html+=`<div class="sep"></div>
+    <div style="font-size:12px;font-weight:600;color:var(--text-sub);margin:6px 0 4px">등급별 부여 점수</div>
+    <div class="subj-grades">
+      ${['탁월','우수','보통','미흡'].map(grade=>`
+        <div class="grade-item">
+          <label>${grade}</label>
+          <input type="number" value="${g[grade]??0}" min="0" step="0.1"
+            onchange="state.fieldGroups[${fgi}].subjGrades['${grade}']=Number(this.value)">
+          <span style="font-size:10px;color:var(--text-hint)">점</span>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--text-hint);margin-top:5px">※ 등급별 점수는 점수 입력 탭 드롭다운에 반영돼요.</div>`;
+  }
+
+  if(fg.type==='objective_select'){
+    const opts=fg.opts||[];
+    html+=`<div class="sep"></div>
+    <div style="font-size:12px;font-weight:600;color:var(--text-sub);margin:6px 0 4px">선택 옵션별 부여 점수</div>
+    <div class="obj-opts-wrap">`;
+    opts.forEach((opt,oi)=>{
+      html+=`<div class="obj-opt-row">
+        <input type="text" value="${opt.label}" placeholder="옵션 설명" onchange="state.fieldGroups[${fgi}].opts[${oi}].label=this.value">
+        <span style="font-size:12px;color:var(--text-sub)">→</span>
+        <input type="number" value="${opt.score??0}" min="0" step="0.1"
+          onchange="state.fieldGroups[${fgi}].opts[${oi}].score=Number(this.value)">
+        <span style="font-size:11px;color:var(--text-hint)">점</span>
+        <button class="btn btn-sm no-print" onclick="removeOpt(${fgi},${oi})">−</button>
+      </div>`;
+    });
+    html+=`</div><button class="btn btn-add no-print" style="margin-top:6px" onclick="addOpt(${fgi})">+ 옵션 추가</button>`;
+  }
+
+  body.innerHTML=html;
+}
+
+function changeFgType(fgi,val){
+  state.fieldGroups[fgi].type=val;
+  if(val==='objective_select'&&!state.fieldGroups[fgi].opts)
+    state.fieldGroups[fgi].opts=[{label:'① 해당 있음',score:state.fieldGroups[fgi].items[0]?.points||0},{label:'해당없음',score:0}];
+  renderFieldGroups();
+}
+function addFieldGroup(){
+  state.fieldGroups.push({id:newId('fg'),name:'새 평가분야',type:'subjective',
+    subjGrades:{탁월:10,우수:7,보통:4,미흡:1},
+    items:[{id:newId('i'),name:'새 항목',points:0,criteria:''}]});
+  renderFieldGroups();
+}
+function removeFieldGroup(fgi){
+  if(state.fieldGroups.length<=1){alert('평가분야는 1개 이상 있어야 해요.');return;}
+  if(!confirm('삭제할까요?'))return;
+  state.fieldGroups.splice(fgi,1);renderFieldGroups();
+}
+function addItem(fgi){
+  state.fieldGroups[fgi].items.push({id:newId('i'),name:'새 항목',points:0,criteria:''});
+  renderFieldGroups();
+}
+function removeItem(fgi,ii){state.fieldGroups[fgi].items.splice(ii,1);renderFieldGroups();}
+function addOpt(fgi){
+  if(!state.fieldGroups[fgi].opts)state.fieldGroups[fgi].opts=[];
+  state.fieldGroups[fgi].opts.push({label:'새 옵션',score:0});renderFieldGroups();
+}
+function removeOpt(fgi,oi){state.fieldGroups[fgi].opts.splice(oi,1);renderFieldGroups();}
+function resetCriteria(){
+  if(!confirm('기본값으로 초기화할까요?'))return;
+  state.fieldGroups=deepClone(DEFAULT_STATE.fieldGroups);renderFieldGroups();
+}
+
+/* ── TAB 1: COMPANIES / EVALUATORS ── */
+function renderCompanies(){
+  document.getElementById('companyList').innerHTML=state.companies.map((c,i)=>`
+    <div class="entry-item">
+      <div class="entry-num">${i+1}</div>
+      <input type="text" value="${c.name}" style="width:126px" placeholder="업체명" onchange="state.companies[${i}].name=this.value">
+      <input type="text" value="${c.product}" style="width:166px" placeholder="제품명" onchange="state.companies[${i}].product=this.value">
+      <button class="btn btn-sm no-print" onclick="removeCompany(${i})">삭제</button>
+    </div>`).join('');
+  document.getElementById('companyCountBadge').textContent=state.companies.length+'개';
+}
+function addCompany(){
+  const n=document.getElementById('newCompanyName').value.trim(),p=document.getElementById('newProductName').value.trim();
+  if(!n)return;
+  state.companies.push({id:newId('c'),name:n,product:p||'제품'+(state.companies.length+1)});
+  document.getElementById('newCompanyName').value='';document.getElementById('newProductName').value='';
+  renderCompanies();
+}
+function removeCompany(i){state.companies.splice(i,1);renderCompanies();}
+
+function renderEvaluators(){
+  document.getElementById('evaluatorList').innerHTML=state.evaluators.map((e,i)=>`
+    <div class="entry-item">
+      <div class="entry-num">${i+1}</div>
+      <input type="text" value="${e.name}" style="width:116px" placeholder="성명" onchange="state.evaluators[${i}].name=this.value">
+      <input type="text" value="${e.dept}" style="width:146px" placeholder="소속" onchange="state.evaluators[${i}].dept=this.value">
+      <button class="btn btn-sm no-print" onclick="removeEvaluator(${i})">삭제</button>
+    </div>`).join('');
+  document.getElementById('evalCountBadge').textContent=state.evaluators.length+'명';
+}
+function addEvaluator(){
+  const n=document.getElementById('newEvalName').value.trim(),d=document.getElementById('newEvalDept').value.trim();
+  if(!n)return;
+  state.evaluators.push({id:newId('e'),name:n,dept:d});
+  document.getElementById('newEvalName').value='';document.getElementById('newEvalDept').value='';
+  renderEvaluators();
+}
+function removeEvaluator(i){state.evaluators.splice(i,1);renderEvaluators();}
+
+/* ── TAB 2: SCORE MATRIX ── */
+function inputId(evId,coId,fgId,itId){return `inp_${evId}_${coId}_${fgId}_${itId}`;}
+function valId(evId,coId,fgId,itId){return `val_${evId}_${coId}_${fgId}_${itId}`;}
+function rowTotalId(evId,coId){return `rt_${evId}_${coId}`;}
+
+// 객관 항목은 업체 공유 점수 키 (위원 ID 없음)
+function objSharedKey(coId,fgId,itId){return `obj__${coId}__${fgId}__${itId}`;}
+
+// 저장된 점수 가져오기 (객관은 공유 저장소 우선)
+function getSavedScore(evId,coId,fg,item){
+  if(fg.type!=='subjective'){
+    const shared=state.scores[objSharedKey(coId,fg.id,item.id)];
+    if(shared!==undefined) return shared.score;
+  }
+  const own=state.scores[scoreKey(evId,coId,fg.id,item.id)];
+  return own?own.score:0;
+}
+
+function getInputScore(evId,coId,fg,item){
+  // 객관이면 공유 input에서 읽기
+  if(fg.type!=='subjective'){
+    const el=document.getElementById('obj_'+objSharedKey(coId,fg.id,item.id));
+    return el?parseFloat(el.value)||0:getSavedScore(evId,coId,fg,item);
+  }
+  const el=document.getElementById(inputId(evId,coId,fg.id,item.id));
+  return el?parseFloat(el.value)||0:0;
+}
+
+function updateAllRowTotals(coId){
+  state.evaluators.forEach(ev=>{
+    let t=0;
+    state.fieldGroups.forEach(fg=>fg.items.forEach(item=>t+=getInputScore(ev.id,coId,fg,item)));
+    const el=document.getElementById(rowTotalId(ev.id,coId));
+    if(el)el.textContent=t>0?t.toFixed(1):'-';
+  });
+}
+function updateRowTotal(evId,coId){
+  let t=0;
+  state.fieldGroups.forEach(fg=>fg.items.forEach(item=>t+=getInputScore(evId,coId,fg,item)));
+  const el=document.getElementById(rowTotalId(evId,coId));if(el)el.textContent=t>0?t.toFixed(1):'-';
+}
+
+function renderScoreBlocks(){
+  const wrap=document.getElementById('scoreBlocks');
+  if(!state.evaluators.length||!state.companies.length){
+    wrap.innerHTML='<div class="info-box">기본 설정 탭에서 업체와 평가위원을 먼저 등록해 주세요.</div>';return;
+  }
+
+  // ── 섹션 1: 객관 항목 공유 입력표 (업체별 1회) ──
+  const objGroups=state.fieldGroups.filter(fg=>fg.type!=='subjective');
+  let objSection='';
+  if(objGroups.length){
+    const objThCols=objGroups.map(fg=>fg.items.map(item=>`
+      <th>
+        <div style="font-weight:700;font-size:11px">${item.name}</div>
+        <div style="font-size:10px;color:var(--text-hint);margin-top:1px">객관 · ${item.points}점</div>
+      </th>`).join('')).join('');
+
+    const objRows=state.companies.map(co=>{
+      const cells=objGroups.map(fg=>fg.items.map(item=>{
+        const shk=objSharedKey(co.id,fg.id,item.id);
+        const saved=state.scores[shk];
+        const sv=saved?saved.score:0;
+        return `<td style="text-align:center;vertical-align:middle;padding:4px 6px">
+          <input type="number" id="obj_${shk}" value="${sv===0?'':sv}"
+            min="0" max="${item.points}" step="0.1" placeholder="0"
+            style="width:58px;text-align:center;font-size:13px;font-weight:600;padding:4px 2px"
+            oninput="onObjInput('${co.id}','${fg.id}','${item.id}',this.value)">
+        </td>`;
+      }).join('')).join('');
+      return `<tr>
+        <td class="td-company">${co.name}<br><span style="font-size:11px;color:var(--text-hint);font-weight:400">${co.product}</span></td>
+        ${cells}
+      </tr>`;
+    }).join('');
+
+    objSection=`<div class="card" style="margin-bottom:18px;border-color:var(--accent);">
+      <div class="card-header" style="background:var(--accent-light)">
+        <span class="card-title">① 객관 항목 점수 입력</span>
+        <span class="badge">업체별 1회 입력 → 전 위원 자동 적용</span>
+      </div>
+      <div class="score-matrix-wrap">
+        <table class="score-matrix">
+          <thead><tr>
+            <th class="col-company">업체 / 제품</th>${objThCols}
+          </tr></thead>
+          <tbody>${objRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  // ── 섹션 2: 주관 항목 위원별 입력 ──
+  const subjGroups=state.fieldGroups.filter(fg=>fg.type==='subjective');
+  let subjSection='';
+  if(subjGroups.length){
+    const thCols=subjGroups.map(fg=>fg.items.map(item=>`
+      <th>
+        <div style="font-weight:700;font-size:11px">${item.name}</div>
+        <div style="font-size:10px;color:var(--text-hint);margin-top:1px">주관 · ${item.points}점</div>
+      </th>`).join('')).join('');
+
+    subjSection=state.evaluators.map((ev,ei)=>{
+      const rows=state.companies.map(co=>{
+        const cells=subjGroups.map(fg=>fg.items.map(item=>{
+          const saved=state.scores[scoreKey(ev.id,co.id,fg.id,item.id)];
+          const id=inputId(ev.id,co.id,fg.id,item.id);
+          const sv=saved?saved.score:0;
+          return `<td style="text-align:center;vertical-align:middle;padding:4px 6px">
+            <input type="number" id="${id}" value="${sv===0?'':sv}"
+              min="0" max="${item.points}" step="0.1" placeholder="0"
+              style="width:58px;text-align:center;font-size:13px;font-weight:600;padding:4px 2px"
+              oninput="onScoreInput('${ev.id}','${co.id}','${fg.id}','${item.id}',this.value)">
+          </td>`;
+        }).join('')).join('');
+
+        // 합계: 주관(위원별) + 객관(공유)
+        let total=0;
+        state.fieldGroups.forEach(fg=>fg.items.forEach(item=>total+=getSavedScore(ev.id,co.id,fg,item)));
+        return `<tr>
+          <td class="td-company">${co.name}<br><span style="font-size:11px;color:var(--text-hint);font-weight:400">${co.product}</span></td>
+          ${cells}
+          <td class="td-total"><span id="${rowTotalId(ev.id,co.id)}">${total>0?total.toFixed(1):'-'}</span></td>
+        </tr>`;
+      }).join('');
+
+      return `<div class="eval-block">
+        <div class="eval-block-header" onclick="toggleBlock('${ev.id}')">
+          <div style="flex:1"><div class="ev-name">평가위원 ${ei+1}: ${ev.name}</div><div class="ev-dept">${ev.dept}</div></div>
+          <div id="arrow_${ev.id}" style="font-size:18px;transition:transform .2s">▾</div>
+        </div>
+        <div class="eval-block-body" id="block_${ev.id}">
+          <div class="score-matrix-wrap">
+            <table class="score-matrix">
+              <thead><tr>
+                <th class="col-company">업체 / 제품</th>${thCols}<th class="col-total">합계</th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  wrap.innerHTML = objSection + (subjGroups.length
+    ? `<div class="info-box" style="margin-bottom:14px;border-color:var(--accent2);background:var(--accent2-light)">
+        <strong>② 주관 항목 점수 입력</strong> — 위원별로 입력해 주세요. 객관 점수는 합계에 자동으로 더해져요.
+       </div>`+subjSection
+    : '');
+}
+
+// 주관 점수 직접 입력
+function onScoreInput(evId,coId,fgId,itemId,val){
+  const score=parseFloat(val)||0;
+  state.scores[scoreKey(evId,coId,fgId,itemId)]={label:'직접입력',score};
+  updateRowTotal(evId,coId);
+}
+
+// 객관 점수 입력 → 공유 저장 + 모든 위원 합계 갱신
+function onObjInput(coId,fgId,itemId,val){
+  const score=parseFloat(val)||0;
+  const shk=objSharedKey(coId,fgId,itemId);
+  state.scores[shk]={label:'직접입력',score};
+  // 모든 위원의 해당 업체 행 합계 갱신
+  state.evaluators.forEach(ev=>updateRowTotal(ev.id,coId));
+}
+
+function toggleBlock(id){
+  const body=document.getElementById('block_'+id),arrow=document.getElementById('arrow_'+id);
+  const col=body.classList.toggle('collapsed');
+  arrow.style.transform=col?'rotate(-90deg)':'rotate(0)';
+}
+function saveAllScores(){
+  state.evaluators.forEach(ev=>{
+    state.companies.forEach(co=>{
+      state.fieldGroups.filter(fg=>fg.type==='subjective').forEach(fg=>{
+        fg.items.forEach(item=>{
+          const el=document.getElementById(inputId(ev.id,co.id,fg.id,item.id));if(!el)return;
+          state.scores[scoreKey(ev.id,co.id,fg.id,item.id)]={label:'직접입력',score:parseFloat(el.value)||0};
+        });
+      });
+    });
+  });
+  // 객관: 공유 저장소
+  state.companies.forEach(co=>{
+    state.fieldGroups.filter(fg=>fg.type!=='subjective').forEach(fg=>{
+      fg.items.forEach(item=>{
+        const el=document.getElementById('obj_'+objSharedKey(co.id,fg.id,item.id));if(!el)return;
+        state.scores[objSharedKey(co.id,fg.id,item.id)]={label:'직접입력',score:parseFloat(el.value)||0};
+      });
+    });
+  });
+  const msg=document.getElementById('saveMsg');
+  msg.style.display='block';setTimeout(()=>msg.style.display='none',2000);
+}
+
+/* ── TAB 3: RESULT ── */
+function setAvgMode(mode,btn){
+  state.avgMode=mode;
+  document.querySelectorAll('.avg-opt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderResult();
+}
+function renderResult(){
+  const rankings=state.companies.map(co=>{
+    const totals=state.evaluators.map(ev=>calcTotal(ev.id,co.id));
+    const normal=r2(totals.length?totals.reduce((a,b)=>a+b,0)/totals.length:0);
+    const trimmed=r2(trimmedAvg(totals));
+    return{co,totals,normal,trimmed};
+  });
+  const sk2=state.avgMode==='trimmed'?'trimmed':'normal';
+  rankings.sort((a,b)=>b[sk2]-a[sk2]);
+
+  const ra=document.getElementById('rankingArea');
+  if(!state.evaluators.length){ra.innerHTML='<div class="info-box">평가위원을 먼저 등록해 주세요.</div>';return;}
+  if(!state.companies.length){ra.innerHTML='<div class="info-box">업체를 먼저 등록해 주세요.</div>';return;}
+
+  ra.innerHTML=rankings.map((r,rank)=>{
+    const mc=rank===0?'medal-1':rank===1?'medal-2':rank===2?'medal-3':'medal-n';
+    let chips='';
+    if(state.avgMode==='normal'||state.avgMode==='both') chips+=`<span class="rank-score-chip chip-normal">일반 평균 ${r.normal.toFixed(2)}점</span>`;
+    if(state.avgMode==='trimmed'||state.avgMode==='both') chips+=`<span class="rank-score-chip chip-trimmed">최고최저제외 ${r.trimmed.toFixed(2)}점</span>`;
+    const ec=r.totals.map((t,i)=>`<span class="eval-chip">${state.evaluators[i].name}: ${t.toFixed(1)}</span>`).join('');
+    return `<div class="rank-item">
+      <div class="rank-medal ${mc}">${rank+1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${r.co.name}</div><div class="rank-product">${r.co.product}</div>
+        <div class="rank-scores">${chips}</div><div class="eval-chips">${ec}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const flat=allItems();
+  const dt=document.getElementById('detailTable');
+
+  // 화면용: 위원별 섹션 테이블 (기존 유지)
+  let screenHtml='';
+  state.evaluators.forEach(ev=>{
+    screenHtml+=`<div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;padding:5px 10px;background:#f0ede6;color:var(--text-sub);border-radius:var(--radius) var(--radius) 0 0">▸ ${ev.name} (${ev.dept})</div>
+      <div style="overflow-x:auto"><table class="tbl" style="min-width:100%"><thead><tr>
+        <th>업체</th>
+        ${flat.map(({item})=>`<th style="font-size:11px;white-space:nowrap;text-align:center">${item.name}<br><span style="font-weight:400;color:var(--text-hint)">(${item.points}점)</span></th>`).join('')}
+        <th style="text-align:center">합계</th>
+      </tr></thead><tbody>`;
+    state.companies.forEach(co=>{
+      let total=0;
+      let cells=flat.map(({fg,item})=>{
+        let s=0;
+        if(fg.type!=='subjective'){const shk=objSharedKey(co.id,fg.id,item.id);s=state.scores[shk]?.score||0;}
+        else s=state.scores[scoreKey(ev.id,co.id,fg.id,item.id)]?.score||0;
+        total+=s;
+        return `<td style="text-align:center;font-size:12px">${s}</td>`;
+      }).join('');
+      screenHtml+=`<tr><td style="font-size:12px;white-space:nowrap">${co.name}<br><span style="color:var(--text-hint);font-size:11px">${co.product}</span></td>${cells}<td style="text-align:center;font-weight:700;color:var(--accent)">${total}</td></tr>`;
+    });
+    screenHtml+=`</tbody></table></div></div>`;
+  });
+
+  // 출력 전용: 업체 행 × (항목별 위원 평균) 열 → 가로 최소화
+  // 구조: 업체 | 항목1_위원평균 | 항목2_위원평균 ... | 객관합계 | 주관평균 | 총평균
+  const subjFlat=flat.filter(({fg})=>fg.type==='subjective');
+  const objFlat=flat.filter(({fg})=>fg.type!=='subjective');
+
+  let printHtml=`<div class="print-detail-section">
+    <div class="print-detail-title">위원별 점수 상세</div>`;
+
+  // 위원별로 한 표씩 (가로: 업체 + 항목들 + 합계)
+  state.evaluators.forEach(ev=>{
+    printHtml+=`<div style="margin-bottom:6mm;break-inside:avoid">
+      <div class="print-eval-label">▸ 평가위원: ${ev.name} (${ev.dept})</div>
+      <table class="print-detail-tbl"><thead><tr>
+        <th class="pdt-co">업체</th>
+        ${flat.map(({fg,item})=>`<th class="pdt-item">${item.name}<br><span style="font-weight:400;font-size:7pt">(${item.points}점)</span></th>`).join('')}
+        <th class="pdt-total">합계</th>
+      </tr></thead><tbody>`;
+    state.companies.forEach(co=>{
+      let total=0;
+      let cells=flat.map(({fg,item})=>{
+        let s=0;
+        if(fg.type!=='subjective'){const shk=objSharedKey(co.id,fg.id,item.id);s=state.scores[shk]?.score||0;}
+        else s=state.scores[scoreKey(ev.id,co.id,fg.id,item.id)]?.score||0;
+        total+=s;
+        return `<td>${s}</td>`;
+      }).join('');
+      printHtml+=`<tr><td class="pdt-co-val">${co.name}</td>${cells}<td class="pdt-total-val">${total}</td></tr>`;
+    });
+    printHtml+=`</tbody></table></div>`;
+  });
+  printHtml+=`</div>`;
+
+  dt.innerHTML=`<div class="screen-detail">${screenHtml}</div>${printHtml}`;
+}
+
+/* ── TAB CONTROL ── */
+function showTab(name){
+  ['setup','score','result','dev'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.style.display=t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn:not(#devTabBtn)').forEach((b,i)=>{
+    b.classList.toggle('active',['setup','score','result'][i]===name);
+  });
+  const devBtn=document.getElementById('devTabBtn');
+  if(devBtn) devBtn.classList.toggle('active',name==='dev');
+  if(name==='score')renderScoreBlocks();
+  if(name==='result')renderResult();
+  if(name==='dev')renderDevTab();
+}
+
+/* ══════════════════════════════════
+   개발자 모드
+══════════════════════════════════ */
+const DEV_PW = '2112'; // ← 비밀번호
+let devGenerated = {}; // {evalId: {coId: {fgId: {itemId: score}}}}
+
+function openDevLock(){
+  document.getElementById('devLock').style.display='flex';
+  document.getElementById('devPwInput').value='';
+  document.getElementById('devPwErr').style.display='none';
+  setTimeout(()=>document.getElementById('devPwInput').focus(),100);
+}
+function closeDevLock(){
+  document.getElementById('devLock').style.display='none';
+}
+function checkDevPw(){
+  const val=document.getElementById('devPwInput').value;
+  if(val===DEV_PW){
+    closeDevLock();
+    document.getElementById('devTabBtn').style.display='';
+    showTab('dev');
+  } else {
+    document.getElementById('devPwErr').style.display='block';
+    document.getElementById('devPwInput').value='';
+    document.getElementById('devPwInput').focus();
+  }
+}
+
+function renderDevRankRows(){
+  const wrap=document.getElementById('devRankRows');
+  if(!wrap) return;
+  if(!state.companies.length){
+    wrap.innerHTML='<div class="info-box">업체를 먼저 등록해 주세요.</div>';return;
+  }
+  wrap.innerHTML=`
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      ${state.companies.map((co,ci)=>`
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px;background:var(--bg)" id="devRadioWrap_${co.id}">
+          <input type="radio" name="devWinner" value="${co.id}" id="devWinner_${co.id}"
+            style="accent-color:var(--accent)"
+            onchange="highlightWinner('${co.id}')"
+            ${ci===0?'checked':''}>
+          <span><strong>${co.name}</strong> <span style="color:var(--text-hint);font-size:11px">${co.product}</span></span>
+        </label>`).join('')}
+    </div>`;
+  highlightWinner(state.companies[0].id);
+}
+
+function renderDevObjInput(){
+  const wrap=document.getElementById('devObjInputArea');
+  if(!wrap) return;
+  const objGroups=state.fieldGroups.filter(fg=>fg.type!=='subjective');
+  if(!objGroups.length){
+    wrap.innerHTML='<div style="font-size:12px;color:var(--text-hint)">객관 평가 항목이 없어요.</div>';return;
+  }
+  if(!state.companies.length){
+    wrap.innerHTML='<div class="info-box">업체를 먼저 등록해 주세요.</div>';return;
+  }
+  const thCols=objGroups.map(fg=>fg.items.map(item=>`
+    <th>
+      <div style="font-weight:700;font-size:11px">${item.name}</div>
+      <div style="font-size:10px;color:var(--text-hint);margin-top:1px">${item.points}점</div>
+    </th>`).join('')).join('');
+  const rows=state.companies.map(co=>{
+    const cells=objGroups.map(fg=>fg.items.map(item=>{
+      const shk=objSharedKey(co.id,fg.id,item.id);
+      const saved=state.scores[shk];
+      const sv=saved?saved.score:0;
+      return `<td style="text-align:center;padding:4px 6px">
+        <input type="number" id="devobj_${shk}" value="${sv===0?'':sv}"
+          min="0" max="${item.points}" step="0.1" placeholder="0"
+          style="width:58px;text-align:center;font-size:13px;font-weight:600;padding:4px 2px"
+          oninput="onDevObjInput('${co.id}','${fg.id}','${item.id}',this.value)">
+      </td>`;
+    }).join('')).join('');
+    return `<tr>
+      <td class="td-company">${co.name}<br><span style="font-size:11px;color:var(--text-hint);font-weight:400">${co.product}</span></td>
+      ${cells}
+    </tr>`;
+  }).join('');
+  wrap.innerHTML=`<div class="score-matrix-wrap">
+    <table class="score-matrix">
+      <thead><tr><th class="col-company">업체 / 제품</th>${thCols}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function onDevObjInput(coId,fgId,itemId,val){
+  const score=parseFloat(val)||0;
+  const shk=objSharedKey(coId,fgId,itemId);
+  state.scores[shk]={label:'직접입력',score};
+  // 점수 입력 탭 공유 input 동기화
+  const el=document.getElementById('obj_'+shk);
+  if(el) el.value=val;
+  state.evaluators.forEach(ev=>updateRowTotal(ev.id,coId));
+}
+
+function renderDevTab(){
+  renderDevObjInput();
+  renderDevRankRows();
+}
+
+function highlightWinner(winId){
+  state.companies.forEach(co=>{
+    const wrap=document.getElementById('devRadioWrap_'+co.id);
+    if(!wrap) return;
+    if(co.id===winId){
+      wrap.style.borderColor='var(--accent)';
+      wrap.style.background='var(--accent-light)';
+    } else {
+      wrap.style.borderColor='var(--border)';
+      wrap.style.background='var(--bg)';
+    }
+  });
+}
+
+function devAddCompany(){
+  const n=document.getElementById('devNewCoName').value.trim();
+  const p=document.getElementById('devNewCoProd').value.trim();
+  if(!n){alert('업체명을 입력해 주세요.');return;}
+  state.companies.push({id:newId('c'),name:n,product:p||'제품'+(state.companies.length+1)});
+  renderCompanies();
+  renderDevTab();
+  document.getElementById('devNewCoName').value='';
+  document.getElementById('devNewCoProd').value='';
+}
+
+// 등급 목록 (기본 or 설정값)
+function getGrades(fg){
+  return fg.subjGrades || {탁월:fg.items[0]?.points||15, 우수:Math.round((fg.items[0]?.points||15)*0.75), 보통:Math.round((fg.items[0]?.points||15)*0.5), 미흡:Math.round((fg.items[0]?.points||15)*0.25)};
+}
+
+// 항목에 맞는 등급 점수 가져오기 (항목별 배점이 다를 수 있으므로 fg의 등급값 사용)
+function getGradeScore(fg, grade){
+  return (fg.subjGrades||{})[grade] || 0;
+}
+
+// 랜덤으로 등급 하나 선택 (가중치 배열로)
+function pickGrade(gradeWeights){
+  const total=gradeWeights.reduce((s,g)=>s+g.w,0);
+  let r=Math.random()*total;
+  for(const g of gradeWeights){
+    r-=g.w;
+    if(r<=0) return g.grade;
+  }
+  return gradeWeights[gradeWeights.length-1].grade;
+}
+
+function devGenerate(){
+  if(!state.companies.length||!state.evaluators.length){
+    alert('업체와 평가위원을 먼저 등록해 주세요.');return;
+  }
+  const winnerRadio=document.querySelector('input[name="devWinner"]:checked');
+  if(!winnerRadio){alert('1등 업체를 골라 주세요.');return;}
+  const winnerId=winnerRadio.value;
+  const useTrimmed=document.getElementById('devTrimmedMode').checked;
+  const subjGroups=state.fieldGroups.filter(fg=>fg.type==='subjective');
+  if(!subjGroups.length){alert('주관 평가 항목이 없어요. 기본 설정에서 주관 항목을 먼저 추가해 주세요.');return;}
+
+  devGenerated={};
+
+  // 1등 업체: 탁월·우수 위주 / 나머지: 보통·미흡 위주
+  const winnerWeights=[{g:'탁월',w:55},{g:'우수',w:35},{g:'보통',w:10},{g:'미흡',w:0}];
+  const otherWeights =[{g:'탁월',w:5}, {g:'우수',w:20},{g:'보통',w:50},{g:'미흡',w:25}];
+
+  function pickGradeW(weights){
+    const total=weights.reduce((s,w)=>s+w.w,0);
+    let r=Math.random()*total;
+    for(const w of weights){r-=w.w;if(r<=0)return w.g;}
+    return weights[weights.length-1].g;
+  }
+
+  state.evaluators.forEach(ev=>{
+    devGenerated[ev.id]={};
+    state.companies.forEach(co=>{
+      devGenerated[ev.id][co.id]={grades:{},scores:{}};
+      const isWinner=(co.id===winnerId);
+      const weights=isWinner?winnerWeights:otherWeights;
+      subjGroups.forEach(fg=>{
+        devGenerated[ev.id][co.id].grades[fg.id]={};
+        devGenerated[ev.id][co.id].scores[fg.id]={};
+        // 등급별 점수: fg.subjGrades에서 가져오되 정수로 변환
+        const gs=fg.subjGrades||{탁월:0,우수:0,보통:0,미흡:0};
+        const gradeVals={
+          탁월:Math.round(Number(gs['탁월'])||0),
+          우수:Math.round(Number(gs['우수'])||0),
+          보통:Math.round(Number(gs['보통'])||0),
+          미흡:Math.round(Number(gs['미흡'])||0),
+        };
+        fg.items.forEach(item=>{
+          const pts=Number(item.points)||0;
+          // 등급 무작위 선택
+          const grade=pickGradeW(weights);
+          // 해당 등급의 점수 (배점 초과 불가, 정수)
+          const score=Math.min(pts, gradeVals[grade]);
+          devGenerated[ev.id][co.id].grades[fg.id][item.id]=grade;
+          devGenerated[ev.id][co.id].scores[fg.id][item.id]=score;
+        });
+      });
+    });
+  });
+  renderDevPreview(winnerId, useTrimmed);
+}
+
+function getDevObjScore(co){
+  let obj=0;
+  state.fieldGroups.filter(fg=>fg.type!=='subjective').forEach(fg=>{
+    fg.items.forEach(item=>{
+      const shk=objSharedKey(co.id,fg.id,item.id);
+      const devEl=document.getElementById('devobj_'+shk);
+      if(devEl) obj+=parseFloat(devEl.value)||0;
+      else obj+=(state.scores[shk]?state.scores[shk].score:0);
+    });
+  });
+  return obj;
+}
+
+function renderDevPreview(winnerId, useTrimmed){
+  const area=document.getElementById('devResultArea');
+  const wrap=document.getElementById('devPreviewTables');
+  if(!area||!wrap) return;
+  area.style.display='block';
+
+  const subjGroups=state.fieldGroups.filter(fg=>fg.type==='subjective');
+  const allSubjItems=[];
+  subjGroups.forEach(fg=>fg.items.forEach(item=>allSubjItems.push({fg,item})));
+
+  const coSummary=state.companies.map(co=>{
+    const evTotals=state.evaluators.map(ev=>{
+      const objScore=getDevObjScore(co);
+      let subj=0;
+      subjGroups.forEach(fg=>fg.items.forEach(item=>{
+        subj+=(devGenerated[ev.id]&&devGenerated[ev.id][co.id]&&devGenerated[ev.id][co.id].scores[fg.id]?devGenerated[ev.id][co.id].scores[fg.id][item.id]||0:0);
+      }));
+      return Math.round((objScore+subj)*10)/10;
+    });
+    const normal=evTotals.length?r2(evTotals.reduce((a,b)=>a+b,0)/evTotals.length):0;
+    const trimmed=(()=>{
+      if(evTotals.length<=2)return normal;
+      const s=[...evTotals].sort((a,b)=>a-b);
+      return r2(s.slice(1,-1).reduce((a,b)=>a+b,0)/(s.length-2));
+    })();
+    return {co,evTotals,normal,trimmed,isWinner:co.id===winnerId};
+  });
+
+  const sortKey=useTrimmed?'trimmed':'normal';
+  const sorted=[...coSummary].sort((a,b)=>b[sortKey]-a[sortKey]);
+  const winnerIsTop=sorted.length&&sorted[0].co.id===winnerId;
+
+  const gradeColor={탁월:'#1a6e3a',우수:'#2c4a7c',보통:'#7a5c00',미흡:'#a33030'};
+  const gradeBg   ={탁월:'#e8f5ef',우수:'#e8eef7',보통:'#fdf8e3',미흡:'#faeaea'};
+
+  // 표1: 순위 요약
+  let out='<div style="font-size:12px;font-weight:700;color:var(--text-sub);margin-bottom:6px">순위 요약</div>';
+  out+='<div style="overflow-x:auto;margin-bottom:16px"><table class="gen-score-tbl"><thead><tr>';
+  out+='<th>순위</th><th>업체</th><th>지정</th>';
+  state.evaluators.forEach(ev=>{ out+='<th>'+ev.name+'</th>'; });
+  out+='<th>일반평균</th>';
+  if(useTrimmed) out+='<th>최고최저제외</th>';
+  out+='</tr></thead><tbody>';
+  sorted.forEach((row,ri)=>{
+    out+='<tr style="'+(row.isWinner?'background:#edf7ee':'')+'">';
+    out+='<td><strong>'+(ri+1)+'위</strong></td>';
+    out+='<td style="text-align:left;font-weight:600">'+row.co.name+'<br><span style="font-size:10px;color:var(--text-hint);font-weight:400">'+row.co.product+'</span></td>';
+    out+='<td>'+(row.isWinner?'<span style="color:var(--success);font-weight:700">★ 1등</span>':'')+'</td>';
+    row.evTotals.forEach(s=>{ out+='<td>'+s.toFixed(1)+'</td>'; });
+    out+='<td style="font-weight:700">'+row.normal.toFixed(2)+'</td>';
+    if(useTrimmed) out+='<td style="font-weight:700">'+row.trimmed.toFixed(2)+'</td>';
+    out+='</tr>';
+  });
+  out+='</tbody></table></div>';
+
+  out+=winnerIsTop
+    ?'<div style="padding:8px 12px;background:var(--success-light);border-radius:var(--radius);font-size:12px;color:var(--success);margin-bottom:14px">✓ 지정한 1등 업체가 1위예요.</div>'
+    :'<div style="padding:8px 12px;background:var(--danger-light);border-radius:var(--radius);font-size:12px;color:var(--danger);margin-bottom:14px">⚠ 지정한 1등 업체가 1위가 아니에요 — 🔄 다시 생성을 눌러 보세요.</div>';
+
+  // 표2: 위원별 항목별 상세
+  out+='<div style="font-size:12px;font-weight:700;color:var(--text-sub);margin-bottom:6px">위원별 항목별 등급 / 점수 상세</div>';
+  out+='<div style="overflow-x:auto"><table class="gen-score-tbl"><thead><tr>';
+  out+='<th>평가위원</th><th>업체</th>';
+  allSubjItems.forEach(function(si){
+    var g=si.fg.subjGrades||{};
+    out+='<th style="font-size:10px">'+si.item.name+'<br><span style="font-weight:400;color:#666">배점:'+si.item.points+'점 | 탁월:'+(g['탁월']||'-')+' 우수:'+(g['우수']||'-')+' 보통:'+(g['보통']||'-')+' 미흡:'+(g['미흡']||'-')+'</span></th>';
+  });
+  out+='<th style="background:#e8eef7">주관합계</th><th>객관합계</th><th style="background:#dce6f4;font-weight:700">총합계</th>';
+  out+='</tr></thead><tbody>';
+
+  state.evaluators.forEach(function(ev,ei){
+    state.companies.forEach(function(co){
+      var objScore=getDevObjScore(co);
+      var subjSum=0;
+      var cells='';
+      allSubjItems.forEach(function(si){
+        var fg=si.fg; var item=si.item;
+        var grade=(devGenerated[ev.id]&&devGenerated[ev.id][co.id]&&devGenerated[ev.id][co.id].grades[fg.id])?devGenerated[ev.id][co.id].grades[fg.id][item.id]||'-':'-';
+        var score=(devGenerated[ev.id]&&devGenerated[ev.id][co.id]&&devGenerated[ev.id][co.id].scores[fg.id])?devGenerated[ev.id][co.id].scores[fg.id][item.id]||0:0;
+        subjSum+=score;
+        var bg=gradeBg[grade]||'#fff';
+        var col=gradeColor[grade]||'#333';
+        cells+='<td style="background:'+bg+';text-align:center"><span style="color:'+col+';font-weight:700;font-size:12px">'+grade+'</span><br><span style="font-size:11px;color:#555">'+score+'점</span></td>';
+      });
+      var total=Math.round((objScore+subjSum)*10)/10;
+      out+='<tr>';
+      out+='<td style="font-weight:600;background:#f5f8ff;text-align:center;white-space:nowrap">'+ev.name+'<br><span style="font-size:10px;color:var(--text-hint);font-weight:400">'+ev.dept+'</span></td>';
+      out+='<td style="font-weight:500;text-align:left;white-space:nowrap">'+co.name+(co.id===winnerId?' ★':'')+'</td>';
+      out+=cells;
+      out+='<td style="font-weight:600;background:#e8eef7;text-align:center">'+Math.round(subjSum*10)/10+'</td>';
+      out+='<td style="text-align:center">'+objScore.toFixed(1)+'</td>';
+      out+='<td style="font-weight:700;background:#dce6f4;text-align:center">'+total+'</td>';
+      out+='</tr>';
+    });
+    out+='<tr><td colspan="'+(allSubjItems.length+5)+'" style="background:#e8e2d6;height:2px;padding:0"></td></tr>';
+  });
+  out+='</tbody></table></div>';
+
+  // 범례
+  out+='<div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;font-size:11px">';
+  Object.keys(gradeBg).forEach(function(g){
+    out+='<span><span style="display:inline-block;width:10px;height:10px;background:'+gradeBg[g]+';border:1px solid #ccc;vertical-align:middle;margin-right:3px"></span><span style="color:'+gradeColor[g]+';font-weight:600">'+g+'</span></span>';
+  });
+  out+='</div>';
+
+  wrap.innerHTML=out;
+  document.getElementById('devApplyMsg').style.display='none';
+}
+
+function devApply(){
+  if(!Object.keys(devGenerated).length){alert('먼저 [⚡ 주관 점수 생성]을 눌러 주세요.');return;}
+  // DEV 탭 객관 입력값 → 공유 저장소에 반영
+  const objGroups=state.fieldGroups.filter(fg=>fg.type!=='subjective');
+  state.companies.forEach(co=>{
+    objGroups.forEach(fg=>{
+      fg.items.forEach(item=>{
+        const shk=objSharedKey(co.id,fg.id,item.id);
+        const el=document.getElementById('devobj_'+shk);
+        if(el) state.scores[shk]={label:'직접입력',score:parseFloat(el.value)||0};
+      });
+    });
+  });
+  // 주관 점수 반영
+  const subjGroups=state.fieldGroups.filter(fg=>fg.type==='subjective');
+  state.evaluators.forEach(ev=>{
+    state.companies.forEach(co=>{
+      subjGroups.forEach(fg=>{
+        fg.items.forEach(item=>{
+          const score=devGenerated[ev.id]?.[co.id]?.scores?.[fg.id]?.[item.id]||0;
+          const grade=devGenerated[ev.id]?.[co.id]?.grades?.[fg.id]?.[item.id]||'보통';
+          state.scores[scoreKey(ev.id,co.id,fg.id,item.id)]={label:grade,score};
+        });
+      });
+    });
+  });
+  const msg=document.getElementById('devApplyMsg');
+  msg.style.display='inline';
+  setTimeout(()=>msg.style.display='none',3000);
+}
+
+/* INIT */
+renderFieldGroups();renderCompanies();renderEvaluators();
+
+/* ══ 엑셀 양식 내려받기 / 올리기 ══ */
+const XL_CO='업체·제품', XL_EV='평가위원', XL_SUBJ='주관점수', XL_HELP='작성 안내';
+function xlItems(kind){const out=[];state.fieldGroups.forEach(fg=>{if((kind==='subj')===(fg.type==='subjective'))fg.items.forEach(item=>out.push({fg,item}));});return out;}
+const xlHead=it=>`${it.item.name} (${it.item.points}점)`;
+function xlSheet(aoa,widths){const ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=widths.map(w=>({wch:w}));return ws;}
+function downloadXlTemplate(){
+  if(typeof XLSX==='undefined'){alert('엑셀 기능을 불러오지 못했어요. 인터넷 연결을 확인한 뒤 새로고침해 주세요.');return;}
+  saveAllScores();
+  const obj=xlItems('obj'), subj=xlItems('subj');
+  const cos=state.companies.length?state.companies:[{name:'',product:''}];
+  const co=[['업체명','제품명',...obj.map(xlHead)]];
+  cos.forEach(c=>co.push([c.name,c.product,...obj.map(o=>{const s=state.scores[objSharedKey(c.id,o.fg.id,o.item.id)];return s&&s.score?s.score:'';})]));
+  const ev=[['성명','소속']];state.evaluators.forEach(e=>ev.push([e.name,e.dept]));
+  const sj=[['위원 성명','업체명',...subj.map(xlHead)]];
+  state.evaluators.forEach(e=>state.companies.forEach(c=>sj.push([e.name,c.name,...subj.map(o=>{const s=state.scores[scoreKey(e.id,c.id,o.fg.id,o.item.id)];return s&&s.score?s.score:'';})])));
+  const help=[['물품선정위원회 평가 — 엑셀 작성 안내'],[''],
+    ['1. 「'+XL_CO+'」 시트: 업체명·제품명을 한 줄에 하나씩 적어요. 객관 항목 점수는 알면 숫자로 적고, 모르면 비워 두세요.'],
+    ['2. 「'+XL_EV+'」 시트: 평가위원 성명·소속을 적어요.'],
+    ['3. 「'+XL_SUBJ+'」 시트(선택): 위원별·업체별 주관 점수를 적어요. 평가 전이면 비워 두세요.'],
+    ['4. 첫 줄(제목 줄)은 지우거나 바꾸지 마세요. 항목 이름으로 칸을 찾아요.'],
+    ['5. 다 적으면 평가 화면의 「엑셀로 한 번에 등록」에 끌어다 놓으세요.'],[''],
+    ['※ 평가 항목·배점은 화면의 「평가 항목 및 배점 설정」에서 정해요. 항목을 바꿨다면 양식을 다시 내려받으세요.'],
+    ['※ 입력한 내용은 이 컴퓨터의 브라우저 안에서만 처리되고 어디로도 보내지 않아요.']];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,xlSheet(co,[18,18,...obj.map(()=>22)]),XL_CO);
+  XLSX.utils.book_append_sheet(wb,xlSheet(ev,[14,18]),XL_EV);
+  XLSX.utils.book_append_sheet(wb,xlSheet(sj,[12,18,...subj.map(()=>20)]),XL_SUBJ);
+  XLSX.utils.book_append_sheet(wb,xlSheet(help,[100]),XL_HELP);
+  XLSX.writeFile(wb,(state.title||'물품선정위원회 평가')+'_엑셀양식.xlsx');
+}
+const xlNorm=s=>String(s==null?'':s).replace(/\s+/g,'').replace(/\(.*?\)/g,'').replace(/[·.]/g,'');
+function xlFind(wb,names){const k=wb.SheetNames.find(n=>names.some(x=>xlNorm(n).includes(xlNorm(x))));return k?XLSX.utils.sheet_to_json(wb.Sheets[k],{header:1,defval:''}):null;}
+function xlCol(head,alts){const H=head.map(xlNorm);for(const a of alts){const i=H.findIndex(x=>x===xlNorm(a));if(i>=0)return i;}for(const a of alts){const i=H.findIndex(x=>x&&x.includes(xlNorm(a)));if(i>=0)return i;}return -1;}
+function xlHeadRow(rows,alts){for(let r=0;r<Math.min(rows.length,10);r++)if(xlCol(rows[r],alts)>=0)return r;return -1;}
+const xlNum=v=>{const n=parseFloat(String(v).replace(/[^0-9.\-]/g,''));return isNaN(n)?null:n;};
+function importXl(file){
+  if(!file)return;
+  if(typeof XLSX==='undefined'){alert('엑셀 기능을 불러오지 못했어요. 인터넷 연결을 확인한 뒤 새로고침해 주세요.');return;}
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+      const coRows=xlFind(wb,['업체','제품'])||XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+      const evRows=xlFind(wb,['평가위원','위원명단','위원']);
+      const sjRows=xlFind(wb,['주관']);
+      const obj=xlItems('obj'), subj=xlItems('subj'), warn=[];
+      const msg=[];
+      // 업체·제품
+      const cr=xlHeadRow(coRows,['업체명','업체','회사명']);
+      let companies=null;const objVals=[];
+      if(cr>=0){
+        const H=coRows[cr],ci=xlCol(H,['업체명','업체','회사명','상호']),pi=xlCol(H,['제품명','제품','품명','모델명']);
+        const oi=obj.map(o=>xlCol(H,[o.item.name]));
+        companies=[];
+        coRows.slice(cr+1).forEach(r=>{const n=String(r[ci]||'').trim();if(!n)return;
+          const c={id:newId('c'),name:n,product:pi>=0?String(r[pi]||'').trim()||'제품'+(companies.length+1):'제품'+(companies.length+1)};companies.push(c);
+          obj.forEach((o,k)=>{if(oi[k]<0)return;const v=xlNum(r[oi[k]]);if(v==null)return;
+            if(v>o.item.points)warn.push(`${n} ${o.item.name} ${v}점(배점 ${o.item.points}점 넘음)`);objVals.push([c.id,o,v]);});});
+      }
+      // 평가위원
+      let evaluators=null;
+      if(evRows){const er=xlHeadRow(evRows,['성명','이름','위원']);
+        if(er>=0){const H=evRows[er],ni=xlCol(H,['성명','이름','위원성명','위원']),di=xlCol(H,['소속','부서','직위','직책']);
+          evaluators=[];evRows.slice(er+1).forEach(r=>{const n=String(r[ni]||'').trim();if(n)evaluators.push({id:newId('e'),name:n,dept:di>=0?String(r[di]||'').trim():''});});}}
+      if(!(companies&&companies.length)&&!(evaluators&&evaluators.length)&&!sjRows){alert('엑셀에서 업체명이나 평가위원 성명 칸을 찾지 못했어요.\n「⬇ 양식 받기」로 받은 양식에 적어서 올려 주세요.');return;}
+      // 목록 바꾸기 (바뀐 쪽 점수는 비움)
+      if(companies&&companies.length){state.companies=companies;state.scores={};msg.push('업체·제품 '+companies.length+'개');}
+      if(evaluators&&evaluators.length){
+        state.evaluators=evaluators;Object.keys(state.scores).forEach(k=>{if(!k.startsWith('obj__'))delete state.scores[k];});msg.push('평가위원 '+evaluators.length+'명');}
+      objVals.forEach(([cid,o,v])=>{state.scores[objSharedKey(cid,o.fg.id,o.item.id)]={label:'직접입력',score:v};});
+      if(objVals.length)msg.push('객관 점수 '+objVals.length+'칸');
+      // 주관점수
+      if(sjRows){const sr=xlHeadRow(sjRows,['업체명','업체']);
+        if(sr>=0){const H=sjRows[sr],ei=xlCol(H,['위원성명','위원','성명','이름']),ci=xlCol(H,['업체명','업체']),si=subj.map(o=>xlCol(H,[o.item.name]));let n=0;
+          sjRows.slice(sr+1).forEach(r=>{const en=String(r[ei]||'').trim(),cn=String(r[ci]||'').trim();if(!en||!cn)return;
+            const e=state.evaluators.find(x=>x.name===en),c=state.companies.find(x=>x.name===cn);
+            if(!e||!c){warn.push(`주관점수 ${en}/${cn}: 등록된 위원·업체에 없음`);return;}
+            subj.forEach((o,k)=>{if(si[k]<0)return;const v=xlNum(r[si[k]]);if(v==null)return;
+              if(v>o.item.points)warn.push(`${en}→${cn} ${o.item.name} ${v}점(배점 ${o.item.points}점 넘음)`);
+              state.scores[scoreKey(e.id,c.id,o.fg.id,o.item.id)]={label:'직접입력',score:v};n++;});});
+          if(n)msg.push('주관 점수 '+n+'칸');}}
+      renderCompanies();renderEvaluators();renderScoreBlocks();
+      alert('엑셀에서 가져왔어요: '+(msg.join(', ')||'바뀐 내용 없음')+(warn.length?'\n\n확인할 곳:\n- '+warn.slice(0,8).join('\n- ')+(warn.length>8?`\n… 외 ${warn.length-8}건`:''):''));
+    }catch(err){alert('엑셀 파일을 읽지 못했어요. 「⬇ 양식 받기」로 받은 파일인지 확인해 주세요. ('+err.message+')');}
+  };
+  rd.readAsArrayBuffer(file);
+}
+(()=>{const d=document.getElementById('xlDrop'),i=document.getElementById('xlFile');if(!d)return;
+  i.addEventListener('change',e=>{importXl(e.target.files[0]);e.target.value='';});
+  ['dragenter','dragover'].forEach(t=>d.addEventListener(t,e=>{e.preventDefault();d.classList.add('hot');}));
+  ['dragleave','drop'].forEach(t=>d.addEventListener(t,e=>{e.preventDefault();d.classList.remove('hot');}));
+  d.addEventListener('drop',e=>importXl(e.dataTransfer.files[0]));})();
+</script>
+<footer class="design-author-credit" style="text-align:center;padding:16px;font:12px/1.8 Malgun Gothic,sans-serif;color:#647892">제작자: 정주고등학교 박지은 / 문의: ican6363@naver.com</footer><div class="brand-tool-footer">제작자: 정주고등학교 박지은 <a href="https://open.kakao.com/o/g4Tap2Ri" target="_blank" rel="noopener">카카오 오픈채팅 문의 ↗</a></div></body>
+</html>

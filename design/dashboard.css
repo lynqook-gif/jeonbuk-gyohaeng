@@ -79,6 +79,11 @@
 @media screen{
  body.brand-portal{background:#f3f6fa!important}
  .brand-portal>.brand-topbar{background:#fff;border-bottom:1px solid #e0e7ef}
+ body.brand-portal:not(.in-page)>.brand-topbar>strong{display:none}
+ body.brand-portal:not(.in-page)>.brand-topbar>a{margin-inline-start:auto}
+ @media(min-width:801px){
+  body.brand-portal:not(.in-page)>.brand-topbar{min-height:0;padding-block:10px;background:transparent;border-bottom:0}
+ }
  .brand-portal>.desk-hero{max-width:1480px;margin:24px auto!important;width:calc(100% - 56px);min-height:265px!important;padding:30px 36px!important;border:1px solid #cbddef!important;background:linear-gradient(110deg,#e5effc 0%,#eef6fc 65%,#e8f3f6 100%)!important;row-gap:19px!important}
  .brand-portal .desk-hero .desk-copy{width:calc(100% - 190px)!important}
  .brand-portal .desk-hero h1{font-size:34px!important;line-height:1.35!important;letter-spacing:-.045em!important;margin:8px 0 10px!important}
