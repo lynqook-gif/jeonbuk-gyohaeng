@@ -1,0 +1,21 @@
+/* 반출입대장 화면 배치 */
+@media screen {
+ body{padding:0!important;margin:0!important}
+ body>.toolbar {
+  max-width:none!important;margin:0!important;border-radius:0!important;
+  border-width:0 0 1px!important;padding:12px var(--tl-gut)!important;
+  box-sizing:border-box;align-content:center;gap:10px 18px;
+ }
+ .ledger-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-width:100%}
+ .ledger-actions button{min-height:38px;max-width:100%;padding-inline:10px}
+ body>.toolbar .hint{flex-basis:100%;margin:0}
+ body>.sheet{max-width:none!important;margin:var(--tl-gap) var(--tl-gut)!important}
+ body>#help.sheet{margin-bottom:0!important}
+}
+@media screen and (max-width:700px) {
+ .ledger-actions{flex-basis:100%}
+ body>.sheet{padding:var(--tl-pad)}
+ .meta-left input{max-width:calc(100% - 90px)}
+ .ledger-scroll{overflow-x:auto}
+ .ledger-scroll .ledger{min-width:760px}
+}

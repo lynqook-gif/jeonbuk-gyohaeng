@@ -357,7 +357,7 @@
   .ls-list a span{word-break:keep-all;line-height:1.4}
 </style>
 <link rel="stylesheet" href="design/dashboard.css?v=20261122-homebar1">
-<script defer src="news.js?v=20261123-2"></script>
+<script defer src="news.js?v=20261123-3"></script>
 <script defer src="design/dashboard.js?v=20261122-news2"></script>
 </head>
 <body>
@@ -883,7 +883,7 @@
     const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){alert('이 브라우저에서는 자동 복사가 안 돼요. 문안을 직접 선택해서 복사해 주세요.');}ta.remove();};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done).catch(fb);else fb();}
   /* NEIS 근무상황부 엑셀 — 엑셀 기능은 필요할 때만 받아 옴 */
-  function tvXlsxLib(){return window.XLSX?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s);});}
+  function tvXlsxLib(){return window.XLSX?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src='design/lib/xlsx.full.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s);});}
   function tvExcelDate(v){if(v==null||v==='')return '';
     if(typeof v==='number'){if(v<20000||v>80000)return '';const dc=XLSX.SSF.parse_date_code(v);return dc?dc.y+'-'+String(dc.m).padStart(2,'0')+'-'+String(dc.d).padStart(2,'0'):'';}
     const m=String(v).match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/);return m?m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0'):'';}
@@ -897,7 +897,7 @@
       if(name)tv_name.value=name;if(dates[0])tv_from.value=dates[0];if(dates[1]||dates[0])tv_to.value=dates[1]||dates[0];tvDays();
       st.textContent='관외출장 1건을 불러왔어요. 내용을 확인하고 고쳐 주세요.';
     }catch(err){st.textContent='엑셀을 읽지 못했어요. NEIS 근무상황부 엑셀이 맞는지 확인해 주세요. ('+err.message+')';}};r.readAsArrayBuffer(file);})
-    .catch(()=>{st.textContent='엑셀 기능을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.';});}
+    .catch(()=>{st.textContent='엑셀 기능을 불러오지 못했어요. 새로고침해 주세요.';});}
   document.addEventListener('DOMContentLoaded',()=>{const inp=document.getElementById('tv_xlsx');if(!inp)return;
     inp.addEventListener('change',e=>{tvLoadXlsx(e.target.files[0]);e.target.value='';});
     const box=inp.closest('.body');box.addEventListener('dragover',e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files'))e.preventDefault();});
@@ -976,10 +976,12 @@
   <iframe id="tmodal-frame" title="도구"></iframe>
 </div>
 <script>
-window.TOOL_V='202611221605'; // 도구 파일(design/tools/)을 바꾸면 배치넣기.js·build.js가 이 값을 올려 캐시를 비움
+window.TOOL_V='202611231607'; // 도구 파일(design/tools/)을 바꾸면 배치넣기.js·build.js가 이 값을 올려 캐시를 비움
 // 포털 창 안에서 연다는 표시(html data-in-portal) → 도구 맨 위 줄이 오른쪽에 닫기 버튼 자리를 비움 (2026-10-28)
-function inPortal(b){try{var h=new TextDecoder().decode(Uint8Array.from(atob(b),function(c){return c.charCodeAt(0)}));
-h=/<html[\s>]/i.test(h)?h.replace(/<html(?=[\s>])/i,'<html data-in-portal'):h.replace(/^(\s*<!doctype[^>]*>)?/i,'$1<script>document.documentElement.setAttribute("data-in-portal","")<\/script>');
+// 라이브러리(엑셀·PDF)는 사이트 안 design/lib/ — data: 창에선 ../lib/ 주소가 안 통해서 진짜 주소로 바꿔 넣고 data-lib에도 알려 줌 (2026-11-23, 외부 CDN 없이)
+function inPortal(b){try{var lib=new URL('design/lib/',location.href).href,h=new TextDecoder().decode(Uint8Array.from(atob(b),function(c){return c.charCodeAt(0)}));
+h=h.replace(/(<script\b[^>]*\bsrc=")\.\.\/lib\//g,function(m,p){return p+lib;});
+h=/<html[\s>]/i.test(h)?h.replace(/<html(?=[\s>])/i,'<html data-in-portal data-lib="'+lib+'"'):h.replace(/^(\s*<!doctype[^>]*>)?/i,function(m,p){return (p||'')+'<script>document.documentElement.setAttribute("data-in-portal","");document.documentElement.setAttribute("data-lib",'+JSON.stringify(lib)+')<\/script>';});
 var u=new TextEncoder().encode(h),t='';for(var i=0;i<u.length;i+=32768)t+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(t);}catch(e){return b;}}
 /* 도구는 누를 때만 design/tools/에서 받아 옴 (2026-11-22, 첫 화면 가볍게) — 열리는 방식(data: 창, data-in-portal)은 예전과 같음 */
 var openSeq=0;

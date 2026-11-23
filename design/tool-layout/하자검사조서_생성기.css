@@ -1,0 +1,21 @@
+/* 하자검사조서 생성기 배치 (Claude, 2026-10-27 / 10-28 한 줄로): 왼쪽 입력·오른쪽 조서 구조라 PC는 맨 위 줄에 도구 이름을 두고(로고·이름·문의 한 줄) 왼쪽 칸 제목은 숨김, 본문은 공통 폭 */
+@media screen{
+ body>.app{max-width:none!important;margin:0!important;padding:var(--tl-gap) var(--tl-gut) 48px!important;gap:var(--tl-gap)!important;box-sizing:border-box}
+}
+@media screen and (min-width:701px){
+ body>.brand-tool-strip{padding-left:var(--tl-gut)!important}
+ body>.brand-tool-strip>div{margin-left:calc(var(--tl-hl) - var(--tl-gut) - var(--tl-logo) - 13px)!important}
+ body>.brand-tool-strip>div>strong{display:block!important;font-size:28px!important;line-height:1.5;font-weight:700!important}
+ body>.brand-tool-strip>div>small{display:none!important}
+ body>.app .panel.left>h1{display:none!important}
+}
+/* A4 미리보기만 가로 스크롤하고 입력 패널과 버튼줄은 화면 폭에 맞춘다. */
+@media screen and (max-width:1280px){
+ .app .right{min-width:0}
+ #sheets{overflow-x:auto}
+}
+@media screen and (max-width:700px){
+ body>.app{flex-direction:column}
+ .app>.panel{width:100%}
+ .app .left{max-height:none;overflow:visible}
+}

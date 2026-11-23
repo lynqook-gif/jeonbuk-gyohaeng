@@ -452,19 +452,21 @@ kbd{font:600 11.5px/1 inherit;padding:2px 6px;border:1px solid var(--line);borde
 
   // 변환 프로그램은 필요할 때 한 번만 내려받음 (따로 연 사본은 ../lib/ 먼저)
   const loaded = {};
-  function loadLib(file, ready) {
+  function loadLib(file, ready, failMsg) {
     if (ready()) return Promise.resolve();
     if (loaded[file]) return loaded[file];
     const bases = [];
-    if (/^(https?|file):$/.test(location.protocol)) bases.push(new URL("../lib/", location.href).href);
-    bases.push(LIB_SITE);
+    const fromPortal = document.documentElement.getAttribute("data-lib"); // 포털 창 안: 포털이 알려 준 design/lib/ 주소 (2026-11-23)
+    if (fromPortal) bases.push(fromPortal);
+    else if (/^(https?|file):$/.test(location.protocol)) bases.push(new URL("../lib/", location.href).href);
+    if (!bases.includes(LIB_SITE)) bases.push(LIB_SITE);
     loaded[file] = bases.reduce((p, base) => p.then(() => ready() ? null : new Promise(res => {
       const s = document.createElement("script"); s.src = base + file; s.onload = s.onerror = () => res(); document.head.appendChild(s);
-    })), Promise.resolve()).then(() => { if (!ready()) { delete loaded[file]; throw new Error("변환 프로그램을 불러오지 못했어요. 인터넷 연결을 확인해 주세요."); } });
+    })), Promise.resolve()).then(() => { if (!ready()) { delete loaded[file]; throw new Error(failMsg || "변환 프로그램을 불러오지 못했어요. 새로고침해 주세요."); } });
     return loaded[file];
   }
   const needKD = () => loadLib("kordoc-hwp.js", () => !!window.KD);
-  const needXLSX = () => loadLib("xlsx.full.min.js", () => !!window.XLSX);
+  const needXLSX = () => loadLib("xlsx.full.min.js", () => !!window.XLSX, "엑셀 기능을 불러오지 못했어요. 새로고침해 주세요.");
 
   const extOf = n => (n.match(/\.([^.]+)$/) || ["", ""])[1].toLowerCase();
   const baseOf = n => n.replace(/\.[^.]+$/, "");

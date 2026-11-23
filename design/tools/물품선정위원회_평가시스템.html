@@ -658,7 +658,8 @@ textarea{width:100%;resize:vertical;line-height:1.5}
 }
 
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="../lib/xlsx.full.min.js"></script>
+<script>/* 라이브러리는 사이트 안 design/lib/에서 받음(2026-11-23, 외부 CDN 없이). 못 받으면 안내 한 줄 */(function(n){if(n.every(function(k){return window[k]}))return;function s(){if(document.getElementById('lib-fail'))return;var d=document.createElement('div');d.id='lib-fail';d.className='no-print';d.setAttribute('role','alert');d.textContent='엑셀 기능을 불러오지 못했어요. 새로고침해 주세요.';d.style.cssText='position:sticky;top:0;z-index:9999;padding:10px 16px;background:#fdecea;color:#b42318;font-weight:700;text-align:center;border-bottom:1px solid #f5c2bd';document.body.insertBefore(d,document.body.firstChild)}document.body?s():document.addEventListener('DOMContentLoaded',s)})(["XLSX"]);</script>
 <style>
 .xl-zone{margin-top:18px;padding-top:16px;border-top:1px solid #e6edf5}
 .xl-zone .xl-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
@@ -2190,7 +2191,7 @@ function xlItems(kind){const out=[];state.fieldGroups.forEach(fg=>{if((kind==='s
 const xlHead=it=>`${it.item.name} (${it.item.points}점)`;
 function xlSheet(aoa,widths){const ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=widths.map(w=>({wch:w}));return ws;}
 function downloadXlTemplate(){
-  if(typeof XLSX==='undefined'){alert('엑셀 기능을 불러오지 못했어요. 인터넷 연결을 확인한 뒤 새로고침해 주세요.');return;}
+  if(typeof XLSX==='undefined'){alert('엑셀 기능을 불러오지 못했어요. 새로고침해 주세요.');return;}
   saveAllScores();
   const obj=xlItems('obj'), subj=xlItems('subj');
   const cos=state.companies.length?state.companies:[{name:'',product:''}];
@@ -2221,7 +2222,7 @@ function xlHeadRow(rows,alts){for(let r=0;r<Math.min(rows.length,10);r++)if(xlCo
 const xlNum=v=>{const n=parseFloat(String(v).replace(/[^0-9.\-]/g,''));return isNaN(n)?null:n;};
 function importXl(file){
   if(!file)return;
-  if(typeof XLSX==='undefined'){alert('엑셀 기능을 불러오지 못했어요. 인터넷 연결을 확인한 뒤 새로고침해 주세요.');return;}
+  if(typeof XLSX==='undefined'){alert('엑셀 기능을 불러오지 못했어요. 새로고침해 주세요.');return;}
   const rd=new FileReader();
   rd.onload=ev=>{
     try{

@@ -1,0 +1,27 @@
+/* 비품인수인계서 배치 (Claude, 2026-10-27 / 10-28 한 줄로): PC는 버튼줄(인쇄·엑셀·저장·불러오기·서명 완료)을 맨 위 줄로 올려 로고·문의와 한 줄(반출입대장과 같은 방식), 종이는 공통 폭 */
+@media screen{
+ body>.wrap{max-width:none!important;margin:0!important;padding:var(--tl-gap) var(--tl-gut) 48px!important}
+}
+@media screen and (min-width:701px){
+ .tl-merge~.wrap{padding-top:calc(var(--tl-head) + var(--tl-gap))!important}
+ .tl-merge~.wrap .doc>.toolbar{position:absolute!important;top:0;left:0;right:0;z-index:5;height:var(--tl-head);box-sizing:border-box;margin:0!important;padding:0 var(--tl-hr) 0 var(--tl-hl)!important;display:flex!important;align-items:center;flex-wrap:nowrap;gap:8px;
+  background:var(--tc-head,#eef5fd)!important;border:0!important;border-bottom:1px solid var(--tc-border,#d5dfeb)!important;border-radius:0!important;box-shadow:none!important}
+ .tl-merge~.wrap .doc>.toolbar .stat{margin-left:auto}
+}
+@media screen and (min-width:701px){
+ .tl-merge~.wrap .doc>.toolbar>*{white-space:nowrap;flex:none}
+}
+@media screen and (min-width:701px) and (max-width:1100px){
+ .tl-merge~.wrap .doc>.toolbar{gap:6px}
+ .tl-merge~.wrap .doc>.toolbar>:is(button,label){padding:7px 10px!important;font-size:12.5px!important}
+ .tl-merge~.wrap .doc>.toolbar .stat{padding:5px 9px!important;font-size:12px!important}
+}
+/* 2026-11-20 버튼 이름이 길어져(작업 저장·작업 불러오기 등) 701~1040px에서는 맨 위 줄에 다 안 들어감 → 그 폭에서는 버튼줄을 문서 안 제자리(학교명 아래)로 내림. 1041px부터는 예전처럼 맨 위 한 줄 */
+@media screen and (min-width:701px) and (max-width:1040px){.tl-merge~.wrap .doc>.toolbar{position:static!important;height:auto!important;padding:0!important;margin:0 0 var(--tl-gap)!important;background:none!important;border:0!important;flex-wrap:wrap!important}}
+
+@media screen and (max-width:700px){
+ .wrap .doc{padding:var(--tl-pad)}
+ .doc .meta :is(input,.left){max-width:100%}
+ .doc .table-scroll{overflow-x:auto}
+ .doc .table-scroll table{width:100%;min-width:680px}
+}
