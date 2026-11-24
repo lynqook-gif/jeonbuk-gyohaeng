@@ -99,6 +99,12 @@ document.querySelectorAll('footer.credit,footer#foot>.wrap').forEach(el=>{el.cla
  const colors=[['#287de6','#e8f2ff'],['#159b78','#e3f7ef'],['#e98a15','#fff1df'],['#8654d5','#f0e9ff']];
  function cards(items){const box=document.createElement('div');box.className='photo-home-cards';items.forEach(([title,desc,symbol,action],i)=>{const b=document.createElement('button');b.type='button';b.className='photo-home-card';b.style.setProperty('--photo-color',colors[i%4][0]);b.style.setProperty('--photo-tint',colors[i%4][1]);b.innerHTML='<span class="photo-home-icon">'+icon(symbol)+'</span><strong>'+title+'</strong><small>'+desc+'</small><span class="photo-home-arrow">→</span>';b.addEventListener('click',action);box.append(b)});return box}
  if(site==='portal'){
+  const hero=document.getElementById('design-hero');
+  if(hero){
+   const bannerHelp=help.cloneNode(true);
+   bannerHelp.className='portal-banner-contact';
+   hero.append(bannerHelp);
+  }
   const h=document.querySelector('#design-hero h1');if(h)h.innerHTML='<img class="winter-lettering" src="design/portal-winter-lettering.webp" alt="전북교행길라잡이">';
   const p=document.querySelector('#design-hero .desk-copy>p');if(p)p.textContent='계산기 · 도구 · 실무 지침을 쉽고 빠르게 찾아보세요.';
   const names=['업무 계산기','도구함','실무 지침','자주 쓰는 사이트'];document.querySelectorAll('#menu .menu2 .mcard .t').forEach((el,i)=>el.textContent=names[i]);
@@ -213,6 +219,13 @@ document.querySelectorAll('footer.credit,footer#foot>.wrap').forEach(el=>{el.cla
   closeButton.textContent = '메뉴 닫기 ×';
   rail.prepend(closeButton);
   bar.prepend(toggle);
+  const hero = document.querySelector('body.brand-portal #design-hero');
+  const bannerToggle = hero ? toggle.cloneNode(true) : null;
+  if (bannerToggle) {
+    bannerToggle.classList.add('portal-banner-menu');
+    hero.append(bannerToggle);
+  }
+  const toggles = bannerToggle ? [toggle, bannerToggle] : [toggle];
   rail.after(backdrop);
   const roles = bar.querySelector('.roleswitch');
   const roleAnchor = roles ? document.createComment('desktop role controls') : null;
@@ -221,10 +234,12 @@ document.querySelectorAll('footer.credit,footer#foot>.wrap').forEach(el=>{el.cla
   function setOpen(value, restoreFocus = false) {
     opened = mobile.matches && value;
     document.body.classList.toggle('mobile-menu-open', opened);
-    toggle.setAttribute('aria-expanded', String(opened));
-    toggle.setAttribute('aria-label', opened ? '메뉴 닫기' : '메뉴 열기');
+    toggles.forEach(button => {
+      button.setAttribute('aria-expanded', String(opened));
+      button.setAttribute('aria-label', opened ? '메뉴 닫기' : '메뉴 열기');
+    });
     rail.inert = mobile.matches && !opened;
-    if (restoreFocus) toggle.focus();
+    if (restoreFocus) toggles.find(button => button.getClientRects().length)?.focus();
     if (opened) closeButton.focus();
   }
   function syncViewport() {
@@ -234,7 +249,7 @@ document.querySelectorAll('footer.credit,footer#foot>.wrap').forEach(el=>{el.cla
       else roleAnchor.after(roles);
     }
   }
-  toggle.addEventListener('click', () => setOpen(!opened));
+  toggles.forEach(button => button.addEventListener('click', () => setOpen(!opened)));
   closeButton.addEventListener('click', () => setOpen(false, true));
   backdrop.addEventListener('click', () => setOpen(false, true));
   rail.addEventListener('click', event => {

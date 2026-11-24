@@ -196,9 +196,9 @@
   align-items:center;
   gap:14px 24px;
   height:auto!important;
-  min-height:245px!important;
+  min-height:312px!important;
   padding:24px clamp(24px,8vw,125px)!important;
-  background:radial-gradient(ellipse at 78% 100%,#466d92 0%,transparent 55%),linear-gradient(115deg,#182f50,#1e3a5f 60%,#31587e)!important;
+  background:#1e3a5f url("portal-winter-cocoa-room.webp") 78% 35% / cover no-repeat!important;
  }
  body.brand-portal #design-hero .desk-copy {
   grid-area:copy;
@@ -218,8 +218,7 @@
   inset:auto!important;
   width:clamp(150px,20vw,250px)!important;
   height:224px!important;
-  background:url("portal-cocoa.webp") center/contain no-repeat!important;
-  filter:drop-shadow(0 6px 12px #0c213b80)!important;
+  visibility:hidden;
  }
  body.brand-portal #design-hero .hsearch {
   grid-area:search;
@@ -229,25 +228,25 @@
   min-width:0;
   margin:0!important;
  }
- body.brand-portal #design-hero::before,
- body.brand-portal #design-hero::after {
-  content:"";
-  display:block!important;
+ body.brand-portal:not(.in-page)>.brand-topbar>a {display:none}
+ body.brand-portal #design-hero .portal-banner-contact {
   position:absolute;
-  inset:-144px 0 0;
-  z-index:0;
-  pointer-events:none;
-  background:
-   radial-gradient(circle at 19px 31px,#ecf6ff80 1px,transparent 2px),
-   radial-gradient(circle at 85px 87px,#fff9 1.3px,transparent 2.5px);
-  background-size:144px 144px;
-  mask-image:linear-gradient(90deg,transparent 12%,#0008 54%,#000);
-  animation:portal-snow 19s linear infinite;
+  z-index:3;
+  top:12px;
+  right:12px;
+  padding:8px 11px;
+  border:1px solid #f2deb88c;
+  border-radius:8px;
+  background:#17293eea;
+  color:#fff7e8;
+  font-size:12px;
+  font-weight:700;
+  text-decoration:none;
  }
- body.brand-portal #design-hero::after {
-  background-position:54px 29px;
-  opacity:.65;
-  animation-duration:29s;
+ body.brand-portal #design-hero .portal-banner-contact:hover {background:#264463}
+ body.brand-portal #design-hero .portal-banner-contact:focus-visible {outline:2px solid #fff7e8;outline-offset:2px}
+ @media(min-width:801px) {
+  body.brand-portal:not(.in-page)>.brand-topbar {display:none!important}
  }
  body.brand-portal #menu .desk-related-sites>div {
   display:grid;
@@ -275,11 +274,6 @@
  body.brand-portal #design-hero .winter-lettering {display:block;width:min(100%,420px);height:auto}
 
 }
-@keyframes portal-snow {to {transform:translateY(144px)}}
-@media (prefers-reduced-motion:reduce) {
- body.brand-portal #design-hero::before,
- body.brand-portal #design-hero::after {animation:none}
-}
 @media screen and (max-width:700px) {
  body.brand-portal #design-hero {
   grid-template-columns:minmax(0,1fr) clamp(85px,28vw,140px);
@@ -287,6 +281,8 @@
   gap:12px 8px;
   padding:16px!important;
   min-height:0!important;
+  background-size:auto max(100%, 236px)!important;
+  background-position:68% center!important;
  }
  body.brand-portal #design-hero h1 {font-size:clamp(20px,6.1vw,29px)!important}
  body.brand-portal #design-hero .desk-mascot {width:100%!important;height:143px!important}
@@ -305,3 +301,24 @@
 }
 @media screen and (max-width:700px){#toolModal .tmodal-bar{height:64px}#toolModal .tmodal-bar button{height:35px;padding:0 10px!important;font-size:11px!important}}
 @media screen and (max-width:600px){#toolModal .tmodal-bar{padding:0 16px!important}}
+
+/* Mobile portal home uses the banner for its menu button. */
+@media screen and (max-width:800px) {
+ body.brand-portal.desk-layout:not(.in-page) {padding-top:0!important}
+ body.brand-portal.desk-layout:not(.in-page)>.brand-topbar {display:none!important}
+ body.brand-portal:not(.in-page)>.desk-rail,
+ body.brand-portal:not(.in-page)>.mobile-menu-backdrop {top:0!important}
+ body.brand-portal #design-hero {padding-top:52px!important}
+ body.brand-portal #design-hero .portal-banner-menu {
+  position:absolute;
+  z-index:3;
+  top:12px;
+  left:12px;
+  border:1px solid #f2deb88c;
+  border-radius:8px;
+  background:#17293eea;
+  color:#fff7e8;
+ }
+ body.brand-portal #design-hero .portal-banner-menu:hover {background:#264463}
+ body.brand-portal #design-hero .portal-banner-menu:focus-visible {outline:2px solid #fff7e8;outline-offset:2px}
+}
