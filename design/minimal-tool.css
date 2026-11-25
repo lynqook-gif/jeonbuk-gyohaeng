@@ -1,0 +1,124 @@
+/* Shared tool appearance. Keep this entire sheet out of print and PDF media. */
+@media screen {
+  @font-face {
+    font-family:Pretendard;
+    src:url(PretendardVariable.woff2) format("woff2");
+    font-weight:100 900;
+    font-display:swap;
+  }
+  html:root {
+    --tc-primary:#1e3a5f;
+    --tc-hover:#284c75;
+    --tc-head:#f3f7fc;
+    --tc-page:#fff;
+    --tc-surface:#fff;
+    --tc-border:#dde5ee;
+    --tc-ink:#13243a;
+    --tc-text:#243a54;
+    --tc-muted:#526278;
+    --tc-tab:#edf5fd;
+    --tc-tab-ink:#246cb3;
+    --tc-radius:15px;
+    --tc-shadow:none;
+    --tool-font:Pretendard,"Malgun Gothic",sans-serif;
+    --tool-focus:#398fe1;
+    background:#fff;
+  }
+  html[data-in-portal]{--tool-font:PortalPretendard,"Malgun Gothic",sans-serif;--tl-close:0px}
+  html[data-in-portal] .brand-tool-strip{display:none!important}
+  html body,html :is(button,input,select,textarea) {
+    font-family:var(--tool-font)!important;
+  }
+  html body {
+    background:white!important;
+    color:var(--tc-text)!important;
+  }
+  html :is(body>header,header.site-header,.site-header,body>.header,body>.toolbar,body>.wrap>header) {
+    background:white!important;
+    border-bottom:1px solid var(--tc-border)!important;
+    box-shadow:none!important;
+    color:var(--tc-ink)!important;
+  }
+  html :is(h1,h2,h3,.card-title,.section-title) {
+    color:var(--tc-ink)!important;
+    letter-spacing:-.035em;
+  }
+  html h1:not(:is(.paper,.print-page,.a4) *){font-size:clamp(25px,3vw,34px)!important;line-height:1.2}
+  html h2:not(:is(.paper,.print-page,.a4) *){font-size:clamp(19px,2vw,23px)!important;line-height:1.25}
+  html h3:not(:is(.paper,.print-page,.a4) *){font-size:17px!important;line-height:1.3}
+  html :is(.card,.input-card,.setting-card,.panel,.sec.guide,.guide,.modal-content,.drop,.drop-zone) {
+    border-color:var(--tc-border)!important;
+    border-radius:var(--tc-radius)!important;
+    box-shadow:none!important;
+  }
+  html :is(button,.btn,.header-btn,.calc-btn,.btn-line,.btn-navy) {
+    border-radius:999px!important;
+    font-weight:700;
+  }
+  html :is(button,.btn,input,select,textarea):focus-visible {
+    outline:2px solid var(--tool-focus);
+    outline-offset:2px;
+  }
+  html :is(input:not([type=checkbox],[type=radio],[type=range],[type=color],[type=hidden]),select,textarea) {
+    border-color:var(--tc-border)!important;
+    border-radius:8px!important;
+    color:var(--tc-ink)!important;
+  }
+  html body :is(thead th,thead td) {
+    background:var(--tc-head)!important;
+    color:var(--tc-ink)!important;
+    border-color:var(--tc-border)!important;
+    font-weight:700;
+  }
+  html #mainTable thead th {
+    background:#f2f5f8!important;
+    color:var(--tc-ink)!important;
+  }
+  html #mainTable thead :is(.th-avg,.th-quant) {background:#edf4fb!important}
+  html #mainTable thead :is(.th-total,.th-result) {background:#e7eff8!important}
+  html body :is(#mainTable .btn-danger,button.delbtn,button.xbtn,button.btn-delete,
+    button[onclick*="delRow("],button[onclick*="removeFieldGroup("],
+    button[onclick*="removeCompany("],button[onclick*="removeEvaluator("],
+    button[title*="삭제"],button[title="빼기"],button[aria-label*="빼기"]) {
+    background:#fff!important;
+    border:1px solid var(--tc-border)!important;
+    color:#526278!important;
+    width:auto;
+    height:auto;
+    min-width:28px;
+    min-height:28px;
+    padding:3px 8px!important;
+    font-size:12px!important;
+    line-height:1.25;
+  }
+  html body :is(#mainTable .btn-danger,button.delbtn,button.xbtn,button.btn-delete,
+    button[onclick*="delRow("],button[onclick*="removeFieldGroup("],
+    button[onclick*="removeCompany("],button[onclick*="removeEvaluator("],
+    button[title*="삭제"],button[title="빼기"],button[aria-label*="빼기"]):hover {
+    background:#f2f5f8!important;
+    color:var(--tc-ink)!important;
+  }
+  html :is(.table-wrap,.tbl-wrap,.table-scroll,.scroll-x,.table-box) {
+    max-width:100%;
+    overflow-x:auto;
+  }
+  .brand-tool-strip .brand-tool-character{display:none!important}
+  .brand-tool-strip > .standalone-tool-home {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:44px;
+    padding:4px 12px;
+    border:1px solid var(--tc-border);
+    border-radius:999px;
+    background:white;
+    color:var(--tc-primary)!important;
+    font-size:13px;
+    font-weight:700;
+    text-decoration:none;
+  }
+  .brand-tool-strip > .standalone-tool-home:hover{background:var(--tc-head)}
+  .brand-tool-strip > .standalone-tool-home:focus-visible{outline:2px solid var(--tool-focus);outline-offset:2px}
+  .brand-tool-strip > img{filter:saturate(.68)}
+}
+@media print{.standalone-tool-home{display:none!important}}
